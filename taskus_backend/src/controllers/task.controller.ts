@@ -1,0 +1,196 @@
+// src/controllers/task.controller.ts
+import { Response } from 'express';
+import prisma from '../prisma';
+import { AuthRequest } from '../middleware/auth.middleware';
+import { isProjectMember } from '../utils/checkTaskAuth';
+
+// GET /task/:taskId
+export const getTask = async (req: AuthRequest, res: Response) => {
+    const { taskId } = req.params as { taskId: string };
+    try {
+        const task = await prisma.task.findUnique({ where: { id: taskId } });
+        if (!task) {
+            res.status(404).json({ error: 'Task not found' });
+            return;
+        }
+        if (task.responsibleId !== req.user!.userId && req.user!.role !== 'admin') {
+            res.status(403).json({ error: 'Unauthorized to access this task: This user is not responsible for it nor an admin' });
+            return;
+        }
+        res.json(task);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// PUT /task/status/:taskId
+export const toggleStatus = async (req: AuthRequest, res: Response) => {
+    const { taskId } = req.params as { taskId: string };
+    const { newStatus } = req.body;
+    const validStatuses = ['Pending', 'InProgress', 'Done'];
+    if (!newStatus) {
+        res.status(400).json({ error: 'newStatus is required' });
+        return;
+    }
+
+    if (!validStatuses.includes(newStatus)) {
+        res.status(400).json({ error: 'newStatus must be Pending, InProgress or Done' });
+        return;
+    }
+    try {
+        const task = await prisma.task.findUnique({ where: { id: taskId } });
+        if (!task) {
+            res.status(404).json({ error: 'Task not found' });
+            return;
+        }
+        if (task.responsibleId !== req.user!.userId && req.user!.role !== 'admin') {
+            res.status(403).json({ error: `Unauthorized to toggle this task's status: This user is not responsible for it nor an admin` });
+            return;
+        }
+        const updated = await prisma.task.update({
+            where: { id: taskId },
+            data: {
+                status: newStatus,
+                completedAt: newStatus === 'Done' ? new Date() : null
+            } 
+        });
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// GET /task/byUser
+export const getTasksByUser = async (req: AuthRequest, res: Response) => {
+    const userId = req.user!.userId;
+    try {
+        const tasks = await prisma.task.findMany({ where: { responsibleId: userId } });
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// GET /task/byTaskGroup/:taskGroupId
+export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
+  const { taskGroupId } = req.params as { taskGroupId: string };
+  try {
+    const taskGroup = await prisma.taskGroup.findUnique({ where: { id: taskGroupId } }); //fetch task group first to get projectId
+    if (!taskGroup) {
+      res.status(404).json({ error: 'Task group not found' });
+      return;
+    }
+    
+    const member = await isProjectMember(req.user!.userId, taskGroup.projectId);//then check if user belongs to the project that contains the task group
+      if (!member) {
+        if (req.user!.role !== 'admin') {
+          res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
+          return;
+        }
+        // verify the project belongs to the admin's organisation
+        const project = await prisma.project.findUnique({ where: { id: taskGroup.projectId } });
+        if (!project || project.organisationId !== req.user!.organisationId) {
+          res.status(403).json({ error: 'Unauthorized: This user is an admin, but not from this organisation' });
+          return;
+        }
+      }
+      
+    const tasks = await prisma.task.findMany({ where: { taskGroupId } });
+    res.json(tasks);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// GET /task/byProject/:projectId (admin)
+export const getTasksByProject = async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params as { projectId: string };
+    try {
+        
+        const member = await isProjectMember(req.user!.userId, projectId);//then check if user belongs to the project that contains the task group
+        if (!member) {
+            if (req.user!.role !== 'admin') {
+                res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
+            return;
+            }
+            // verify the project belongs to the admin's organisation
+            const project = await prisma.project.findUnique({ where: { id: projectId } });
+            if (!project || project.organisationId !== req.user!.organisationId) {
+                res.status(403).json({ error: 'Unauthorized: This user is an admin, but not from this organisation' });
+                return;
+            }
+        }
+        const taskGroups = await prisma.taskGroup.findMany({
+            where: { projectId },
+            include: { tasks: true }
+        });
+        const tasks = taskGroups.flatMap(tg => tg.tasks);
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// POST /task (admin)
+export const createTask = async (req: AuthRequest, res: Response) => {
+    const { title, description, responsibleId, taskGroupId } = req.body;
+    if (!title || !responsibleId || !taskGroupId) {
+        res.status(400).json({ error: 'title, responsibleId and taskGroupId are required' });
+        return;
+    }
+    try {
+        const task = await prisma.task.create({
+            data: {
+                title,
+                description,
+                responsibleId,
+                taskGroupId,
+                status: 'Pending'
+            }
+        });
+    res.status(201).json(task);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// DELETE /task/:taskId (admin)
+export const deleteTask = async (req: AuthRequest, res: Response) => {
+    const { taskId } = req.params as { taskId: string };
+    try {
+        const task = await prisma.task.findUnique({ where: { id: taskId } });
+        if (!task) {
+            res.status(404).json({ error: 'Task not found' });
+            return;
+        }
+        await prisma.task.delete({ where: { id: taskId } });
+        res.json({ message: 'Task deleted successfully' });
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// PUT /task/:taskId (admin)
+export const changeResponsible = async (req: AuthRequest, res: Response) => {
+    const { taskId } = req.params as { taskId: string };
+    const { newResponsibleId } = req.body;
+    if (!newResponsibleId) {
+        res.status(400).json({ error: 'newResponsibleId is required' });
+        return;
+    }
+    try {
+        const task = await prisma.task.findUnique({ where: { id: taskId } });
+        if (!task) {
+            res.status(404).json({ error: 'Task not found' });
+            return;
+        }
+        const updated = await prisma.task.update({
+            where: { id: taskId },
+            data: { responsibleId: newResponsibleId }
+        });
+        res.json(updated);
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};

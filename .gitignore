@@ -1,0 +1,35 @@
+# Dependencies
+node_modules/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# Build outputs
+dist/
+build/
+
+# Angular specific
+taskus_frontend_angular/.angular/
+taskus_frontend_angular/dist/
+
+# React specific
+taskus_frontend_react/dist/
+taskus_frontend_react/build/
+
+# Prisma
+taskus_backend/prisma/migrations/dev/
+
+# Logs
+logs/
+*.log
+npm-debug.log*
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
