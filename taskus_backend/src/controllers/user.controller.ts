@@ -1,4 +1,3 @@
-// src/controllers/user.controller.ts
 import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
@@ -96,8 +95,8 @@ export const requestAccount = async (req: Request, res: Response) => {
 // PUT /user/updateInfo
 export const editInformation = async (req: AuthRequest, res: Response) => {
     const { newUsername, newEmail, newPic } = req.body;
-    if (!newUsername && !newEmail) {
-        res.status(400).json({ error: 'newUsername and/or newEmail are required' });
+    if (!newUsername && !newEmail && !newPic) {
+        res.status(400).json({ error: 'At least one field is required' });
         return;
     } 
     const userId = req.user!.userId;
@@ -183,12 +182,7 @@ export const uploadUserPic = async (req: AuthRequest, res: Response) => {
     const fileName = `${userId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
     try {
         const url = await uploadImage('user-pics', fileName, req.file.buffer, req.file.mimetype);
-        const updated = await prisma.user.update({
-            where: { id: userId },
-            data: { pic: url },
-        select: { id: true, username: true, email: true, role: true, pic: true }
-        });
-        res.json(updated);
+        res.json({url});
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -308,7 +302,16 @@ export const rejectUserRequest = async (req: AuthRequest, res: Response) => {
 // DELETE /user/:userId (admin)
 export const removeUserFromOrganisation = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params as { userId: string };
+    const userToBeRemoved = await prisma.user.findUnique({ where: { id: userId } });
     try {
+        if (!userToBeRemoved) {
+            res.status(404).json({ error: 'User not found' });
+            return;
+        }
+        if (userToBeRemoved.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized: This user does not belong to your organisation' });
+            return;
+        }
         await prisma.user.delete({ where: { id: userId } });
         res.json({ message: 'User removed successfully' });
     } catch (error) {
@@ -320,8 +323,17 @@ export const removeUserFromOrganisation = async (req: AuthRequest, res: Response
 export const updateRole = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params as { userId: string };
     const { newRole } = req.body;
-        if (!newRole) {
+    if (!newRole) {
         res.status(400).json({ error: 'newRole is required' });
+        return;
+    }
+    if (newRole !== 'admin' && newRole !== 'member') {
+        res.status(400).json({ error: 'newRole must be either admin or member' });
+        return;
+    }
+    const userToBeUpdated = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userToBeUpdated) {
+        res.status(404).json({ error: 'User not found' });
         return;
     }
     try {

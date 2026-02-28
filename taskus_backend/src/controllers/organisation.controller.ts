@@ -65,7 +65,6 @@ export const createOrganisation = async (req: Request, res: Response) => {
     });
   } catch (error){
     res.status(500).json({ error: 'Internal server error' });
-    console.log(error);
   }
 };
 
@@ -73,11 +72,13 @@ export const createOrganisation = async (req: Request, res: Response) => {
 export const getOrganisation = async (req: AuthRequest, res: Response) => {
   const { organisationId } = req.params as { organisationId: string };
   try {
-    const organisation = await prisma.organisation.findUnique({
-      where: { id: organisationId }
-    });
+    const organisation = await prisma.organisation.findUnique({where: { id: organisationId }});
     if (!organisation) {
       res.status(404).json({ error: 'Organisation not found' });
+      return;
+    }
+    if (organisation.id !== req.user!.organisationId) {
+      res.status(403).json({ error: 'Unauthorized: This user does not belong to this organisation' });
       return;
     }
     res.json(organisation);
@@ -89,6 +90,10 @@ export const getOrganisation = async (req: AuthRequest, res: Response) => {
 // PUT /organisation
 export const updateOrganisation = async (req: AuthRequest, res: Response) => {
   const { newName, newDescription, newPic } = req.body;
+  if (!newName && !newDescription && !newPic) {
+        res.status(400).json({ error: 'At least one field is required' });
+        return;
+    } 
   const organisationId = req.user!.organisationId;
   try {
     const updated = await prisma.organisation.update({
@@ -115,11 +120,7 @@ export const uploadOrganisationPic = async (req: AuthRequest, res: Response) => 
   const fileName = `${organisationId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
   try {
     const url = await uploadImage('organisation-pics', fileName, req.file.buffer, req.file.mimetype);
-    const updated = await prisma.organisation.update({
-      where: { id: organisationId },
-      data: { pic: url }
-    });
-    res.json(updated);
+    res.json({url});
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }

@@ -8,26 +8,23 @@ import { uploadImage } from '../utils/blobStorage';
 export const getProject = async (req: AuthRequest, res: Response) => {
   const { projectId } = req.params as { projectId: string };
   try {
-
-      const member = await isProjectMember(req.user!.userId, projectId);
-      if (!member) {
-        if (req.user!.role !== 'admin') {
-          res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
-          return;
-        }
-        // verify the project belongs to the admin's organisation
-        const project = await prisma.project.findUnique({ where: { id: projectId } });
-        if (!project || project.organisationId !== req.user!.organisationId) {
-          res.status(403).json({ error: 'Unauthorized: This user is an admin, but not from this organisation' });
-          return;
-        }
-      }
-
-      const project = await prisma.project.findUnique({ where: { id: projectId } });
-      if (!project) {
-        res.status(404).json({ error: 'Project not found' });
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    const member = await isProjectMember(req.user!.userId, projectId);
+    if (!member) {
+      if (req.user!.role !== 'admin') {
+        res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
         return;
       }
+      // verify the project belongs to the admin's organisation
+      if (!project || project.organisationId !== req.user!.organisationId) {
+        res.status(403).json({ error: 'Unauthorized: This user is an admin, but not from this organisation' });
+        return;
+      }
+    }
       res.json(project);
     } catch (error) {
       res.status(500).json({ error: 'Internal server error' });
@@ -65,16 +62,16 @@ export const createProject = async (req: AuthRequest, res: Response) => {
   const { title, description, pic } = req.body;
   const organisationId = req.user!.organisationId;
   const userId = req.user!.userId;
-  const organisation = await prisma.organisation.findUnique({ where: { id: organisationId } });
-    if (!organisation) {
-      res.status(404).json({ error: 'Organisation not found' });
-      return;
-    }
   if (!title) {
     res.status(400).json({ error: 'title is required' });
     return;
   }
   try {
+    const organisation = await prisma.organisation.findUnique({ where: { id: organisationId } });
+    if (!organisation) {
+      res.status(404).json({ error: 'Organisation not found' });
+      return;
+    }
     const project = await prisma.$transaction(async (tx) => { //transaction: project gets created, projectmember relation gets created (creator is now part of project)
       const newProject = await tx.project.create({
         data: { title, description, pic, organisationId }
@@ -96,6 +93,15 @@ export const createProject = async (req: AuthRequest, res: Response) => {
 export const deleteProject = async (req: AuthRequest, res: Response) => {
   const { projectId } = req.params as { projectId: string };
   try {
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    if (project.organisationId !== req.user!.organisationId) {
+      res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
+      return;
+    }
     await prisma.project.delete({ where: { id: projectId } });
     res.json({ message: 'Project deleted successfully' });
   } catch {
@@ -104,10 +110,27 @@ export const deleteProject = async (req: AuthRequest, res: Response) => {
 };
 
 // POST /project/:projectId/member/:userId (admin)
-// TODO: check if admin adding user belongs to the same organisation as the project, AND if the user being added belongs to the same organisation as well 
 export const addMember = async (req: AuthRequest, res: Response) => {
   const { projectId, userId } = req.params as { projectId: string; userId: string };
   try {
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    if (project.organisationId !== req.user!.organisationId) {
+      res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
+      return;
+    }
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    if (user.organisationId !== req.user!.organisationId) {
+      res.status(403).json({ error: 'Unauthorized: This user does not belong to your organisation' });
+      return;
+    }
     const existing = await prisma.projectMember.findUnique({
       where: { userId_projectId: { userId, projectId } }
     });
@@ -115,10 +138,9 @@ export const addMember = async (req: AuthRequest, res: Response) => {
       res.status(409).json({ error: 'User is already a member of this project' });
       return;
     }
-
     await prisma.projectMember.create({ data: { userId, projectId } });
     res.status(201).json({ message: 'Member added successfully' });
-  } catch (error) {
+  } catch {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -127,11 +149,25 @@ export const addMember = async (req: AuthRequest, res: Response) => {
 export const removeMember = async (req: AuthRequest, res: Response) => {
   const { projectId, userId } = req.params as { projectId: string; userId: string };
   try {
+    const user = await prisma.user.findUnique({ where: { id: userId } });
+    if (!user) {
+      res.status(404).json({ error: 'User not found' });
+      return;
+    }
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    if (project.organisationId !== req.user!.organisationId) {
+      res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
+      return;
+    }
     await prisma.projectMember.delete({
       where: { userId_projectId: { userId, projectId } }
     });
     res.json({ message: 'Member removed successfully' });
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -142,20 +178,12 @@ export const uploadProjectPic = async (req: AuthRequest, res: Response) => {
     res.status(400).json({ error: 'No file provided' });
     return;
   }
-
   const { projectId } = req.params as { projectId: string };
   const fileName = `${projectId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
-
   try {
     const url = await uploadImage('project-pics', fileName, req.file.buffer, req.file.mimetype);
-
-    const updated = await prisma.project.update({
-      where: { id: projectId },
-      data: { pic: url }
-    });
-
-    res.json(updated);
-  } catch {
+    res.json({url});
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 };

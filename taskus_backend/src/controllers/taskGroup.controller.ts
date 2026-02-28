@@ -17,7 +17,7 @@ export const getTaskGroup = async (req: AuthRequest, res: Response) => {
         if (!member) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
-            return;
+                return;
             }
             // verify the project belongs to the admin's organisation
             const project = await prisma.project.findUnique({ where: { id: taskGroup.projectId } });
@@ -41,7 +41,7 @@ export const getTaskGroupsByProject = async (req: AuthRequest, res: Response) =>
         if (!member) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
-            return;
+                return;
             }
             // verify the project belongs to admin's organisation
             const project = await prisma.project.findUnique({ where: { id: projectId } });
@@ -65,6 +65,15 @@ export const createTaskGroup = async (req: AuthRequest, res: Response) => {
         return;
     }
     try {
+        const project = await prisma.project.findUnique({ where: { id: projectId } });
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+        if (project.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized: This project does not belong to the same organisation as the user' });
+            return;
+        }
         const taskGroup = await prisma.taskGroup.create({
         data: { title, description, projectId }
         });
@@ -78,7 +87,21 @@ export const createTaskGroup = async (req: AuthRequest, res: Response) => {
 export const editTaskGroup = async (req: AuthRequest, res: Response) => {
     const { taskGroupId } = req.params as { taskGroupId: string };
     const { newTitle, newDescription } = req.body;
+    if (!newTitle && !newDescription) {
+        res.status(400).json({ error: 'At least one field is required' });
+        return;
+    }
     try {
+        const taskGroup = await prisma.taskGroup.findUnique({ where: { id: taskGroupId } });
+         if (!taskGroup) {
+            res.status(404).json({ error: 'Task group not found' });
+            return;
+        }
+        const project = await prisma.project.findUnique({ where: { id: taskGroup.projectId } });
+        if (!project || project.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized: This task group does not belong to the same organisation as the user' });
+            return;
+        }
         const updated = await prisma.taskGroup.update({
             where: { id: taskGroupId },
             data: {
@@ -96,6 +119,16 @@ export const editTaskGroup = async (req: AuthRequest, res: Response) => {
 export const deleteTaskGroup = async (req: AuthRequest, res: Response) => {
     const { taskGroupId } = req.params as { taskGroupId: string };
     try {
+        const taskGroup = await prisma.taskGroup.findUnique({ where: { id: taskGroupId } });
+        if (!taskGroup) {
+            res.status(404).json({ error: 'Task group not found' });
+            return;
+        }
+        const project = await prisma.project.findUnique({ where: { id: taskGroup.projectId } });
+        if (!project || project.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized: This task group does not belong to the same organisation as the user' });
+            return;
+        }
         await prisma.taskGroup.delete({ where: { id: taskGroupId } });
         res.json({ message: 'Task group deleted successfully' });
     } catch (error) {

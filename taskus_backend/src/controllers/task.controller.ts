@@ -1,4 +1,3 @@
-// src/controllers/task.controller.ts
 import { Response } from 'express';
 import prisma from '../prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
@@ -15,6 +14,11 @@ export const getTask = async (req: AuthRequest, res: Response) => {
         }
         if (task.responsibleId !== req.user!.userId && req.user!.role !== 'admin') {
             res.status(403).json({ error: 'Unauthorized to access this task: This user is not responsible for it nor an admin' });
+            return;
+        }
+        const responsible = await prisma.user.findUnique({ where: { id: task.responsibleId } });
+        if (responsible?.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized to access this task: This user is not from the same organisation as the responsible person' });
             return;
         }
         res.json(task);
@@ -80,7 +84,6 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
       res.status(404).json({ error: 'Task group not found' });
       return;
     }
-    
     const member = await isProjectMember(req.user!.userId, taskGroup.projectId);//then check if user belongs to the project that contains the task group
       if (!member) {
         if (req.user!.role !== 'admin') {
@@ -94,7 +97,6 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
           return;
         }
       }
-      
     const tasks = await prisma.task.findMany({ where: { taskGroupId } });
     res.json(tasks);
   } catch (error) {
@@ -106,12 +108,11 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
 export const getTasksByProject = async (req: AuthRequest, res: Response) => {
     const { projectId } = req.params as { projectId: string };
     try {
-        
         const member = await isProjectMember(req.user!.userId, projectId);//then check if user belongs to the project that contains the task group
         if (!member) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
-            return;
+                return;
             }
             // verify the project belongs to the admin's organisation
             const project = await prisma.project.findUnique({ where: { id: projectId } });
@@ -139,6 +140,20 @@ export const createTask = async (req: AuthRequest, res: Response) => {
         return;
     }
     try {
+        const responsible = await prisma.user.findUnique({ where: { id: responsibleId } });
+        if (!responsible) {
+            res.status(404).json({ error: 'Responsible user not found' });
+            return;
+        }
+        if (responsible.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized to create this task: This user is not from the same organisation as the responsible person' });
+            return;
+        }
+        const taskGroup = await prisma.taskGroup.findUnique({ where: { id: taskGroupId } });
+        if (!taskGroup) {
+            res.status(404).json({ error: 'Task group for the task to be created in not found' });
+            return;
+        }
         const task = await prisma.task.create({
             data: {
                 title,
@@ -163,6 +178,11 @@ export const deleteTask = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Task not found' });
             return;
         }
+        const responsible = await prisma.user.findUnique({ where: { id: task.responsibleId } });
+        if (responsible?.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized to access this task: This user is not from the same organisation as the responsible person' });
+            return;
+        }
         await prisma.task.delete({ where: { id: taskId } });
         res.json({ message: 'Task deleted successfully' });
     } catch (error) {
@@ -184,13 +204,21 @@ export const changeResponsible = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Task not found' });
             return;
         }
+        const newResponsible = await prisma.user.findUnique({ where: { id: newResponsibleId } });
+        if (!newResponsible) {
+            res.status(404).json({ error: 'New responsible user not found' });
+            return;
+        }
+        if (newResponsible.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized to change responsible: This user is not from the same organisation as the new responsible person' });
+            return;
+        }
         const updated = await prisma.task.update({
             where: { id: taskId },
             data: { responsibleId: newResponsibleId }
         });
         res.json(updated);
     } catch (error) {
-        console.log(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
