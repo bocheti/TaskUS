@@ -7,14 +7,17 @@ import {
   createProject,
   deleteProject,
   addMember,
-  removeMember
+  removeMember,
+  uploadProjectPic
 } from '../controllers/project.controller';
+import upload from '../middleware/upload.middleware';
 
 const router = Router();
 
 router.get('/byUser', authenticate, getProjectsByUser);
 router.get('/all', authenticate, isAdmin, getAllProjects); //(this one is from admin too, needed to put it here to have static routes before dynamic ones)
 router.get('/:projectId', authenticate, getProject);
+router.post('/uploadPic/:projectId', authenticate, isAdmin, upload.single('pic'), uploadProjectPic);
 
 router.post('/', authenticate, isAdmin, createProject);
 router.delete('/:projectId', authenticate, isAdmin, deleteProject);

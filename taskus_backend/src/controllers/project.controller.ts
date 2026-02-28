@@ -2,6 +2,7 @@ import { Response } from 'express';
 import prisma from '../prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { isProjectMember } from '../utils/checkTaskAuth';
+import { uploadImage } from '../utils/blobStorage';
 
 // GET /project/:projectId
 export const getProject = async (req: AuthRequest, res: Response) => {
@@ -130,6 +131,30 @@ export const removeMember = async (req: AuthRequest, res: Response) => {
       where: { userId_projectId: { userId, projectId } }
     });
     res.json({ message: 'Member removed successfully' });
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// POST /project/uploadPic/:projectId (admin)
+export const uploadProjectPic = async (req: AuthRequest, res: Response) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'No file provided' });
+    return;
+  }
+
+  const { projectId } = req.params as { projectId: string };
+  const fileName = `${projectId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
+
+  try {
+    const url = await uploadImage('project-pics', fileName, req.file.buffer, req.file.mimetype);
+
+    const updated = await prisma.project.update({
+      where: { id: projectId },
+      data: { pic: url }
+    });
+
+    res.json(updated);
   } catch {
     res.status(500).json({ error: 'Internal server error' });
   }

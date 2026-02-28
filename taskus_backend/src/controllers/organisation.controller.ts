@@ -3,6 +3,7 @@ import prisma from '../prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
+import { uploadImage } from '../utils/blobStorage';
 
 
 // POST /organisation/create
@@ -62,8 +63,9 @@ export const createOrganisation = async (req: Request, res: Response) => {
         pic: result.user.pic
       }
     });
-  } catch {
+  } catch (error){
     res.status(500).json({ error: 'Internal server error' });
+    console.log(error);
   }
 };
 
@@ -99,6 +101,26 @@ export const updateOrganisation = async (req: AuthRequest, res: Response) => {
     });
     res.json(updated);
   } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// POST /organisation/uploadPic (admin)
+export const uploadOrganisationPic = async (req: AuthRequest, res: Response) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'No file provided' });
+    return;
+  }
+  const organisationId = req.user!.organisationId;
+  const fileName = `${organisationId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
+  try {
+    const url = await uploadImage('organisation-pics', fileName, req.file.buffer, req.file.mimetype);
+    const updated = await prisma.organisation.update({
+      where: { id: organisationId },
+      data: { pic: url }
+    });
+    res.json(updated);
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 };

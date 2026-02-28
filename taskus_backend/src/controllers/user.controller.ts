@@ -4,6 +4,8 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import prisma from '../prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
+import { sendAcceptanceEmail, sendRejectionEmail, sendPasswordResetEmail } from '../utils/email';
+import { uploadImage } from '../utils/blobStorage';
 
 // GET /user/:userId
 export const getUserInfo = async (req: AuthRequest, res: Response) => {
@@ -128,8 +130,68 @@ export const removeUser = async (req: AuthRequest, res: Response) => {
 
 // POST /user/passwordRequest
 export const requestPasswordChange = async (req: AuthRequest, res: Response) => {
-    // TODO: email service
-    res.json({ message: 'Password reset email sent' });
+    const { email } = req.body;
+    if (!email) {
+        res.status(400).json({ error: 'email is required' });
+        return;
+    }
+    try {
+        const user = await prisma.user.findFirst({ where: { email } });
+        res.json({ message: 'If that email exists, a reset link will be sent to it shortly.'}); //dont reveal if the email exists or not
+        if (!user) {
+            return;
+        }
+        const resetToken = jwt.sign({ userId: user.id, purpose: 'password-reset' }, process.env.JWT_SECRET!, { expiresIn: '1h' }); //generates token
+        const resetLink = `https://taskus.app/reset-password?token=${resetToken}`;
+        await sendPasswordResetEmail(email, resetLink);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
+// POST /user/resetPassword
+export const resetPassword = async (req: Request, res: Response) => {
+const { token, newPassword } = req.body;
+    if (!token || !newPassword) {
+        res.status(400).json({ error: 'token and newPassword are required' });
+        return;
+    }
+    try {
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string, purpose: string };
+        if (decoded.purpose !== 'password-reset') {
+            res.status(401).json({ error: 'Invalid token' });
+            return;
+        }
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        await prisma.user.update({
+            where: { id: decoded.userId },
+            data: { password: hashedPassword }
+        });
+        res.json({ message: 'Password reset successfully' });
+    } catch (error) {
+        res.status(401).json({ error: 'Invalid or expired token' });
+    }
+};
+
+// POST /user/uploadPic
+export const uploadUserPic = async (req: AuthRequest, res: Response) => {
+    if (!req.file) {
+        res.status(400).json({ error: 'No file provided' });
+        return;
+    }
+    const userId = req.user!.userId;
+    const fileName = `${userId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
+    try {
+        const url = await uploadImage('user-pics', fileName, req.file.buffer, req.file.mimetype);
+        const updated = await prisma.user.update({
+            where: { id: userId },
+            data: { pic: url },
+        select: { id: true, username: true, email: true, role: true, pic: true }
+        });
+        res.json(updated);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
 };
 
 // POST /user/create (admin)
@@ -196,6 +258,11 @@ export const acceptUserRequest = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Request not found' });
             return;
         }
+        const organisation = await prisma.organisation.findUnique({ where: { id: request.organisationId } });
+        if (!organisation) {
+            res.status(404).json({ error: 'Organisation not found' });
+            return;
+        }
         await prisma.$transaction([
            prisma.user.create({
             data: {
@@ -209,7 +276,7 @@ export const acceptUserRequest = async (req: AuthRequest, res: Response) => {
             }),
             prisma.userRequest.delete({ where: { id: userRequestId } }) 
         ]);
-        
+        await sendAcceptanceEmail(request.email, request.username, organisation.name);
         res.json({ message: 'User accepted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
@@ -218,9 +285,20 @@ export const acceptUserRequest = async (req: AuthRequest, res: Response) => {
 
 // POST /user/:userRequestId/reject (admin)
 export const rejectUserRequest = async (req: AuthRequest, res: Response) => {
-    const { userRequestId } = req.params as { userRequestId: string };
+    const { userRequestId } = req.params as { userRequestId: string };    
     try {
-        await prisma.userRequest.delete({ where: { id: userRequestId } });
+        const request = await prisma.userRequest.findUnique({ where: { id: userRequestId } });
+        if (!request) {
+            res.status(404).json({ error: 'Request not found' });
+            return;
+        }
+        const organisation = await prisma.organisation.findUnique({ where: { id: request.organisationId } });
+        if (!organisation) {
+            res.status(404).json({ error: 'Organisation not found' });
+            return;
+        }
+        await prisma.userRequest.delete({ where: { id : userRequestId } });
+        await sendRejectionEmail(request.email, request.username, organisation.name);
         res.json({ message: 'Request rejected' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
