@@ -39,7 +39,7 @@ model UserRequest {
 model Organisation {
   id          String    @id @default(uuid())
   name        String
-  description String
+  description String?
   pic         String?
   users       User[]
   projects    Project[]
@@ -48,7 +48,7 @@ model Organisation {
 model Project {
   id             String          @id @default(uuid())
   title          String
-  description    String
+  description    String?
   pic            String?
   organisationId String
   organisation   Organisation    @relation(fields: [organisationId], references: [id])
@@ -68,7 +68,7 @@ model ProjectMember {
 model TaskGroup {
   id          String  @id @default(uuid())
   title       String
-  description String
+  description String?
   projectId   String
   project     Project @relation(fields: [projectId], references: [id])
   tasks       Task[]
@@ -77,7 +77,7 @@ model TaskGroup {
 model Task {
   id            String    @id @default(uuid())
   title         String
-  description   String
+  description   String?
   status        Status    @default(Pending)
   completedAt   DateTime?
   taskGroupId   String
