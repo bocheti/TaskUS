@@ -102,9 +102,16 @@ export const deleteProject = async (req: AuthRequest, res: Response) => {
       res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
       return;
     }
-    await prisma.project.delete({ where: { id: projectId } });
+    await prisma.$transaction(async (tx) => {
+      const taskGroups = await tx.taskGroup.findMany({ where: { projectId } });
+      const taskGroupIds = taskGroups.map(tg => tg.id);
+      await tx.task.deleteMany({ where: { taskGroupId: { in: taskGroupIds } } });
+      await tx.taskGroup.deleteMany({ where: { projectId } });
+      await tx.projectMember.deleteMany({ where: { projectId } });
+      await tx.project.delete({ where: { id: projectId } });
+    });
     res.json({ message: 'Project deleted successfully' });
-  } catch {
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 };

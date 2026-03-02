@@ -16,12 +16,16 @@ export const createOrganisation = async (req: Request, res: Response) => {
   }
 
   try {
-    const existingUser = await prisma.user.findFirst({ where: { email } });
-    if (existingUser) {
+    const existingMailUser = await prisma.user.findFirst({ where: { email } });
+    if (existingMailUser) {
       res.status(409).json({ error: 'A user with this email already exists' });
       return;
     }
-
+    const existingUsernameUser = await prisma.user.findFirst({ where: { username } });
+    if (existingUsernameUser) {
+      res.status(409).json({ error: 'A user with this username already exists' });
+      return;
+    }
     const hashedPassword = await bcrypt.hash(password, 10);
 
     const result = await prisma.$transaction(async (tx) => {
@@ -59,6 +63,7 @@ export const createOrganisation = async (req: Request, res: Response) => {
         userId: result.user.id,
         username: result.user.username,
         email: result.user.email,
+        organisationId: result.organisation.id,
         role: result.user.role,
         pic: result.user.pic
       }

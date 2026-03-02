@@ -129,7 +129,10 @@ export const deleteTaskGroup = async (req: AuthRequest, res: Response) => {
             res.status(403).json({ error: 'Unauthorized: This task group does not belong to the same organisation as the user' });
             return;
         }
-        await prisma.taskGroup.delete({ where: { id: taskGroupId } });
+        await prisma.$transaction([
+            prisma.task.deleteMany({ where: { taskGroupId } }),
+            prisma.taskGroup.delete({ where: { id: taskGroupId } })
+        ]);
         res.json({ message: 'Task group deleted successfully' });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });

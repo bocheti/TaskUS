@@ -30,9 +30,7 @@ export const sendRejectionEmail = async (to: string, username: string, organisat
         <p>Unfortunately your request to join <strong>${organisationName}</strong> has been rejected.</p>
         `
     });
-    console.log('sent from', from ,' to: ', to, ' with subject: ', `Your request to join ${organisationName}`);
     } catch (error) {
-        console.error('Error sending rejection email:', error);
         return;
     }
 };
