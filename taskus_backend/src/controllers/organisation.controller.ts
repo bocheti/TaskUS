@@ -76,6 +76,24 @@ export const createOrganisation = async (req: Request, res: Response) => {
   }
 };
 
+// GET /organisation/all
+export const getAllOrganisations = async (req: Request, res: Response) => {
+  try {
+    const organisations = await prisma.organisation.findMany({
+      select: {
+        id: true,
+        name: true
+      },
+      orderBy: {
+        name: 'asc'
+      }
+    });
+    res.json(organisations);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
 // GET /organisation/:organisationId
 export const getOrganisation = async (req: AuthRequest, res: Response) => {
   const { organisationId } = req.params as { organisationId: string };

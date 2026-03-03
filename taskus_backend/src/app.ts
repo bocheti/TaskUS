@@ -23,17 +23,7 @@ if (process.env.NODE_ENV !== 'test') {
     max: 500,
     message: { error: 'Too many requests, please try again later' }
   });
-
-  const sensitiveLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000,
-    max: 20,
-    message: { error: 'Too many requests, please try again later' }
-  });
-
   app.use(generalLimiter);
-  app.use('/user/login', sensitiveLimiter);
-  app.use('/user/passwordRequest', sensitiveLimiter);
-  app.use('/organisation', sensitiveLimiter);
 }
 
 app.use('/user', userRoutes);
