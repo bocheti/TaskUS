@@ -79,6 +79,7 @@ model Task {
   title         String
   description   String?
   status        Status    @default(Pending)
+  createdAt     DateTime @default(now())
   completedAt   DateTime?
   taskGroupId   String
   responsibleId String

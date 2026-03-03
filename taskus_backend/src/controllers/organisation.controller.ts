@@ -14,7 +14,10 @@ export const createOrganisation = async (req: Request, res: Response) => {
     res.status(400).json({ error: 'organisationName, username, email and password are required' });
     return;
   }
-
+  if (password.length < 8) {
+        res.status(400).json({ error: 'Password must be at least 8 characters' });
+        return;
+  }
   try {
     const existingMailUser = await prisma.user.findFirst({ where: { email } });
     if (existingMailUser) {
@@ -54,7 +57,7 @@ export const createOrganisation = async (req: Request, res: Response) => {
     const token = jwt.sign(
       { userId: result.user.id, organisationId: result.organisation.id, role: 'admin' },
       process.env.JWT_SECRET!,
-      { expiresIn: '7d' }
+      { expiresIn: '1d' }
     );
 
     res.status(201).json({

@@ -42,7 +42,7 @@ export const login = async (req: Request, res: Response) => {
             res.status(401).json({ error: 'Invalid credentials' });
             return;
         }
-        const token = jwt.sign({ userId: user.id, organisationId: user.organisationId, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '7d' }); //generates token
+        const token = jwt.sign({ userId: user.id, organisationId: user.organisationId, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '1d' }); //generates token
         res.json({
             authToken: token,
             userInfo: {
@@ -66,6 +66,10 @@ export const requestAccount = async (req: Request, res: Response) => {
         res.status(400).json({ error: 'username, email, password and organisationId are required' });
         return;
     } 
+    if (password.length < 8) {
+        res.status(400).json({ error: 'Password must be at least 8 characters' });
+        return;
+    }
     try {
         //avoid email repetition with existing requests and existing users
         const existingEmailRequest = await prisma.userRequest.findFirst({ where: { email } });
@@ -162,6 +166,10 @@ const { token, newPassword } = req.body;
         res.status(400).json({ error: 'token and newPassword are required' });
         return;
     }
+    if (newPassword.length < 8) {
+        res.status(400).json({ error: 'Password must be at least 8 characters' });
+        return;
+    }
     try {
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string, purpose: string };
         if (decoded.purpose !== 'password-reset') {
@@ -200,6 +208,10 @@ export const createAccount = async (req: AuthRequest, res: Response) => {
     const { username, email, password, role } = req.body;
     if (!username || !email || !password || !role) {
         res.status(400).json({ error: 'username, email, password and role are required' });
+        return;
+    }
+    if (password.length < 8) {
+        res.status(400).json({ error: 'Password must be at least 8 characters' });
         return;
     }
     const organisationId = req.user!.organisationId;
