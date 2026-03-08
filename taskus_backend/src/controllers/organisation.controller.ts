@@ -5,28 +5,22 @@ import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import { uploadImage } from '../utils/blobStorage';
 
-
 // POST /organisation/create
 export const createOrganisation = async (req: Request, res: Response) => {
-  const { organisationName, organisationDescription, username, email, password } = req.body;
+  const { organisationName, organisationDescription, firstName, lastName, email, password } = req.body;
 
-  if (!organisationName || !username || !email || !password) {
-    res.status(400).json({ error: 'organisationName, username, email and password are required' });
+  if (!organisationName || !firstName || !lastName || !email || !password) {
+    res.status(400).json({ error: 'organisationName, firstName, lastName, email and password are required' });
     return;
   }
   if (password.length < 8) {
-        res.status(400).json({ error: 'Password must be at least 8 characters' });
-        return;
+    res.status(400).json({ error: 'Password must be at least 8 characters' });
+    return;
   }
   try {
     const existingMailUser = await prisma.user.findFirst({ where: { email } });
     if (existingMailUser) {
       res.status(409).json({ error: 'A user with this email already exists' });
-      return;
-    }
-    const existingUsernameUser = await prisma.user.findFirst({ where: { username } });
-    if (existingUsernameUser) {
-      res.status(409).json({ error: 'A user with this username already exists' });
       return;
     }
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -35,14 +29,15 @@ export const createOrganisation = async (req: Request, res: Response) => {
       const organisation = await tx.organisation.create({
         data: {
           name: organisationName,
-          description: organisationDescription ?? null,
+          description: organisationDescription ?? undefined,
           pic: null
         }
       });
 
       const user = await tx.user.create({
         data: {
-          username,
+          firstName,
+          lastName,
           email,
           password: hashedPassword,
           role: 'admin',
@@ -64,14 +59,15 @@ export const createOrganisation = async (req: Request, res: Response) => {
       authToken: token,
       userInfo: {
         userId: result.user.id,
-        username: result.user.username,
+        firstName: result.user.firstName,
+        lastName: result.user.lastName,
         email: result.user.email,
         organisationId: result.organisation.id,
         role: result.user.role,
         pic: result.user.pic
       }
     });
-  } catch (error){
+  } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
 };
@@ -80,13 +76,8 @@ export const createOrganisation = async (req: Request, res: Response) => {
 export const getAllOrganisations = async (req: Request, res: Response) => {
   try {
     const organisations = await prisma.organisation.findMany({
-      select: {
-        id: true,
-        name: true
-      },
-      orderBy: {
-        name: 'asc'
-      }
+      select: { id: true, name: true },
+      orderBy: { name: 'asc' }
     });
     res.json(organisations);
   } catch (error) {
@@ -98,7 +89,7 @@ export const getAllOrganisations = async (req: Request, res: Response) => {
 export const getOrganisation = async (req: AuthRequest, res: Response) => {
   const { organisationId } = req.params as { organisationId: string };
   try {
-    const organisation = await prisma.organisation.findUnique({where: { id: organisationId }});
+    const organisation = await prisma.organisation.findUnique({ where: { id: organisationId } });
     if (!organisation) {
       res.status(404).json({ error: 'Organisation not found' });
       return;
@@ -117,9 +108,9 @@ export const getOrganisation = async (req: AuthRequest, res: Response) => {
 export const updateOrganisation = async (req: AuthRequest, res: Response) => {
   const { newName, newDescription, newPic } = req.body;
   if (!newName && !newDescription && !newPic) {
-        res.status(400).json({ error: 'At least one field is required' });
-        return;
-    } 
+    res.status(400).json({ error: 'At least one field is required' });
+    return;
+  }
   const organisationId = req.user!.organisationId;
   try {
     const updated = await prisma.organisation.update({
@@ -146,7 +137,7 @@ export const uploadOrganisationPic = async (req: AuthRequest, res: Response) => 
   const fileName = `${organisationId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
   try {
     const url = await uploadImage('organisation-pics', fileName, req.file.buffer, req.file.mimetype);
-    res.json({url});
+    res.json({ url });
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }

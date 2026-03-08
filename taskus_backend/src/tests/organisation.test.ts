@@ -11,7 +11,8 @@ describe('Organisation routes', () => {
       .send({
         organisationName: 'Test Organisation',
         organisationDescription: 'Test description',
-        username: 'orgadmin',
+        firstName: 'Org',
+        lastName: 'Admin',
         email: 'orgadmin@test.com',
         password: 'password123'
       });
@@ -33,21 +34,9 @@ describe('Organisation routes', () => {
       .send({
         organisationName: 'Another Org',
         organisationDescription: 'Another description',
-        username: 'uniqueusername',
+        firstName: 'Another',
+        lastName: 'Admin',
         email: 'orgadmin@test.com',
-        password: 'password123'
-      });
-    expect(res.status).toBe(409);
-  });
-
-  it('POST /organisation - duplicate username', async () => {
-    const res = await request(app)
-      .post('/organisation')
-      .send({
-        organisationName: 'Another Org',
-        organisationDescription: 'Another description',
-        username: 'orgadmin',
-        email: 'unique@test.com',
         password: 'password123'
       });
     expect(res.status).toBe(409);
@@ -81,7 +70,8 @@ describe('Organisation routes', () => {
       .send({
         organisationName: 'Other Organisation',
         organisationDescription: 'Other description',
-        username: 'otheradmin',
+        firstName: 'Other',
+        lastName: 'Admin',
         email: 'otheradmin@test.com',
         password: 'password123'
       });
@@ -156,14 +146,15 @@ describe('Organisation routes', () => {
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'memberuser',
+        firstName: 'Member',
+        lastName: 'User',
         email: 'member@test.com',
         password: 'password123',
         role: 'member'
       });
     const memberLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'memberuser', password: 'password123' });
+      .send({ email: 'member@test.com', password: 'password123' });
     const memberToken = memberLogin.body.authToken;
 
     const res = await request(app)

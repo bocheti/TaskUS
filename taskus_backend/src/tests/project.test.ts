@@ -10,13 +10,13 @@ describe('Project routes', () => {
   let projectId: string;
 
   beforeAll(async () => {
-    // create org and admin
     const res = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'Test Organisation',
         organisationDescription: 'Test description',
-        username: 'projectadmin',
+        firstName: 'Project',
+        lastName: 'Admin',
         email: 'projectadmin@test.com',
         password: 'password123'
       });
@@ -24,12 +24,12 @@ describe('Project routes', () => {
     organisationId = res.body.userInfo.organisationId;
     userId = res.body.userInfo.userId;
 
-    // create a member
     const memberRes = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'projectmember',
+        firstName: 'Project',
+        lastName: 'Member',
         email: 'projectmember@test.com',
         password: 'password123',
         role: 'member'
@@ -37,17 +37,13 @@ describe('Project routes', () => {
     memberId = memberRes.body.id;
     const memberLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'projectmember', password: 'password123' });
+      .send({ email: 'projectmember@test.com', password: 'password123' });
     memberToken = memberLogin.body.authToken;
 
-    // create a project
     const projectRes = await request(app)
       .post('/project')
       .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        title: 'Test Project',
-        description: 'Test project description'
-      });
+      .send({ title: 'Test Project', description: 'Test project description' });
     projectId = projectRes.body.id;
   });
 
@@ -94,7 +90,6 @@ describe('Project routes', () => {
   });
 
   it('GET /project/:projectId - valid as member', async () => {
-    // add member to project first
     await request(app)
       .post(`/project/${projectId}/member/${memberId}`)
       .set('Authorization', `Bearer ${authToken}`);
@@ -119,13 +114,13 @@ describe('Project routes', () => {
   });
 
   it('GET /project/:projectId - unauthorized (not a member)', async () => {
-    // create a second org with its own admin
     const otherOrg = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'Other Organisation',
         organisationDescription: 'Other description',
-        username: 'otheradmin',
+        firstName: 'Other',
+        lastName: 'Admin',
         email: 'otheradmin@test.com',
         password: 'password123'
       });
@@ -201,7 +196,8 @@ describe('Project routes', () => {
       .send({
         organisationName: 'Another Organisation',
         organisationDescription: 'Another description',
-        username: 'anotheradmin',
+        firstName: 'Another',
+        lastName: 'Admin',
         email: 'anotheradmin@test.com',
         password: 'password123'
       });
@@ -219,7 +215,8 @@ describe('Project routes', () => {
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'newprojectmember',
+        firstName: 'New',
+        lastName: 'Member',
         email: 'newprojectmember@test.com',
         password: 'password123',
         role: 'member'
@@ -267,37 +264,33 @@ describe('Project routes', () => {
     expect(res.status).toBe(403);
   });
 
+  // Cascade deletion
   it('DELETE /project/:projectId - cascades to taskgroups and tasks', async () => {
-    // create a project
     const projectRes = await request(app)
-        .post('/project')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ title: 'Cascade Test Project', description: 'test' });
+      .post('/project')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ title: 'Cascade Test Project', description: 'test' });
     const cascadeProjectId = projectRes.body.id;
-    // create a task group in it
+
     const taskGroupRes = await request(app)
-        .post('/taskGroup')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({ title: 'Cascade Task Group', projectId: cascadeProjectId });
+      .post('/taskGroup')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ title: 'Cascade Task Group', projectId: cascadeProjectId });
     const cascadeTaskGroupId = taskGroupRes.body.id;
-    // create a task in it
+
     await request(app)
-        .post('/task')
-        .set('Authorization', `Bearer ${authToken}`)
-        .send({
-        title: 'Cascade Task',
-        responsibleId: userId,
-        taskGroupId: cascadeTaskGroupId
-        });
-    // delete the project
+      .post('/task')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ title: 'Cascade Task', responsibleId: userId, taskGroupId: cascadeTaskGroupId });
+
     const deleteRes = await request(app)
-        .delete(`/project/${cascadeProjectId}`)
-        .set('Authorization', `Bearer ${authToken}`);
+      .delete(`/project/${cascadeProjectId}`)
+      .set('Authorization', `Bearer ${authToken}`);
     expect(deleteRes.status).toBe(200);
-    // verify task group is gone
+
     const taskGroupRes2 = await request(app)
-        .get(`/taskGroup/${cascadeTaskGroupId}`)
-        .set('Authorization', `Bearer ${authToken}`);
+      .get(`/taskGroup/${cascadeTaskGroupId}`)
+      .set('Authorization', `Bearer ${authToken}`);
     expect(taskGroupRes2.status).toBe(404);
-    });
+  });
 });

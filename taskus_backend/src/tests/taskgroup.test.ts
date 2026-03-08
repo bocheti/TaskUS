@@ -1,4 +1,3 @@
-// src/tests/taskGroup.test.ts
 import request from 'supertest';
 import app from '../app';
 
@@ -11,24 +10,24 @@ describe('TaskGroup routes', () => {
   let otherOrgToken: string;
 
   beforeAll(async () => {
-    // create org and admin
     const res = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'TaskGroup Test Organisation',
         organisationDescription: 'Test description',
-        username: 'taskgroupadmin',
+        firstName: 'TaskGroup',
+        lastName: 'Admin',
         email: 'taskgroupadmin@test.com',
         password: 'password123'
       });
     authToken = res.body.authToken;
 
-    // create a member
     const memberRes = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'taskgroupmember',
+        firstName: 'TaskGroup',
+        lastName: 'Member',
         email: 'taskgroupmember@test.com',
         password: 'password123',
         role: 'member'
@@ -36,10 +35,9 @@ describe('TaskGroup routes', () => {
     memberId = memberRes.body.id;
     const memberLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'taskgroupmember', password: 'password123' });
+      .send({ email: 'taskgroupmember@test.com', password: 'password123' });
     memberToken = memberLogin.body.authToken;
 
-    // create a project and add member to it
     const projectRes = await request(app)
       .post('/project')
       .set('Authorization', `Bearer ${authToken}`)
@@ -50,20 +48,19 @@ describe('TaskGroup routes', () => {
       .post(`/project/${projectId}/member/${memberId}`)
       .set('Authorization', `Bearer ${authToken}`);
 
-    // create a task group
     const taskGroupRes = await request(app)
       .post('/taskGroup')
       .set('Authorization', `Bearer ${authToken}`)
       .send({ title: 'Test TaskGroup', description: 'Test description', projectId });
     taskGroupId = taskGroupRes.body.id;
 
-    // create another org for cross-org tests
     const otherOrg = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'Other Organisation',
         organisationDescription: 'Other description',
-        username: 'othertaskgroupadmin',
+        firstName: 'Other',
+        lastName: 'Admin',
         email: 'othertaskgroupadmin@test.com',
         password: 'password123'
       });
@@ -287,7 +284,7 @@ describe('TaskGroup routes', () => {
     const adminRes = await request(app)
       .get('/user/all')
       .set('Authorization', `Bearer ${authToken}`);
-    const admin = adminRes.body.find((u: any) => u.username === 'taskgroupadmin');
+    const admin = adminRes.body.find((u: any) => u.email === 'taskgroupadmin@test.com');
 
     await request(app)
       .post('/task')

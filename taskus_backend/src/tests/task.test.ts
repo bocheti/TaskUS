@@ -13,25 +13,25 @@ describe('Task routes', () => {
   let otherOrgToken: string;
 
   beforeAll(async () => {
-    // create org and admin
     const res = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'Task Test Organisation',
         organisationDescription: 'Test description',
-        username: 'taskadmin',
+        firstName: 'Task',
+        lastName: 'Admin',
         email: 'taskadmin@test.com',
         password: 'password123'
       });
     authToken = res.body.authToken;
     adminId = res.body.userInfo.userId;
 
-    // create a member
     const memberRes = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'taskmember',
+        firstName: 'Task',
+        lastName: 'Member',
         email: 'taskmember@test.com',
         password: 'password123',
         role: 'member'
@@ -39,10 +39,9 @@ describe('Task routes', () => {
     memberId = memberRes.body.id;
     const memberLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'taskmember', password: 'password123' });
+      .send({ email: 'taskmember@test.com', password: 'password123' });
     memberToken = memberLogin.body.authToken;
 
-    // create project and add member
     const projectRes = await request(app)
       .post('/project')
       .set('Authorization', `Bearer ${authToken}`)
@@ -53,14 +52,12 @@ describe('Task routes', () => {
       .post(`/project/${projectId}/member/${memberId}`)
       .set('Authorization', `Bearer ${authToken}`);
 
-    // create task group
     const taskGroupRes = await request(app)
       .post('/taskGroup')
       .set('Authorization', `Bearer ${authToken}`)
       .send({ title: 'Task Test Group', projectId });
     taskGroupId = taskGroupRes.body.id;
 
-    // create a task assigned to the member
     const taskRes = await request(app)
       .post('/task')
       .set('Authorization', `Bearer ${authToken}`)
@@ -72,13 +69,13 @@ describe('Task routes', () => {
       });
     taskId = taskRes.body.id;
 
-    // create another org for cross-org tests
     const otherOrg = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'Other Task Organisation',
         organisationDescription: 'Other description',
-        username: 'othertaskadmin',
+        firstName: 'Other',
+        lastName: 'Admin',
         email: 'othertaskadmin@test.com',
         password: 'password123'
       });
@@ -90,12 +87,7 @@ describe('Task routes', () => {
     const res = await request(app)
       .post('/task')
       .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        title: 'New Task',
-        description: 'New description',
-        responsibleId: memberId,
-        taskGroupId
-      });
+      .send({ title: 'New Task', description: 'New description', responsibleId: memberId, taskGroupId });
     expect(res.status).toBe(201);
     expect(res.body).toHaveProperty('title', 'New Task');
     expect(res.body).toHaveProperty('status', 'Pending');
@@ -196,19 +188,19 @@ describe('Task routes', () => {
   });
 
   it('GET /task/:taskId - unauthorized (not responsible nor admin)', async () => {
-    // create another member not responsible for the task
     await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'notresponsible',
+        firstName: 'Not',
+        lastName: 'Responsible',
         email: 'notresponsible@test.com',
         password: 'password123',
         role: 'member'
       });
     const notResponsibleLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'notresponsible', password: 'password123' });
+      .send({ email: 'notresponsible@test.com', password: 'password123' });
     const notResponsibleToken = notResponsibleLogin.body.authToken;
 
     const res = await request(app)
@@ -283,7 +275,7 @@ describe('Task routes', () => {
   it('PUT /task/status/:taskId - unauthorized (not responsible nor admin)', async () => {
     const notResponsibleLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'notresponsible', password: 'password123' });
+      .send({ email: 'notresponsible@test.com', password: 'password123' });
     const notResponsibleToken = notResponsibleLogin.body.authToken;
 
     const res = await request(app)
@@ -364,11 +356,11 @@ describe('Task routes', () => {
   });
 
   it('GET /task/byProject/:projectId - unauthorized (not member)', async () => {
-  const res = await request(app)
-    .get(`/task/byProject/${projectId}`)
-    .set('Authorization', `Bearer ${memberToken}`);
-  expect(res.status).toBe(403);
-});
+    const res = await request(app)
+      .get(`/task/byProject/${projectId}`)
+      .set('Authorization', `Bearer ${memberToken}`);
+    expect(res.status).toBe(403);
+  });
 
   it('GET /task/byProject/:projectId - unauthorized (wrong org)', async () => {
     const res = await request(app)
@@ -423,7 +415,8 @@ describe('Task routes', () => {
       .send({
         organisationName: 'Another Task Organisation',
         organisationDescription: 'Another description',
-        username: 'anothertaskadmin',
+        firstName: 'Another',
+        lastName: 'Admin',
         email: 'anothertaskadmin@test.com',
         password: 'password123'
       });

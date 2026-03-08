@@ -14,7 +14,8 @@ describe('User routes', () => {
       .send({
         organisationName: 'Test Organisation',
         organisationDescription: 'Test description',
-        username: 'testadmin',
+        firstName: 'Test',
+        lastName: 'Admin',
         email: 'testadmin@test.com',
         password: 'password123'
       });
@@ -27,21 +28,23 @@ describe('User routes', () => {
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'testmember',
+        firstName: 'Test',
+        lastName: 'Member',
         email: 'testmember@test.com',
         password: 'password123',
         role: 'member'
       });
     const memberLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'testmember', password: 'password123' });
+      .send({ email: 'testmember@test.com', password: 'password123' });
     memberToken = memberLogin.body.authToken;
 
     // create a user request
     const reqRes = await request(app)
       .post('/user/request')
       .send({
-        username: 'requestuser',
+        firstName: 'Request',
+        lastName: 'User',
         email: 'requestuser@test.com',
         password: 'password123',
         organisationId
@@ -53,7 +56,7 @@ describe('User routes', () => {
   it('POST /user/login - valid credentials', async () => {
     const res = await request(app)
       .post('/user/login')
-      .send({ username: 'testadmin', password: 'password123' });
+      .send({ email: 'testadmin@test.com', password: 'password123' });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('authToken');
     expect(res.body).toHaveProperty('userInfo');
@@ -62,21 +65,21 @@ describe('User routes', () => {
   it('POST /user/login - invalid credentials', async () => {
     const res = await request(app)
       .post('/user/login')
-      .send({ username: 'testadmin', password: 'wrongpassword' });
+      .send({ email: 'testadmin@test.com', password: 'wrongpassword' });
     expect(res.status).toBe(401);
   });
 
   it('POST /user/login - missing fields', async () => {
     const res = await request(app)
       .post('/user/login')
-      .send({ username: 'testadmin' });
+      .send({ email: 'testadmin@test.com' });
     expect(res.status).toBe(400);
   });
 
-  it('POST /user/login - non-existent username', async () => {
+  it('POST /user/login - non-existent email', async () => {
     const res = await request(app)
       .post('/user/login')
-      .send({ username: 'nonexistent', password: 'password123' });
+      .send({ email: 'nonexistent@test.com', password: 'password123' });
     expect(res.status).toBe(401);
   });
 
@@ -85,7 +88,8 @@ describe('User routes', () => {
     const res = await request(app)
       .post('/user/request')
       .send({
-        username: 'newrequestuser',
+        firstName: 'New',
+        lastName: 'Request',
         email: 'newrequest@test.com',
         password: 'password123',
         organisationId
@@ -97,7 +101,7 @@ describe('User routes', () => {
   it('POST /user/request - missing fields', async () => {
     const res = await request(app)
       .post('/user/request')
-      .send({ username: 'incomplete' });
+      .send({ firstName: 'Incomplete' });
     expect(res.status).toBe(400);
   });
 
@@ -105,20 +109,9 @@ describe('User routes', () => {
     const res = await request(app)
       .post('/user/request')
       .send({
-        username: 'uniqueusername',
+        firstName: 'Unique',
+        lastName: 'Name',
         email: 'testadmin@test.com',
-        password: 'password123',
-        organisationId
-      });
-    expect(res.status).toBe(409);
-  });
-
-  it('POST /user/request - duplicate username', async () => {
-    const res = await request(app)
-      .post('/user/request')
-      .send({
-        username: 'testadmin',
-        email: 'unique@test.com',
         password: 'password123',
         organisationId
       });
@@ -131,7 +124,8 @@ describe('User routes', () => {
       .get(`/user/${userId}`)
       .set('Authorization', `Bearer ${authToken}`);
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('username', 'testadmin');
+    expect(res.body).toHaveProperty('firstName', 'Test');
+    expect(res.body).toHaveProperty('lastName', 'Admin');
   });
 
   it('GET /user/:userId - not found', async () => {
@@ -147,51 +141,28 @@ describe('User routes', () => {
     expect(res.status).toBe(401);
   });
 
-  // PUT /user/updateInfo
-  it('PUT /user/updateInfo - update username', async () => {
-    const res = await request(app)
-      .put('/user/updateInfo')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ newUsername: 'updatedadmin' });
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('username', 'updatedadmin');
-  });
-
-  it('PUT /user/updateInfo - no fields provided', async () => {
-    const res = await request(app)
-      .put('/user/updateInfo')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({});
-    expect(res.status).toBe(400);
-  });
-
-  it('PUT /user/updateInfo - no auth token', async () => {
-    const res = await request(app)
-      .put('/user/updateInfo')
-      .send({ newUsername: 'someusername' });
-    expect(res.status).toBe(401);
-  });
-
   // Admin - POST /user/create
   it('POST /user/create - valid', async () => {
     const res = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'createduser',
+        firstName: 'Created',
+        lastName: 'User',
         email: 'createduser@test.com',
         password: 'password123',
         role: 'member'
       });
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('username', 'createduser');
+    expect(res.body).toHaveProperty('firstName', 'Created');
+    expect(res.body).toHaveProperty('lastName', 'User');
   });
 
   it('POST /user/create - missing fields', async () => {
     const res = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
-      .send({ username: 'incomplete' });
+      .send({ firstName: 'Incomplete' });
     expect(res.status).toBe(400);
   });
 
@@ -200,7 +171,8 @@ describe('User routes', () => {
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'uniqueuser',
+        firstName: 'Unique',
+        lastName: 'User',
         email: 'testmember@test.com',
         password: 'password123',
         role: 'member'
@@ -213,7 +185,8 @@ describe('User routes', () => {
       .post('/user/create')
       .set('Authorization', `Bearer ${memberToken}`)
       .send({
-        username: 'anotheruser',
+        firstName: 'Another',
+        lastName: 'User',
         email: 'another@test.com',
         password: 'password123',
         role: 'member'
@@ -271,11 +244,11 @@ describe('User routes', () => {
 
   // Admin - POST /user/:userRequestId/reject
   it('POST /user/:userRequestId/reject - valid', async () => {
-    // create a new request to reject
     const reqRes = await request(app)
       .post('/user/request')
       .send({
-        username: 'torejectuser',
+        firstName: 'To',
+        lastName: 'Reject',
         email: 'toreject@test.com',
         password: 'password123',
         organisationId
@@ -301,7 +274,7 @@ describe('User routes', () => {
     const memberRes = await request(app)
       .get('/user/all')
       .set('Authorization', `Bearer ${authToken}`);
-    const member = memberRes.body.find((u: any) => u.username === 'testmember');
+    const member = memberRes.body.find((u: any) => u.email === 'testmember@test.com');
 
     const res = await request(app)
       .put(`/user/${member.id}/role`)
@@ -315,7 +288,7 @@ describe('User routes', () => {
     const memberRes = await request(app)
       .get('/user/all')
       .set('Authorization', `Bearer ${authToken}`);
-    const member = memberRes.body.find((u: any) => u.username === 'testmember');
+    const member = memberRes.body.find((u: any) => u.email === 'testmember@test.com');
 
     const res = await request(app)
       .put(`/user/${member.id}/role`)
@@ -338,7 +311,8 @@ describe('User routes', () => {
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'tobedeleted',
+        firstName: 'To',
+        lastName: 'Delete',
         email: 'tobedeleted@test.com',
         password: 'password123',
         role: 'member'
@@ -357,31 +331,32 @@ describe('User routes', () => {
     expect(res.status).toBe(403);
   });
 
-  // DELETE /user/self/:userId
-  it('DELETE /user/self/:userId - valid', async () => {
+  // DELETE /user/self
+  it('DELETE /user/self - valid', async () => {
     const created = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
-        username: 'selfdeletion',
+        firstName: 'Self',
+        lastName: 'Delete',
         email: 'selfdeletion@test.com',
         password: 'password123',
         role: 'member'
       });
     const selfLogin = await request(app)
       .post('/user/login')
-      .send({ username: 'selfdeletion', password: 'password123' });
+      .send({ email: 'selfdeletion@test.com', password: 'password123' });
     const selfToken = selfLogin.body.authToken;
 
     const res = await request(app)
-      .delete(`/user/self/${created.body.id}`)
+      .delete(`/user/self`)
       .set('Authorization', `Bearer ${selfToken}`);
     expect(res.status).toBe(200);
   });
 
-  it('DELETE /user/self/:userId - no auth token', async () => {
+  it('DELETE /user/self - no auth token', async () => {
     const res = await request(app)
-      .delete(`/user/self/${userId}`);
+      .delete(`/user/self`);
     expect(res.status).toBe(401);
   });
 });
