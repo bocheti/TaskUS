@@ -5,7 +5,6 @@ import {
   LoginCredentials,
   LoginResponse,
   CreateAccountRequest,
-  UpdateUserInfoRequest,
   CreateUserRequest,
   UpdateUserRoleRequest,
   UploadPicResponse,
@@ -38,13 +37,8 @@ export const userService = {
     return response.data;
   },
 
-  updateUserInfo: async (data: UpdateUserInfoRequest): Promise<User> => {
-    const response = await apiClient.put<User>('/user/updateInfo', data);
-    return response.data;
-  },
-
-  deleteUser: async (userId: string): Promise<void> => {
-    await apiClient.delete(`/user/${userId}`);
+  deleteUser: async (): Promise<void> => {
+    await apiClient.delete('/user/self');
   },
 
   uploadPic: async (file: File): Promise<UploadPicResponse> => {

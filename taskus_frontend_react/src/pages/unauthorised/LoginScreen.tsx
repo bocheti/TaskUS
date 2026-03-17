@@ -1,0 +1,126 @@
+import { LandingBanner } from '@/components/layout/LandingBanner';
+import { Link, useNavigate } from 'react-router-dom';
+import { useState } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
+
+export const LoginScreen = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  
+  const { login } = useAuth();
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      await login({ email, password }); 
+      toast.success('Login successful!');
+      navigate('/dashboard');
+    } catch (error) {
+      let errorMessage = 'Invalid credentials. Please try again.';
+      if (error instanceof Error) {
+        errorMessage = error.message;
+      }
+      toast.error(errorMessage);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return (
+    <div className="flex min-h-screen">
+      <LandingBanner />
+
+      <div className="w-1/2 min-h-screen flex flex-col justify-center items-center px-16 py-12">
+        <div className="w-full space-y-8">
+          <div className="text-center">
+            <h1 className="text-5xl font-bold text-foreground mb-6">
+              Log in
+            </h1>
+          </div>
+
+          <form onSubmit={handleSubmit} className="pt-8 max-w-md mx-auto flex flex-col space-y-6">
+            {/* Email input */}
+            <div className="w-full flex flex-col space-y-2">
+              <label htmlFor="email" className="text-foreground font-thin text-left">
+                Email address
+              </label>
+              <input
+                id="email"
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full bg-background text-foreground px-4 py-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Enter your email"
+                required
+                disabled={isLoading}
+              />
+            </div>
+
+            {/* Password input */}
+            <div className="w-full flex flex-col space-y-2">
+              <label htmlFor="password" className="text-foreground font-thin text-left">
+                Password
+              </label>
+              <input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="w-full bg-background text-foreground px-4 py-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                placeholder="Enter your password"
+                required
+                disabled={isLoading}
+              />
+              <div className="text-right">
+                <Link 
+                  to="/reset-password-request" 
+                  className="text-xs text-primary hover:text-[hsl(193,95%,68%)] hover:underline transition-colors"
+                >
+                  Forgot password?
+                </Link>
+              </div>
+            </div>
+
+            {/* Submit button */}
+            <div className="w-full flex justify-center">
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-3/5 bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? 'Logging in...' : 'Log in'}
+              </button>
+            </div>
+          </form>
+
+          {/* Bottom links */}
+          <div className="text-center text-foreground pt-8">
+            <p className="mb-2">
+              Don't have an account?{' '}
+              <Link 
+                to="/request" 
+                className="text-primary hover:text-[hsl(193,95%,68%)] hover:underline transition-colors font-medium"
+              >
+                Request an account
+              </Link>
+            </p>
+            <p>
+              Are you a business?{' '}
+              <Link 
+                to="/create-org" 
+                className="text-primary hover:text-[hsl(193,95%,68%)] hover:underline transition-colors font-medium"
+              >
+                Create an organisation
+              </Link>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};

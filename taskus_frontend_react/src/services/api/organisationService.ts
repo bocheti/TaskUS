@@ -1,6 +1,7 @@
 import apiClient from './client';
 import {
   Organisation,
+  OrganisationListItem,
   CreateOrganisationRequest,
   CreateOrganisationResponse,
   UpdateOrganisationRequest,
@@ -11,8 +12,8 @@ export const organisationService = {
 
   // public routes
   
-  getAllOrganisations: async (): Promise<Organisation[]> => {
-    const response = await apiClient.get<Organisation[]>('/organisation/all');
+  getAllOrganisations: async (): Promise<OrganisationListItem[]> => {  // Changed return type
+    const response = await apiClient.get<OrganisationListItem[]>('/organisation/all');
     return response.data;
   },
 

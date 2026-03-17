@@ -2,18 +2,18 @@ import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Toaster } from 'sonner'; 
 
-import { LandingScreen } from '@/pages/LandingScreen';
-import { LoginScreen } from '@/pages/auth/LoginScreen';
-import { RequestScreen } from '@/pages/auth/RequestScreen';
-import { CreateOrgScreen } from '@/pages/auth/CreateOrgScreen';
-import { ResetPasswordRequestScreen } from '@/pages/auth/ResetPasswordRequestScreen';
-import { ResetPasswordScreen } from '@/pages/auth/ResetPasswordScreen';
+import { LandingScreen } from '@/pages/unauthorised/LandingScreen';
+import { LoginScreen } from '@/pages/unauthorised/LoginScreen';
+import { RequestScreen } from '@/pages/unauthorised/RequestScreen';
+import { CreateOrgScreen } from '@/pages/unauthorised/CreateOrgScreen';
+import { ResetPasswordRequestScreen } from '@/pages/unauthorised/ResetPasswordRequestScreen';
+import { ResetPasswordScreen } from '@/pages/unauthorised/ResetPasswordScreen';
 
-import { DashboardScreen } from '@/pages/dashboard/DashboardScreen';
-import { ProjectListScreen } from '@/pages/projects/ProjectListScreen';
-import { ProjectDetailScreen } from '@/pages/projects/ProjectDetailScreen';
-import { TaskGroupDetailScreen } from '@/pages/projects/TaskGroupDetailScreen';
-import { ProfileScreen } from '@/pages/profile/ProfileScreen';
+import { DashboardScreen } from '@/pages/authorised/DashboardScreen';
+import { ProjectListScreen } from '@/pages/authorised/ProjectListScreen';
+import { ProjectDetailScreen } from '@/pages/authorised/ProjectDetailScreen';
+import { TaskGroupDetailScreen } from '@/pages/authorised/TaskGroupDetailScreen';
+import { ProfileScreen } from '@/pages/authorised/ProfileScreen';
 
 import { OrganisationSettingsScreen } from '@/pages/admin/OrganisationSettingsScreen';
 import { UserManagementScreen } from '@/pages/admin/UserManagementScreen';

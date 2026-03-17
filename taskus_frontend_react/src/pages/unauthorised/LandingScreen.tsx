@@ -4,10 +4,8 @@ import { Link } from 'react-router-dom';
 export const LandingScreen = () => {
   return (
     <div className="flex min-h-screen">
-      {/* Left side - Banner */}
       <LandingBanner />
 
-      {/* Right side - Content */}
       <div className="w-1/2 min-h-screen bg-mutd flex flex-col justify-center items-center px-16 py-12">
         <div className="w-full space-y-8">
           <div className="text-center">
@@ -26,7 +24,6 @@ export const LandingScreen = () => {
           </div>
 
           <div className="pt-8 max-w-md mx-auto flex flex-col items-center space-y-6">
-            {/* Login section */}
             <div className="w-full flex flex-col items-center space-y-2">
               <p className="text-center text-foreground font-thin">
                 Do you already have an account?
@@ -39,7 +36,6 @@ export const LandingScreen = () => {
               </Link>
             </div>
 
-            {/* Request account section */}
             <div className="w-full flex flex-col items-center space-y-2">
               <p className="text-center text-foreground font-thin">
                 Don't have an account?
@@ -52,7 +48,6 @@ export const LandingScreen = () => {
               </Link>
             </div>
 
-            {/* Create organisation section */}
             <div className="w-full flex flex-col items-center space-y-2">
               <p className="text-center text-foreground font-thin">
                 Are you a business?

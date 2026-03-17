@@ -2,7 +2,8 @@ export type UserRole = "member" | "admin";
 
 export interface User {
   userId: string;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   organisationId: string;
   role: UserRole;
@@ -12,14 +13,15 @@ export interface User {
 export interface UserRequest {
   id: string;
   organisationId: string;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   timestamp: string;
   pic: string | null;
 }
 
 export interface LoginCredentials {
-  username: string;
+  email: string;
   password: string;
 }
 
@@ -29,17 +31,11 @@ export interface LoginResponse {
 }
 
 export interface CreateAccountRequest {
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   organisationId: string;
-  pic?: string;
-}
-
-export interface UpdateUserInfoRequest {
-  newUsername?: string;
-  newEmail?: string;
-  newPic?: string;
 }
 
 export interface ResetPasswordRequest {
@@ -52,7 +48,8 @@ export interface ResetPassword {
 }
 
 export interface CreateUserRequest {
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
   role: UserRole;
@@ -62,19 +59,22 @@ export interface UpdateUserRoleRequest {
   newRole: UserRole;
 }
 
-
-
 export interface Organisation {
-  id: string;
+  organisationId: string;
   name: string;
   description: string | null;
   pic: string | null;
 }
 
+export interface OrganisationListItem {
+  organisationId: string;
+  name: string;
+}
+
 export interface CreateOrganisationRequest {
   organisationName: string;
-  organisationDescription?: string;
-  username: string;
+  firstName: string;
+  lastName: string;
   email: string;
   password: string;
 }
@@ -85,12 +85,10 @@ export interface CreateOrganisationResponse {
 }
 
 export interface UpdateOrganisationRequest {
-  newName?: string;
-  newDescription?: string;
-  newPic?: string;
+  newName: string;
+  newDescription: string;
+  newPic: string;
 }
-
-
 
 export interface Project {
   projectId: string;
@@ -105,8 +103,6 @@ export interface CreateProjectRequest {
   description: string;
   pic?: string;
 }
-
-
 
 export interface TaskGroup {
   taskGroupId: string;
@@ -125,8 +121,6 @@ export interface UpdateTaskGroupRequest {
   newTitle: string;
   newDescription: string;
 }
-
-
 
 export type TaskStatus = "Pending" | "In Progress" | "Done";
 
@@ -156,17 +150,12 @@ export interface UpdateTaskResponsibleRequest {
   newResponsibleId: string;
 }
 
-
 export interface UploadPicResponse {
   url: string;
 }
 
-
-// For dropdown selections
-export interface OrganisationOption {
-  id: string;
-  name: string;
-  pic: string | null;
+export interface ApiError {
+  error: string;
 }
 
 // For user stats (mentioned in user stories)
