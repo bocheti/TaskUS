@@ -20,6 +20,7 @@ import { UserManagementScreen } from '@/pages/admin/UserManagementScreen';
 
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { NotFoundScreen } from './pages/NotFoundScreen';
+import { AboutUsScreen } from './pages/authorised/AboutUsScreen';
 
 function App() {
   const { user } = useAuth();
@@ -39,6 +40,14 @@ function App() {
           <Route path="/reset-password-request" element={<ResetPasswordRequestScreen />} />
           <Route path="/reset-password" element={<ResetPasswordScreen />} />
 
+          <Route
+            path="/about-us"
+            element={
+              <ProtectedRoute>
+                <AboutUsScreen />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/dashboard"
             element={

@@ -1,12 +1,13 @@
+import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
+import { useAuth } from '@/hooks/useAuth';
 import { useParams } from 'react-router-dom';
 
 export const TaskGroupDetailScreen = () => {
   const { taskGroupId } = useParams();
-  
+  const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-background p-8">
-      <h1 className="text-3xl font-bold text-foreground mb-4">Task Group Details</h1>
-      <p className="text-foreground">Task group {taskGroupId} details will go here</p>
-    </div>
-  );
+    <AuthorizedLayout title="Project Detail">
+      <p>Welcome, {user?.firstName} {user?.lastName}! Task group {taskGroupId} details will go here</p>
+    </AuthorizedLayout>
+  );  
 };

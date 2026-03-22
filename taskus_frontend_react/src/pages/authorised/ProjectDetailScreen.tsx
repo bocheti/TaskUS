@@ -1,12 +1,13 @@
+import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
+import { useAuth } from '@/hooks/useAuth';
 import { useParams } from 'react-router-dom';
 
 export const ProjectDetailScreen = () => {
   const { projectId } = useParams();
-  
+  const { user } = useAuth();
   return (
-    <div className="min-h-screen bg-background p-8">
-      <h1 className="text-3xl font-bold text-foreground mb-4">Project Details</h1>
-      <p className="text-foreground">Project {projectId} details will go here</p>
-    </div>
+    <AuthorizedLayout title="Project Detail">
+      <p>Welcome, {user?.firstName} {user?.lastName}! Project {projectId} details will go here</p>
+    </AuthorizedLayout>
   );
 };

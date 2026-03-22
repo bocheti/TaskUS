@@ -1,3 +1,4 @@
+import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
 import { useAuth } from '@/hooks/useAuth';
 import { useParams } from 'react-router-dom';
 
@@ -10,11 +11,8 @@ export const ProfileScreen = () => {
   const isOwnProfile = !userId || userId === user?.userId;
   
   return (
-    <div className="min-h-screen bg-background p-8">
-      <h1 className="text-3xl font-bold text-foreground mb-4">
-        {isOwnProfile ? 'My Profile' : 'User Profile'}
-      </h1>
-      <p className="text-foreground">Profile content will go here</p>
-    </div>
-  );
+    <AuthorizedLayout title={isOwnProfile ? 'My Profile' : 'User Profile'}>
+      <p>Welcome, {user?.firstName} {user?.lastName}! Profile information for user {userId} will go here</p>
+    </AuthorizedLayout>
+  );  
 };

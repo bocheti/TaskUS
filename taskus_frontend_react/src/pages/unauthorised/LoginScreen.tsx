@@ -32,19 +32,18 @@ export const LoginScreen = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <LandingBanner />
 
-      <div className="w-1/2 min-h-screen flex flex-col justify-center items-center px-16 py-12">
+      <div className="w-full md:w-1/2 h-[60vh] md:min-h-screen flex flex-col justify-center items-center px-8 md:px-16 py-6 md:py-12">
         <div className="w-full space-y-8">
           <div className="text-center">
-            <h1 className="text-5xl font-bold text-foreground mb-6">
+            <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-2 md:mb-6">
               Log in
             </h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="pt-8 max-w-md mx-auto flex flex-col space-y-6">
-            {/* Email input */}
+          <form onSubmit={handleSubmit} className="pt-0 md:pt-8 max-w-md mx-auto flex flex-col space-y-6">
             <div className="w-full flex flex-col space-y-2">
               <label htmlFor="email" className="text-foreground font-thin text-left">
                 Email address
@@ -60,8 +59,6 @@ export const LoginScreen = () => {
                 disabled={isLoading}
               />
             </div>
-
-            {/* Password input */}
             <div className="w-full flex flex-col space-y-2">
               <label htmlFor="password" className="text-foreground font-thin text-left">
                 Password
@@ -85,21 +82,17 @@ export const LoginScreen = () => {
                 </Link>
               </div>
             </div>
-
-            {/* Submit button */}
-            <div className="w-full flex justify-center">
+            <div className="w-full flex justify-center pt-2">
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-3/5 bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full md:w-3/5 bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Logging in...' : 'Log in'}
               </button>
             </div>
           </form>
-
-          {/* Bottom links */}
-          <div className="text-center text-foreground pt-8">
+          <div className="text-center text-foreground pt-2 md:pt-8">
             <p className="mb-2">
               Don't have an account?{' '}
               <Link 

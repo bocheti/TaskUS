@@ -63,18 +63,18 @@ export const CreateOrgScreen = () => {
   };
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex flex-col md:flex-row min-h-screen">
       <LandingBanner />
 
-      <div className="w-1/2 min-h-screen flex flex-col justify-center items-center px-16 py-12">
-        <div className="w-full space-y-8">
+      <div className="w-full md:w-1/2 h-[75vh] md:min-h-screen flex flex-col justify-center items-center px-8 md:px-16 py-6">
+        <div className="w-full space-y-1">
           <div className="text-center">
-            <h1 className="text-4xl font-bold text-foreground mb-6">
+            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 md:mb-6">
               Create an Organisation
             </h1>
           </div>
 
-          <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col space-y-4">
+          <form onSubmit={handleSubmit} className="max-w-md mx-auto flex flex-col space-y-3">
             <div className="w-full flex flex-col space-y-2">
               <label htmlFor="orgName" className="text-foreground font-thin text-left">
                 Organisation Name
@@ -173,7 +173,7 @@ export const CreateOrgScreen = () => {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-3/5 bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full md:w-3/5 bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? 'Creating...' : 'Create Organisation'}
               </button>

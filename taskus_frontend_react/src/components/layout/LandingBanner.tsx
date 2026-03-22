@@ -1,4 +1,5 @@
 import { Github, Linkedin } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import BannerLogo from '@/assets/bannerLogo.svg';
 
 export const LandingBanner = () => {
@@ -11,21 +12,22 @@ export const LandingBanner = () => {
   };
 
   return (
-    <div className="w-1/2 min-h-screen bg-banner-bg flex flex-col justify-between px-36 py-2">
-      {/* Logo and Slogan - centered */}
+    <div className="w-full md:w-1/2 h-[50vh] md:min-h-screen bg-banner-bg flex flex-col justify-between px-8 md:px-[8%] py-8 md:py-2">
       <div className="flex-1 flex flex-col justify-center items-center">
-        <div className="mb-6">
-          <img src={BannerLogo} alt="TaskUS Logo" className="w-auto" />
-        </div>
+        <Link to="/" className="mb-6 w-11/12 md:w-auto max-h-[25vh] md:max-h-none">
+          <img 
+            src={BannerLogo} 
+            alt="TaskUS Logo" 
+            className="w-full h-auto max-h-[25vh] md:max-h-none object-contain cursor-pointer hover:opacity-90 transition-opacity" 
+          />
+        </Link>
         
-        <p className="text-4xl text-center text-foreground py-4">
+        <p className="text-2xl md:text-4xl text-center text-foreground py-4">
           Make task managing <span className="text-[hsl(193,95%,68%)]">easier</span>
         </p>
       </div>
-
-      {/* Footer - centered, inline */}
-      <div className="flex justify-center gap-2">
-        <p className="text-sm text-foreground">
+      <div className="flex flex-row justify-center items-center gap-2">
+        <p className="text-xs md:text-sm text-foreground text-center">
           Made By Salvador Ramón Espinosa Merino
         </p>
         

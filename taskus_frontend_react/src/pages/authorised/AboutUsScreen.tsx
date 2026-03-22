@@ -1,11 +1,11 @@
 import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
 import { useAuth } from '@/hooks/useAuth';
 
-export const ProjectListScreen = () => {
+export const AboutUsScreen = () => {
   const { user } = useAuth();
   return (
-    <AuthorizedLayout title="Project List">
-      <p>Welcome, {user?.firstName} {user?.lastName}! Project List content goes here!</p>
+    <AuthorizedLayout title="About Us">
+      <p>Welcome, {user?.firstName} {user?.lastName}! About Us content goes here!</p>
     </AuthorizedLayout>
   );
 };
