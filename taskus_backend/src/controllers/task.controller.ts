@@ -3,6 +3,19 @@ import prisma from '../prisma';
 import { AuthRequest } from '../middleware/auth.middleware';
 import { isProjectMember } from '../utils/checkTaskAuth';
 
+const parseDeadline = (deadline: string): Date => {
+  const [day, month, year] = deadline.split('/').map(Number);
+  return new Date(year, month - 1, day, 23, 59, 0);
+};
+
+const formatDeadline = (deadline: Date | null): string | null => {
+  if (!deadline) return null;
+  const day = String(deadline.getDate()).padStart(2, '0');
+  const month = String(deadline.getMonth() + 1).padStart(2, '0');
+  const year = deadline.getFullYear();
+  return `${day}/${month}/${year}`;
+};
+
 // GET /task/:taskId
 export const getTask = async (req: AuthRequest, res: Response) => {
     const { taskId } = req.params as { taskId: string };
@@ -21,7 +34,7 @@ export const getTask = async (req: AuthRequest, res: Response) => {
             res.status(403).json({ error: 'Unauthorized to access this task: This user is not from the same organisation as the responsible person' });
             return;
         }
-        res.json(task);
+        res.json({ ...task, deadline: formatDeadline(task.deadline) });
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -69,7 +82,7 @@ export const getTasksByUser = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
     try {
         const tasks = await prisma.task.findMany({ where: { responsibleId: userId } });
-        res.json(tasks);
+        res.json(tasks.map(task => ({ ...task, deadline: formatDeadline(task.deadline) })));
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -98,7 +111,7 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
         }
       }
     const tasks = await prisma.task.findMany({ where: { taskGroupId } });
-    res.json(tasks);
+    res.json(tasks.map(task => ({ ...task, deadline: formatDeadline(task.deadline) })));
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -126,7 +139,7 @@ export const getTasksByProject = async (req: AuthRequest, res: Response) => {
             include: { tasks: true }
         });
         const tasks = taskGroups.flatMap(tg => tg.tasks);
-        res.json(tasks);
+        res.json(tasks.map(task => ({ ...task, deadline: formatDeadline(task.deadline) })));
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -134,9 +147,13 @@ export const getTasksByProject = async (req: AuthRequest, res: Response) => {
 
 // POST /task (admin)
 export const createTask = async (req: AuthRequest, res: Response) => {
-    const { title, description, responsibleId, taskGroupId } = req.body;
+    const { title, description, responsibleId, taskGroupId, deadline } = req.body;
     if (!title || !responsibleId || !taskGroupId) {
         res.status(400).json({ error: 'title, responsibleId and taskGroupId are required' });
+        return;
+    }
+    if (deadline && !/^\d{2}\/\d{2}\/\d{4}$/.test(deadline)) {
+        res.status(400).json({ error: 'deadline must be in dd/mm/yyyy format' });
         return;
     }
     try {
@@ -160,11 +177,13 @@ export const createTask = async (req: AuthRequest, res: Response) => {
                 description,
                 responsibleId,
                 taskGroupId,
-                status: 'Pending'
+                status: 'Pending',
+                deadline: deadline ? parseDeadline(deadline) : null,
             }
         });
-    res.status(201).json(task);
+    res.status(201).json({ ...task, deadline: formatDeadline(task.deadline) });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -191,12 +210,16 @@ export const deleteTask = async (req: AuthRequest, res: Response) => {
 };
 
 // PUT /task/:taskId (admin)
-export const changeResponsible = async (req: AuthRequest, res: Response) => {
+export const editTask = async (req: AuthRequest, res: Response) => {
     const { taskId } = req.params as { taskId: string };
-    const { newResponsibleId } = req.body;
-    if (!newResponsibleId) {
-        res.status(400).json({ error: 'newResponsibleId is required' });
+    const { newResponsibleId, newDeadline } = req.body;
+    if (!newResponsibleId && newDeadline === undefined) {
+        res.status(400).json({ error: 'At least one field is required' });
         return;
+    }
+    if (newDeadline && !/^\d{2}\/\d{2}\/\d{4}$/.test(newDeadline)) {
+    res.status(400).json({ error: 'deadline must be in dd/mm/yyyy format' });
+    return;
     }
     try {
         const task = await prisma.task.findUnique({ where: { id: taskId } });
@@ -204,21 +227,27 @@ export const changeResponsible = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Task not found' });
             return;
         }
-        const newResponsible = await prisma.user.findUnique({ where: { id: newResponsibleId } });
-        if (!newResponsible) {
-            res.status(404).json({ error: 'New responsible user not found' });
-            return;
-        }
-        if (newResponsible.organisationId !== req.user!.organisationId) {
-            res.status(403).json({ error: 'Unauthorized to change responsible: This user is not from the same organisation as the new responsible person' });
-            return;
+        if (newResponsibleId) {
+            const newResponsible = await prisma.user.findUnique({ where: { id: newResponsibleId } });
+            if (!newResponsible) {
+                res.status(404).json({ error: 'New responsible user not found' });
+                return;
+            }
+            if (newResponsible.organisationId !== req.user!.organisationId) {
+                res.status(403).json({ error: 'Unauthorized to change responsible: This user is not from the same organisation as the new responsible person' });
+                return;
+            }
         }
         const updated = await prisma.task.update({
             where: { id: taskId },
-            data: { responsibleId: newResponsibleId }
+           data: {
+            ...(newResponsibleId && { responsibleId: newResponsibleId }),
+            ...(newDeadline !== undefined && { deadline: newDeadline ? parseDeadline(newDeadline) : null }),
+            }
         });
-        res.json(updated);
+        res.json({ ...updated, deadline: formatDeadline(updated.deadline) });
     } catch (error) {
+        console.log(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

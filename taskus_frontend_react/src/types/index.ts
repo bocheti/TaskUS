@@ -131,6 +131,7 @@ export interface Task {
   status: TaskStatus;
   createdAt: string;
   completedAt: string | null;
+  deadline: string | null;
   responsibleId: string;
   taskGroupId: string;
 }
@@ -140,6 +141,7 @@ export interface CreateTaskRequest {
   description: string;
   responsibleId: string;
   taskGroupId: string;
+  deadline?: string | null;
 }
 
 export interface UpdateTaskStatusRequest {

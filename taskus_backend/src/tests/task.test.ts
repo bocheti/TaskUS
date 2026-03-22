@@ -157,6 +157,33 @@ describe('Task routes', () => {
     expect(res.status).toBe(401);
   });
 
+  it('POST /task - with deadline', async () => {
+    const res = await request(app)
+      .post('/task')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Task With Deadline',
+        responsibleId: memberId,
+        taskGroupId,
+        deadline: '31/12/2026'
+      });
+    expect(res.status).toBe(201);
+    expect(res.body).toHaveProperty('deadline', '31/12/2026');
+  });
+
+  it('POST /task - invalid deadline format', async () => {
+    const res = await request(app)
+      .post('/task')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({
+        title: 'Bad Deadline Task',
+        responsibleId: memberId,
+        taskGroupId,
+        deadline: '2026-12-31'
+      });
+    expect(res.status).toBe(400);
+  });
+
   // GET /task/:taskId
   it('GET /task/:taskId - valid as responsible member', async () => {
     const res = await request(app)
@@ -375,7 +402,7 @@ describe('Task routes', () => {
     expect(res.status).toBe(401);
   });
 
-  // PUT /task/:taskId (changeResponsible)
+  // PUT /task/:taskId (editTask)
   it('PUT /task/:taskId - valid', async () => {
     const res = await request(app)
       .put(`/task/${taskId}`)
@@ -385,12 +412,12 @@ describe('Task routes', () => {
     expect(res.body).toHaveProperty('responsibleId', adminId);
   });
 
-  it('PUT /task/:taskId - missing newResponsibleId', async () => {
-    const res = await request(app)
-      .put(`/task/${taskId}`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({});
-    expect(res.status).toBe(400);
+  it('PUT /task/:taskId - no fields provided', async () => {
+  const res = await request(app)
+    .put(`/task/${taskId}`)
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({});
+  expect(res.status).toBe(400);
   });
 
   it('PUT /task/:taskId - task not found', async () => {
@@ -442,6 +469,32 @@ describe('Task routes', () => {
       .put(`/task/${taskId}`)
       .send({ newResponsibleId: memberId });
     expect(res.status).toBe(401);
+  });
+
+  it('PUT /task/:taskId - update deadline', async () => {
+    const res = await request(app)
+      .put(`/task/${taskId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ newDeadline: '15/01/2027' });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('deadline', '15/01/2027');
+  });
+
+  it('PUT /task/:taskId - clear deadline', async () => {
+    const res = await request(app)
+      .put(`/task/${taskId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ newDeadline: null });
+    expect(res.status).toBe(200);
+    expect(res.body.deadline).toBeNull();
+  });
+
+  it('PUT /task/:taskId - invalid deadline format', async () => {
+    const res = await request(app)
+      .put(`/task/${taskId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ newDeadline: '2027-01-15' });
+    expect(res.status).toBe(400);
   });
 
   // DELETE /task/:taskId

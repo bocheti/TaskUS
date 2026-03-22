@@ -8,7 +8,7 @@ import {
   getTasksByProject,
   createTask,
   deleteTask,
-  changeResponsible
+  editTask
 } from '../controllers/task.controller';
 
 const router = Router();
@@ -22,7 +22,7 @@ router.put('/status/:taskId', authenticate, toggleStatus);
 // Admin
 router.post('/', authenticate, isAdmin, createTask);
 router.delete('/:taskId', authenticate, isAdmin, deleteTask);
-router.put('/:taskId', authenticate, isAdmin, changeResponsible);
+router.put('/:taskId', authenticate, isAdmin, editTask);
 router.get('/byProject/:projectId', authenticate, isAdmin, getTasksByProject);
 
 export default router;
