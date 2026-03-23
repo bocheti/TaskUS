@@ -27,7 +27,7 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
         />
       )}
       <div className={`
-        fixed md:static
+        fixed
         top-0 left-0
         w-48 h-screen
         bg-muted

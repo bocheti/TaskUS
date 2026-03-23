@@ -44,6 +44,9 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
+        'status-pending': "hsl(var(--status-pending))",
+        'status-progress': "hsl(var(--status-progress))",
+        'status-done': "hsl(var(--status-done))",
         destructive: {
           DEFAULT: "hsl(var(--destructive))",
           foreground: "hsl(var(--destructive-foreground))",

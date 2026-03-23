@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { AxiosError } from 'axios';
 
 export const LoginScreen = () => {
   const [email, setEmail] = useState('');
@@ -13,23 +14,31 @@ export const LoginScreen = () => {
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
+  e.preventDefault();
+  setIsLoading(true);
 
-    try {
-      await login({ email, password }); 
-      toast.success('Login successful!');
-      navigate('/dashboard');
-    } catch (error) {
-      let errorMessage = 'Invalid credentials. Please try again.';
-      if (error instanceof Error) {
-        errorMessage = error.message;
+  try {
+    await login({ email, password }); 
+    toast.success('Login successful!');
+    navigate('/dashboard');
+  } catch (error) {
+    if (error instanceof AxiosError) {
+      const status = error.response?.status;
+      const message = error.response?.data?.error;
+      if (status === 401 || status === 403) {
+        toast.error('Invalid email or password');
+      } else if (message) {
+        toast.error(message);
+      } else {
+        toast.error('Login failed. Please try again.');
       }
-      toast.error(errorMessage);
-    } finally {
-      setIsLoading(false);
+    } else {
+      toast.error('Login failed. Please try again.');
     }
-  };
+  } finally {
+    setIsLoading(false);
+  }
+};
 
   return (
     <div className="flex flex-col md:flex-row min-h-screen">

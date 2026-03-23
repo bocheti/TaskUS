@@ -27,7 +27,7 @@ export const AuthorizedLayout = ({ title, children }: AuthorizedLayoutProps) => 
         <Menu size={24} />
       </button>
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      <div className="flex-1 flex flex-col p-4 md:p-8 pt-16 md:pt-8">
+      <div className="flex-1 flex flex-col p-4 md:p-8 md:pb-4 pt-16 md:pt-8 md:ml-48">
             <div className="mb-4 md:mb-6">
                 <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-2 md:mb-4">{title}</h1>
                 <hr className="border-border border-t-2" />

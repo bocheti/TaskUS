@@ -168,7 +168,7 @@ describe('Task routes', () => {
         deadline: '31/12/2026'
       });
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('deadline', '31/12/2026');
+    expect(res.body).toHaveProperty('deadline', '2026-12-31T23:59:00.000Z');
   });
 
   it('POST /task - invalid deadline format', async () => {
@@ -477,7 +477,7 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .send({ newDeadline: '15/01/2027' });
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('deadline', '15/01/2027');
+    expect(res.body).toHaveProperty('deadline', '2027-01-15T23:59:00.000Z');
   });
 
   it('PUT /task/:taskId - clear deadline', async () => {

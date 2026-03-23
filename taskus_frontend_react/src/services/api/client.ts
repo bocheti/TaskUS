@@ -31,11 +31,13 @@ apiClient.interceptors.response.use(
     return response;
   },
   (error: AxiosError) => {
-    if (error.response?.status === 401) {
+    // Only redirect if this is NOT the login endpoint
+    if (error.response?.status === 401 && error.config?.url !== '/user/login') {
       localStorage.removeItem('authToken');
       localStorage.removeItem('user');
       window.location.href = '/login';
     }
+    
     return Promise.reject(error);
   }
 );

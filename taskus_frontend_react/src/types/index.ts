@@ -1,7 +1,7 @@
 export type UserRole = "member" | "admin";
 
 export interface User {
-  userId: string;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -60,14 +60,14 @@ export interface UpdateUserRoleRequest {
 }
 
 export interface Organisation {
-  organisationId: string;
+  id: string;
   name: string;
   description: string | null;
   pic: string | null;
 }
 
 export interface OrganisationListItem {
-  organisationId: string;
+  id: string;
   name: string;
 }
 
@@ -91,7 +91,7 @@ export interface UpdateOrganisationRequest {
 }
 
 export interface Project {
-  projectId: string;
+  id: string;
   title: string;
   description: string;
   pic: string | null;
@@ -105,7 +105,7 @@ export interface CreateProjectRequest {
 }
 
 export interface TaskGroup {
-  taskGroupId: string;
+  id: string;
   title: string;
   description: string;
   projectId: string;
@@ -122,10 +122,10 @@ export interface UpdateTaskGroupRequest {
   newDescription: string;
 }
 
-export type TaskStatus = "Pending" | "In Progress" | "Done";
+export type TaskStatus = "Pending" | "InProgress" | "Done";
 
 export interface Task {
-  taskId: string;
+  id: string;
   title: string;
   description: string;
   status: TaskStatus;

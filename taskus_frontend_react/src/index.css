@@ -20,6 +20,9 @@
     --muted-foreground: 193 20% 20%;
     --accent: 193 40% 80%;
     --accent-foreground: 193 20% 20%;
+    --status-pending: 359 60% 50%;
+    --status-progress: 58 60% 50%;
+    --status-done: 106 60% 50%;
     --destructive: 0 84% 60%;
     --destructive-foreground: 0 0% 98%;
     --border: 193 40% 80%;

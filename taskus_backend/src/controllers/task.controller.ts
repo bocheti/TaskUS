@@ -5,15 +5,7 @@ import { isProjectMember } from '../utils/checkTaskAuth';
 
 const parseDeadline = (deadline: string): Date => {
   const [day, month, year] = deadline.split('/').map(Number);
-  return new Date(year, month - 1, day, 23, 59, 0);
-};
-
-const formatDeadline = (deadline: Date | null): string | null => {
-  if (!deadline) return null;
-  const day = String(deadline.getDate()).padStart(2, '0');
-  const month = String(deadline.getMonth() + 1).padStart(2, '0');
-  const year = deadline.getFullYear();
-  return `${day}/${month}/${year}`;
+  return new Date(Date.UTC(year, month - 1, day, 0, 0, 0));
 };
 
 // GET /task/:taskId
@@ -34,7 +26,7 @@ export const getTask = async (req: AuthRequest, res: Response) => {
             res.status(403).json({ error: 'Unauthorized to access this task: This user is not from the same organisation as the responsible person' });
             return;
         }
-        res.json({ ...task, deadline: formatDeadline(task.deadline) });
+        res.json(task);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -82,7 +74,7 @@ export const getTasksByUser = async (req: AuthRequest, res: Response) => {
     const userId = req.user!.userId;
     try {
         const tasks = await prisma.task.findMany({ where: { responsibleId: userId } });
-        res.json(tasks.map(task => ({ ...task, deadline: formatDeadline(task.deadline) })));
+        res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -111,7 +103,7 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
         }
       }
     const tasks = await prisma.task.findMany({ where: { taskGroupId } });
-    res.json(tasks.map(task => ({ ...task, deadline: formatDeadline(task.deadline) })));
+    res.json(tasks);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }
@@ -139,7 +131,7 @@ export const getTasksByProject = async (req: AuthRequest, res: Response) => {
             include: { tasks: true }
         });
         const tasks = taskGroups.flatMap(tg => tg.tasks);
-        res.json(tasks.map(task => ({ ...task, deadline: formatDeadline(task.deadline) })));
+        res.json(tasks);
     } catch (error) {
         res.status(500).json({ error: 'Internal server error' });
     }
@@ -181,7 +173,7 @@ export const createTask = async (req: AuthRequest, res: Response) => {
                 deadline: deadline ? parseDeadline(deadline) : null,
             }
         });
-    res.status(201).json({ ...task, deadline: formatDeadline(task.deadline) });
+    res.status(201).json(task);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Internal server error' });
@@ -245,7 +237,7 @@ export const editTask = async (req: AuthRequest, res: Response) => {
             ...(newDeadline !== undefined && { deadline: newDeadline ? parseDeadline(newDeadline) : null }),
             }
         });
-        res.json({ ...updated, deadline: formatDeadline(updated.deadline) });
+        res.json(updated);
     } catch (error) {
         console.log(error);
         res.status(500).json({ error: 'Internal server error' });
