@@ -112,7 +112,7 @@ export const RequestScreen = () => {
                     {isLoadingOrgs ? 'Loading organisations...' : 'Select an organisation'}
                   </option>
                   {organisations.map((org) => (
-                    <option key={org.organisationId} value={org.organisationId}>
+                    <option key={org.id} value={org.id}>
                       {org.name}
                     </option>
                   ))}

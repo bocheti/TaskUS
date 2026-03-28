@@ -1,6 +1,6 @@
 import { LandingBanner } from '@/components/layout/LandingBanner';
 import { Link, useNavigate } from 'react-router-dom';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
 import { AxiosError } from 'axios';
@@ -12,6 +12,10 @@ export const LoginScreen = () => {
   
   const { login } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    sessionStorage.removeItem('isLoggingOut');
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();

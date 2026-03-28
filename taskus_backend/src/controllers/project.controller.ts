@@ -46,6 +46,40 @@ export const getProjectsByUser = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// GET /project/:projectId/members
+export const getProjectMembers = async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params as { projectId: string };
+    try {
+        const project = await prisma.project.findUnique({ where: { id: projectId } });
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+        const isMember = await isProjectMember(req.user!.userId, projectId);
+        if (!isMember) {
+            if (req.user!.role !== 'admin') {
+                res.status(403).json({ error: 'Unauthorized: You are not a member of this project' });
+                return;
+            }
+            if (project.organisationId !== req.user!.organisationId) {
+                res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
+                return;
+            }
+        }
+        const members = await prisma.projectMember.findMany({
+            where: { projectId },
+            select: {
+                user: {
+                    select: { id: true, firstName: true, lastName: true, email: true, role: true, pic: true }
+                }
+            }
+        });
+        res.json(members.map(m => m.user));
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 // GET /project/all (admin)
 export const getAllProjects = async (req: AuthRequest, res: Response) => {
   const organisationId = req.user!.organisationId;
@@ -179,7 +213,38 @@ export const removeMember = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// POST /project/uploadPic/:projectId (admin)
+// PUT /project/:projectId (admin)
+export const updateProject = async (req: AuthRequest, res: Response) => {
+  const { projectId } = req.params as { projectId: string };
+  const { newTitle, newDescription } = req.body;
+  if (!newTitle && !newDescription) {
+    res.status(400).json({ error: 'At least one field is required' });
+    return;
+  }
+  try {
+    const project = await prisma.project.findUnique({ where: { id: projectId } });
+    if (!project) {
+      res.status(404).json({ error: 'Project not found' });
+      return;
+    }
+    if (project.organisationId !== req.user!.organisationId) {
+      res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
+      return;
+    }
+    const updated = await prisma.project.update({
+      where: { id: projectId },
+      data: {
+        ...(newTitle && { title: newTitle }),
+        ...(newDescription && { description: newDescription }),
+      }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
+
+// POST /project/:projectId/uploadPic (admin)
 export const uploadProjectPic = async (req: AuthRequest, res: Response) => {
   if (!req.file) {
     res.status(400).json({ error: 'No file provided' });
@@ -189,7 +254,11 @@ export const uploadProjectPic = async (req: AuthRequest, res: Response) => {
   const fileName = `${projectId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
   try {
     const url = await uploadImage('project-pics', fileName, req.file.buffer, req.file.mimetype);
-    res.json({url});
+    const updated = await prisma.project.update({
+      where: { id: projectId },
+      data: { pic: url }
+    });
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }

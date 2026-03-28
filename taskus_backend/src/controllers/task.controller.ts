@@ -109,6 +109,39 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
   }
 };
 
+// GET /task/byUserAndProject/:projectId
+export const getTasksByUserAndProject = async (req: AuthRequest, res: Response) => {
+    const { projectId } = req.params as { projectId: string };
+    const userId = req.user!.userId;
+    try {
+        const project = await prisma.project.findUnique({ where: { id: projectId } });
+        if (!project) {
+            res.status(404).json({ error: 'Project not found' });
+            return;
+        }
+        const isMember = await isProjectMember(userId, projectId);
+        if (!isMember) {
+            if (req.user!.role !== 'admin') {
+                res.status(403).json({ error: 'Unauthorized: You are not a member of this project' });
+                return;
+            }
+            if (project.organisationId !== req.user!.organisationId) {
+                res.status(403).json({ error: 'Unauthorized: This project does not belong to your organisation' });
+                return;
+            }
+        }
+        const tasks = await prisma.task.findMany({
+            where: {
+                responsibleId: userId,
+                taskGroup: { projectId }
+            }
+        });
+        res.json(tasks);
+    } catch (error) {
+        res.status(500).json({ error: 'Internal server error' });
+    }
+};
+
 // GET /task/byProject/:projectId (admin)
 export const getTasksByProject = async (req: AuthRequest, res: Response) => {
     const { projectId } = req.params as { projectId: string };

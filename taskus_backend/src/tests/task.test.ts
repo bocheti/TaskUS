@@ -168,7 +168,7 @@ describe('Task routes', () => {
         deadline: '31/12/2026'
       });
     expect(res.status).toBe(201);
-    expect(res.body).toHaveProperty('deadline', '2026-12-31T23:59:00.000Z');
+    expect(res.body).toHaveProperty('deadline', '2026-12-31T00:00:00.000Z');
   });
 
   it('POST /task - invalid deadline format', async () => {
@@ -371,7 +371,42 @@ describe('Task routes', () => {
       .get(`/task/byTaskGroup/${taskGroupId}`);
     expect(res.status).toBe(401);
   });
+  // GET /task/byUserAndProject/:projectId
+  it('GET /task/byUserAndProject/:projectId - valid as member', async () => {
+    const res = await request(app)
+        .get(`/task/byUserAndProject/${projectId}`)
+        .set('Authorization', `Bearer ${memberToken}`);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+});
 
+it('GET /task/byUserAndProject/:projectId - valid as admin', async () => {
+    const res = await request(app)
+        .get(`/task/byUserAndProject/${projectId}`)
+        .set('Authorization', `Bearer ${authToken}`);
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+});
+
+it('GET /task/byUserAndProject/:projectId - project not found', async () => {
+    const res = await request(app)
+        .get('/task/byUserAndProject/nonexistentid')
+        .set('Authorization', `Bearer ${memberToken}`);
+    expect(res.status).toBe(404);
+});
+
+it('GET /task/byUserAndProject/:projectId - unauthorized (wrong org)', async () => {
+    const res = await request(app)
+        .get(`/task/byUserAndProject/${projectId}`)
+        .set('Authorization', `Bearer ${otherOrgToken}`);
+    expect(res.status).toBe(403);
+});
+
+it('GET /task/byUserAndProject/:projectId - no auth token', async () => {
+    const res = await request(app)
+        .get(`/task/byUserAndProject/${projectId}`);
+    expect(res.status).toBe(401);
+});
   // GET /task/byProject/:projectId
   it('GET /task/byProject/:projectId - valid as admin', async () => {
     const res = await request(app)
@@ -477,7 +512,7 @@ describe('Task routes', () => {
       .set('Authorization', `Bearer ${authToken}`)
       .send({ newDeadline: '15/01/2027' });
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('deadline', '2027-01-15T23:59:00.000Z');
+    expect(res.body).toHaveProperty('deadline', '2027-01-15T00:00:00.000Z');
   });
 
   it('PUT /task/:taskId - clear deadline', async () => {

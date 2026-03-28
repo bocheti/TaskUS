@@ -87,7 +87,6 @@ export interface CreateOrganisationResponse {
 export interface UpdateOrganisationRequest {
   newName: string;
   newDescription: string;
-  newPic: string;
 }
 
 export interface Project {
@@ -152,8 +151,9 @@ export interface UpdateTaskResponsibleRequest {
   newResponsibleId: string;
 }
 
-export interface UploadPicResponse {
-  url: string;
+export interface UpdateProjectRequest {
+  newTitle?: string;
+  newDescription?: string;
 }
 
 export interface ApiError {

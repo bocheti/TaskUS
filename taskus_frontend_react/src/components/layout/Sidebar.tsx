@@ -1,7 +1,9 @@
 import { Home, Users, Building2, User, X, Grid3x3 } from 'lucide-react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import BannerLogo from '@/assets/bannerLogo.svg';
+import { useState, useRef, useEffect } from 'react';
+import { toast } from 'sonner';
 
 interface SidebarProps {
   isOpen: boolean;
@@ -9,14 +11,34 @@ interface SidebarProps {
 }
 
 export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const location = useLocation();
-
+  const [isProfileOpen, setIsProfileOpen] = useState(false)
+  const profileRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
   const isActive = (path: string) => location.pathname === path;
-
-  const handleLinkClick = () => {
-    onClose(); // Close sidebar on mobile when clicking a link
+  
+  const handleLogout = () => {
+    sessionStorage.setItem('isLoggingOut', 'true');
+    logout();
+    navigate('/login', { replace: true });
+    toast.success('Logged out successfully');
   };
+  
+  const handleLinkClick = () => {
+    onClose();
+  };
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+        setIsProfileOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
 
   return (
     <>
@@ -108,18 +130,43 @@ export const Sidebar = ({ isOpen, onClose }: SidebarProps) => {
             </>
           )}
         </nav>
-        <Link
-          to="/profile"
-          onClick={handleLinkClick}
-          className={`flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
-            isActive('/profile')
-              ? 'bg-primary text-primary-foreground'
-              : 'text-foreground hover:bg-background'
-          }`}
-        >
-          <User size={22} />
-          <span className="text-base font-medium">Profile</span>
-        </Link>
+        <div className="relative" ref={profileRef}>
+          <button
+            onClick={() => setIsProfileOpen(prev => !prev)}
+            className={`w-full flex items-center gap-3 px-3 py-3 rounded-lg transition-colors ${
+              isActive('/profile')
+                ? 'bg-primary text-primary-foreground'
+                : 'text-foreground hover:bg-background'
+            }`}
+          >
+            <User size={22} />
+            <span className="text-base font-medium">Profile</span>
+          </button>
+          {isProfileOpen && (
+            <div className="absolute bottom-14 left-0 w-40 bg-background border border-border rounded-lg shadow-lg z-50 animate-in fade-in zoom-in-95">
+              <button
+                onClick={() => {
+                  navigate('/profile');
+                  handleLinkClick();
+                  setIsProfileOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm hover:bg-slate-100 rounded-t-lg"
+              >
+                View Profile
+              </button>
+
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setIsProfileOpen(false);
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-red-500 hover:bg-slate-100 rounded-b-lg"
+              >
+                Log out
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </>
   );

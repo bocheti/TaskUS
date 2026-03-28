@@ -106,8 +106,8 @@ export const getOrganisation = async (req: AuthRequest, res: Response) => {
 
 // PUT /organisation
 export const updateOrganisation = async (req: AuthRequest, res: Response) => {
-  const { newName, newDescription, newPic } = req.body;
-  if (!newName && !newDescription && !newPic) {
+  const { newName, newDescription } = req.body;
+  if (!newName && !newDescription) {
     res.status(400).json({ error: 'At least one field is required' });
     return;
   }
@@ -118,7 +118,6 @@ export const updateOrganisation = async (req: AuthRequest, res: Response) => {
       data: {
         ...(newName && { name: newName }),
         ...(newDescription && { description: newDescription }),
-        ...(newPic && { pic: newPic }),
       }
     });
     res.json(updated);
@@ -137,7 +136,11 @@ export const uploadOrganisationPic = async (req: AuthRequest, res: Response) => 
   const fileName = `${organisationId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
   try {
     const url = await uploadImage('organisation-pics', fileName, req.file.buffer, req.file.mimetype);
-    res.json({ url });
+    const updated = await prisma.organisation.update({
+      where: { id: organisationId },
+      data: { pic: url }
+    });
+    res.json(updated);
   } catch (error) {
     res.status(500).json({ error: 'Internal server error' });
   }

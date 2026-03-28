@@ -6,6 +6,7 @@ import {
   getTasksByUser,
   getTasksByTaskGroup,
   getTasksByProject,
+  getTasksByUserAndProject,
   createTask,
   deleteTask,
   editTask
@@ -18,6 +19,7 @@ router.get('/byUser', authenticate, getTasksByUser);
 router.get('/byTaskGroup/:taskGroupId', authenticate, getTasksByTaskGroup);
 router.get('/:taskId', authenticate, getTask);
 router.put('/status/:taskId', authenticate, toggleStatus);
+router.get('/byUserAndProject/:projectId', authenticate, getTasksByUserAndProject);
 
 // Admin
 router.post('/', authenticate, isAdmin, createTask);

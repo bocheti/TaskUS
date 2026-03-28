@@ -147,6 +147,58 @@ describe('Project routes', () => {
     expect(res.status).toBe(401);
   });
 
+  // GET /project/:projectId/members
+  it('GET /project/:projectId/members - valid as admin', async () => {
+      const res = await request(app)
+          .get(`/project/${projectId}/members`)
+          .set('Authorization', `Bearer ${authToken}`);
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+      expect(res.body.length).toBeGreaterThan(0);
+      expect(res.body[0]).toHaveProperty('firstName');
+      expect(res.body[0]).toHaveProperty('email');
+  });
+
+  it('GET /project/:projectId/members - valid as member', async () => {
+      const res = await request(app)
+          .get(`/project/${projectId}/members`)
+          .set('Authorization', `Bearer ${memberToken}`);
+      expect(res.status).toBe(200);
+      expect(Array.isArray(res.body)).toBe(true);
+  });
+
+  it('GET /project/:projectId/members - not found', async () => {
+      const res = await request(app)
+          .get('/project/nonexistentid/members')
+          .set('Authorization', `Bearer ${authToken}`);
+      expect(res.status).toBe(404);
+  });
+
+  it('GET /project/:projectId/members - unauthorized (wrong org)', async () => {
+      const otherOrg = await request(app)
+          .post('/organisation')
+          .send({
+              organisationName: 'Members Test Org',
+              organisationDescription: 'Test',
+              firstName: 'Members',
+              lastName: 'Admin',
+              email: 'membersadmin@test.com',
+              password: 'password123'
+          });
+      const otherToken = otherOrg.body.authToken;
+
+      const res = await request(app)
+          .get(`/project/${projectId}/members`)
+          .set('Authorization', `Bearer ${otherToken}`);
+      expect(res.status).toBe(403);
+  });
+
+  it('GET /project/:projectId/members - no auth token', async () => {
+      const res = await request(app)
+          .get(`/project/${projectId}/members`);
+      expect(res.status).toBe(401);
+  });
+
   // GET /project/all (admin)
   it('GET /project/all - valid', async () => {
     const res = await request(app)
@@ -262,6 +314,75 @@ describe('Project routes', () => {
       .delete(`/project/${projectId}/member/${memberId}`)
       .set('Authorization', `Bearer ${memberToken}`);
     expect(res.status).toBe(403);
+  });
+
+  // PUT /project/:projectId
+  it('PUT /project/:projectId - update title', async () => {
+    const res = await request(app)
+      .put(`/project/${projectId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ newTitle: 'Updated Project' });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('title', 'Updated Project');
+  });
+
+  it('PUT /project/:projectId - update description', async () => {
+    const res = await request(app)
+      .put(`/project/${projectId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ newDescription: 'Updated description' });
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('description', 'Updated description');
+  });
+
+  it('PUT /project/:projectId - no fields provided', async () => {
+    const res = await request(app)
+      .put(`/project/${projectId}`)
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('PUT /project/:projectId - not found', async () => {
+    const res = await request(app)
+      .put('/project/nonexistentid')
+      .set('Authorization', `Bearer ${authToken}`)
+      .send({ newTitle: 'Updated' });
+    expect(res.status).toBe(404);
+  });
+
+  it('PUT /project/:projectId - wrong organisation', async () => {
+    const otherOrg = await request(app)
+      .post('/organisation')
+      .send({
+        organisationName: 'Update Test Org',
+        firstName: 'Update',
+        lastName: 'Admin',
+        email: 'updateadmin@test.com',
+        password: 'password123'
+      });
+    const otherToken = otherOrg.body.authToken;
+
+    const res = await request(app)
+      .put(`/project/${projectId}`)
+      .set('Authorization', `Bearer ${otherToken}`)
+      .send({ newTitle: 'Updated' });
+    expect(res.status).toBe(403);
+  });
+
+  it('PUT /project/:projectId - non admin', async () => {
+    const res = await request(app)
+      .put(`/project/${projectId}`)
+      .set('Authorization', `Bearer ${memberToken}`)
+      .send({ newTitle: 'Updated' });
+    expect(res.status).toBe(403);
+  });
+
+  it('PUT /project/:projectId - no auth token', async () => {
+    const res = await request(app)
+      .put(`/project/${projectId}`)
+      .send({ newTitle: 'Updated' });
+    expect(res.status).toBe(401);
   });
 
   // Cascade deletion

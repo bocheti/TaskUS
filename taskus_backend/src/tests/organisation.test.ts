@@ -102,28 +102,17 @@ describe('Organisation routes', () => {
     expect(res.body).toHaveProperty('description', 'Updated description');
   });
 
-  it('PUT /organisation - update pic only', async () => {
-    const res = await request(app)
-      .put('/organisation')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ newPic: 'https://example.com/pic.jpg' });
-    expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('pic', 'https://example.com/pic.jpg');
-  });
-
   it('PUT /organisation - update all fields', async () => {
     const res = await request(app)
       .put('/organisation')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
         newName: 'Fully Updated Org',
-        newDescription: 'Fully updated description',
-        newPic: 'https://example.com/newpic.jpg'
+        newDescription: 'Fully updated description'
       });
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('name', 'Fully Updated Org');
     expect(res.body).toHaveProperty('description', 'Fully updated description');
-    expect(res.body).toHaveProperty('pic', 'https://example.com/newpic.jpg');
   });
 
   it('PUT /organisation - no fields provided', async () => {

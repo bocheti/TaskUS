@@ -30,6 +30,11 @@ export const taskService = {
     return response.data;
   },
 
+  getTasksByUserAndProject: async (projectId: string): Promise<Task[]> => {
+    const response = await apiClient.get<Task[]>(`/task/byUserAndProject/${projectId}`);
+    return response.data;
+  },
+
   // admin routes
   
   createTask: async (data: CreateTaskRequest): Promise<Task> => {

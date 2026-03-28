@@ -14,26 +14,24 @@ export const ProtectedRoute = ({ children, requireAdmin = false }: ProtectedRout
 
   useEffect(() => {
     if (hasShownToast.current) return;
-
-    if (!user) {
+    const isLoggingOut = sessionStorage.getItem('isLoggingOut') === 'true';
+    if (!user && !isLoggingOut) {
       toast.error('Please log in to access this page');
       hasShownToast.current = true;
-    } else if (requireAdmin && user.role !== 'admin') {
+    } else if (user && requireAdmin && user.role !== 'admin') {
       toast.error('You need admin privileges to access this page');
       hasShownToast.current = true;
     }
   }, [user, requireAdmin]);
-
+  
   // Not logged in - redirect to login
   if (!user) {
     return <Navigate to="/login" replace />;
   }
-
   // Logged in but not admin when admin is required
   if (requireAdmin && user.role !== 'admin') {
     return <Navigate to="/dashboard" replace />;
   }
-
   // All checks passed
   return <>{children}</>;
 };
