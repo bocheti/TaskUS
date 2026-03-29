@@ -17,7 +17,7 @@ export const getTask = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Task not found' });
             return;
         }
-        if (task.responsibleId !== req.user!.userId && req.user!.role !== 'admin') {
+        if (task.responsibleId !== req.user!.id && req.user!.role !== 'admin') {
             res.status(403).json({ error: 'Unauthorized to access this task: This user is not responsible for it nor an admin' });
             return;
         }
@@ -52,7 +52,7 @@ export const toggleStatus = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Task not found' });
             return;
         }
-        if (task.responsibleId !== req.user!.userId && req.user!.role !== 'admin') {
+        if (task.responsibleId !== req.user!.id && req.user!.role !== 'admin') {
             res.status(403).json({ error: `Unauthorized to toggle this task's status: This user is not responsible for it nor an admin` });
             return;
         }
@@ -71,7 +71,7 @@ export const toggleStatus = async (req: AuthRequest, res: Response) => {
 
 // GET /task/byUser
 export const getTasksByUser = async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.userId;
+    const userId = req.user!.id;
     try {
         const tasks = await prisma.task.findMany({ where: { responsibleId: userId } });
         res.json(tasks);
@@ -89,7 +89,7 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
       res.status(404).json({ error: 'Task group not found' });
       return;
     }
-    const member = await isProjectMember(req.user!.userId, taskGroup.projectId);//then check if user belongs to the project that contains the task group
+    const member = await isProjectMember(req.user!.id, taskGroup.projectId);//then check if user belongs to the project that contains the task group
       if (!member) {
         if (req.user!.role !== 'admin') {
           res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
@@ -112,7 +112,7 @@ export const getTasksByTaskGroup = async (req: AuthRequest, res: Response) => {
 // GET /task/byUserAndProject/:projectId
 export const getTasksByUserAndProject = async (req: AuthRequest, res: Response) => {
     const { projectId } = req.params as { projectId: string };
-    const userId = req.user!.userId;
+    const userId = req.user!.id;
     try {
         const project = await prisma.project.findUnique({ where: { id: projectId } });
         if (!project) {
@@ -146,7 +146,7 @@ export const getTasksByUserAndProject = async (req: AuthRequest, res: Response) 
 export const getTasksByProject = async (req: AuthRequest, res: Response) => {
     const { projectId } = req.params as { projectId: string };
     try {
-        const member = await isProjectMember(req.user!.userId, projectId);//then check if user belongs to the project that contains the task group
+        const member = await isProjectMember(req.user!.id, projectId);//then check if user belongs to the project that contains the task group
         if (!member) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });

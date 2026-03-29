@@ -42,11 +42,11 @@ export const login = async (req: Request, res: Response) => {
             res.status(401).json({ error: 'Invalid credentials' });
             return;
         }
-        const token = jwt.sign({ userId: user.id, organisationId: user.organisationId, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '1d' });
+        const token = jwt.sign({ id: user.id, organisationId: user.organisationId, role: user.role }, process.env.JWT_SECRET!, { expiresIn: '1d' });
         res.json({
             authToken: token,
             userInfo: {
-                userId: user.id,
+                id: user.id,
                 firstName: user.firstName,
                 lastName: user.lastName,
                 email: user.email,
@@ -94,7 +94,7 @@ export const requestAccount = async (req: Request, res: Response) => {
 
 // DELETE /user/self
 export const removeUser = async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.userId;
+    const userId = req.user!.id;
     try {
         await prisma.user.delete({ where: { id: userId } });
         res.json({ message: 'Account deleted successfully' });
@@ -116,7 +116,7 @@ export const requestPasswordChange = async (req: Request, res: Response) => {
         if (!user) {
             return;
         }
-        const resetToken = jwt.sign({ userId: user.id, purpose: 'password-reset' }, process.env.JWT_SECRET!, { expiresIn: '1h' });
+        const resetToken = jwt.sign({ id: user.id, purpose: 'password-reset' }, process.env.JWT_SECRET!, { expiresIn: '1h' });
         const resetLink = `https://taskus.app/reset-password?token=${resetToken}`;
         await sendPasswordResetEmail(email, resetLink);
     } catch (error) {
@@ -136,14 +136,14 @@ export const resetPassword = async (req: Request, res: Response) => {
         return;
     }
     try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { userId: string, purpose: string };
+        const decoded = jwt.verify(token, process.env.JWT_SECRET!) as { id: string, purpose: string };
         if (decoded.purpose !== 'password-reset') {
             res.status(401).json({ error: 'Invalid token' });
             return;
         }
         const hashedPassword = await bcrypt.hash(newPassword, 10);
         await prisma.user.update({
-            where: { id: decoded.userId },
+            where: { id: decoded.id },
             data: { password: hashedPassword }
         });
         res.json({ message: 'Password reset successfully' });
@@ -158,7 +158,7 @@ export const uploadUserPic = async (req: AuthRequest, res: Response) => {
         res.status(400).json({ error: 'No file provided' });
         return;
     }
-    const userId = req.user!.userId;
+    const userId = req.user!.id;
     const fileName = `${userId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
     try {
         const url = await uploadImage('user-pics', fileName, req.file.buffer, req.file.mimetype);

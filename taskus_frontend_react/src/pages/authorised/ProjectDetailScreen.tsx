@@ -202,9 +202,9 @@ export const ProjectDetailScreen = () => {
         )}
 
         {/* Project Header - Adjusted Layout: 1/3 image, 2/3 info */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-start">
+        <div className="grid grid-cols-1 md:grid-cols-7 gap-3 items-start">
           {/* Left: Project Image - 1 column */}
-          <div className="bg-background rounded-lg border-2 border-border overflow-hidden">
+          <div className="md:col-span-2 bg-background rounded-lg border-2 border-border overflow-hidden">
             <div className="aspect-square w-full bg-background flex items-center justify-center">
               {project.pic ? (
                 <img
@@ -221,10 +221,10 @@ export const ProjectDetailScreen = () => {
           </div>
 
           {/* Right: Project Info & Progress - 2 columns */}
-          <div className="md:col-span-2 space-y-5 flex flex-col">
+          <div className="md:col-span-5 space-y-2 flex flex-col">
             {/* Description */}
             <div className="bg-background rounded-lg border-2 border-border p-4">
-              <p className="text-muted-foreground text-sm">
+              <p className="text-muted-foreground text-base">
                 {project.description || "No description provided"}
               </p>
             </div>
@@ -232,7 +232,7 @@ export const ProjectDetailScreen = () => {
             {/* Members Preview */}
             <div className="bg-background rounded-lg border-2 border-border p-4">
               <div className="flex items-center justify-between mb-3">
-                <h3 className="text-base font-['League_Spartan'] font-semibold">
+                <h3 className="text-base font-semibold">
                   Members
                 </h3>
                 <button
@@ -274,7 +274,7 @@ export const ProjectDetailScreen = () => {
 
             {/* Progress Overview */}
             <div className="bg-background rounded-lg border-2 border-border p-4">
-              <h3 className="text-base font-['League_Spartan'] font-semibold mb-3">
+              <h3 className="text-base font-semibold mb-3">
                 {user?.role === "admin" ? "Overall Progress" : "Your Progress"}
               </h3>
               

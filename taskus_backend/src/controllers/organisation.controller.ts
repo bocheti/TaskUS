@@ -50,7 +50,7 @@ export const createOrganisation = async (req: Request, res: Response) => {
     });
 
     const token = jwt.sign(
-      { userId: result.user.id, organisationId: result.organisation.id, role: 'admin' },
+      { id: result.user.id, organisationId: result.organisation.id, role: 'admin' },
       process.env.JWT_SECRET!,
       { expiresIn: '1d' }
     );
@@ -58,7 +58,7 @@ export const createOrganisation = async (req: Request, res: Response) => {
     res.status(201).json({
       authToken: token,
       userInfo: {
-        userId: result.user.id,
+        id: result.user.id,
         firstName: result.user.firstName,
         lastName: result.user.lastName,
         email: result.user.email,

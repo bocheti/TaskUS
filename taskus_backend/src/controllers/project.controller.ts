@@ -13,7 +13,7 @@ export const getProject = async (req: AuthRequest, res: Response) => {
       res.status(404).json({ error: 'Project not found' });
       return;
     }
-    const member = await isProjectMember(req.user!.userId, projectId);
+    const member = await isProjectMember(req.user!.id, projectId);
     if (!member) {
       if (req.user!.role !== 'admin') {
         res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
@@ -33,7 +33,7 @@ export const getProject = async (req: AuthRequest, res: Response) => {
 
 // GET /project/byUser
 export const getProjectsByUser = async (req: AuthRequest, res: Response) => {
-  const userId = req.user!.userId;
+  const userId = req.user!.id;
   try {
     const memberships = await prisma.projectMember.findMany({
       where: { userId },
@@ -55,7 +55,7 @@ export const getProjectMembers = async (req: AuthRequest, res: Response) => {
             res.status(404).json({ error: 'Project not found' });
             return;
         }
-        const isMember = await isProjectMember(req.user!.userId, projectId);
+        const isMember = await isProjectMember(req.user!.id, projectId);
         if (!isMember) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: You are not a member of this project' });
@@ -95,7 +95,7 @@ export const getAllProjects = async (req: AuthRequest, res: Response) => {
 export const createProject = async (req: AuthRequest, res: Response) => {
   const { title, description, pic } = req.body;
   const organisationId = req.user!.organisationId;
-  const userId = req.user!.userId;
+  const userId = req.user!.id;
   if (!title) {
     res.status(400).json({ error: 'title is required' });
     return;
@@ -118,7 +118,8 @@ export const createProject = async (req: AuthRequest, res: Response) => {
       return newProject;
     });
     res.status(201).json(project);
-  } catch {
+  } catch (error) {
+    console.error('Error creating project:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

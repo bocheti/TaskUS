@@ -3,6 +3,9 @@ import { X, Calendar, Clock, User } from 'lucide-react';
 import { useState } from 'react';
 import { taskService } from '@/services/api';
 import { toast } from 'sonner';
+import { useAuth } from '@/hooks/useAuth';
+import { Trash2 } from 'lucide-react';
+
 
 interface TaskModalProps {
   task: Task;
@@ -14,7 +17,8 @@ interface TaskModalProps {
 export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalProps) => {
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [currentTask, setCurrentTask] = useState(task);
-
+  const { user } = useAuth();
+  
   if (!isOpen) return null;
 
   const handleToggleStatus = async () => {
@@ -43,6 +47,26 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
       toast.error('Failed to update task status');
     } finally {
       setIsTogglingStatus(false);
+    }
+  };
+
+  const handleDeleteTask = async () => {
+    const confirmed = window.confirm(
+      `Are you sure you want to delete "${currentTask.title}"? This action cannot be undone.`
+    );
+
+    if (!confirmed) return;
+
+    try {
+      await taskService.deleteTask(currentTask.id);
+      toast.success('Task deleted successfully');
+      onClose();
+      if (onTaskUpdated) {
+        // Refresh parent by passing a deleted flag or trigger refetch
+        window.location.reload(); // Simple approach, or pass callback from parent
+      }
+    } catch (error) {
+      toast.error('Failed to delete task');
     }
   };
 
@@ -172,13 +196,31 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
 
           {/* Actions */}
           <div className="pt-4 border-t border-border">
-            <button
-              onClick={handleToggleStatus}
-              disabled={isTogglingStatus}
-              className="w-full bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isTogglingStatus ? 'Updating...' : getNextStatusText()}
-            </button>
+            {(user?.role === "admin" || currentTask.responsibleId === user?.userId) ? (
+              <div className="flex gap-3">
+                <button
+                  onClick={handleToggleStatus}
+                  disabled={isTogglingStatus}
+                  className="flex-1 bg-primary text-primary-foreground py-3 rounded-lg hover:opacity-90 transition-opacity font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isTogglingStatus ? 'Updating...' : getNextStatusText()}
+                </button>
+                
+                {user?.role === 'admin' && (
+                  <button
+                    onClick={handleDeleteTask}
+                    className="px-4 py-3 rounded-lg border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    Delete
+                  </button>
+                )}
+              </div>
+            ) : (
+              <p className="text-center text-muted-foreground py-2">
+                This task is assigned to another user.
+              </p>
+            )}
           </div>
         </div>
       </div>

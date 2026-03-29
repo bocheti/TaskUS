@@ -13,7 +13,7 @@ export const getTaskGroup = async (req: AuthRequest, res: Response) => {
             return;
         }
         
-        const member = await isProjectMember(req.user!.userId, taskGroup.projectId);//then check if user belongs to the project that contains the task group
+        const member = await isProjectMember(req.user!.id, taskGroup.projectId);//then check if user belongs to the project that contains the task group
         if (!member) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });
@@ -37,7 +37,7 @@ export const getTaskGroup = async (req: AuthRequest, res: Response) => {
 export const getTaskGroupsByProject = async (req: AuthRequest, res: Response) => {
     const { projectId } = req.params as { projectId: string };
     try {
-        const member = await isProjectMember(req.user!.userId, projectId);//check if user belongs to the project that contains the task group
+        const member = await isProjectMember(req.user!.id, projectId);//check if user belongs to the project that contains the task group
         if (!member) {
             if (req.user!.role !== 'admin') {
                 res.status(403).json({ error: 'Unauthorized: This user is not a member of this project nor an admin' });

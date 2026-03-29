@@ -22,7 +22,7 @@ describe('Project routes', () => {
       });
     authToken = res.body.authToken;
     organisationId = res.body.userInfo.organisationId;
-    userId = res.body.userInfo.userId;
+    userId = res.body.userInfo.id;
 
     const memberRes = await request(app)
       .post('/user/create')

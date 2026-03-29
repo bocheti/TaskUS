@@ -21,7 +21,7 @@ describe('User routes', () => {
       });
     authToken = res.body.authToken;
     organisationId = res.body.userInfo.organisationId;
-    userId = res.body.userInfo.userId;
+    userId = res.body.userInfo.id;
 
     // create a member user
     await request(app)

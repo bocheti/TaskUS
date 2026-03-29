@@ -24,7 +24,7 @@ describe('Task routes', () => {
         password: 'password123'
       });
     authToken = res.body.authToken;
-    adminId = res.body.userInfo.userId;
+    adminId = res.body.userInfo.id;
 
     const memberRes = await request(app)
       .post('/user/create')
@@ -482,7 +482,7 @@ it('GET /task/byUserAndProject/:projectId - no auth token', async () => {
         email: 'anothertaskadmin@test.com',
         password: 'password123'
       });
-    const otherUserId = otherOrgMember.body.userInfo.userId;
+    const otherUserId = otherOrgMember.body.userInfo.id;
 
     const res = await request(app)
       .put(`/task/${taskId}`)
