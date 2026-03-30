@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Plus, Image as ImageIcon, Upload, Trash2, Users, Edit } from "lucide-react";
+import { Plus, Image as ImageIcon, Upload, Trash2, Users, Edit, ArrowLeft } from "lucide-react";
 import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -163,65 +163,72 @@ export const ProjectDetailScreen = () => {
   return (
     <AuthorizedLayout title={project.title}>
       <div className="space-y-6">
-        {/* Admin Controls */}
-        {user?.role === "admin" && (
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setEditDialogOpen(true)}
-              className="flex items-center gap-2"
+        <div className="flex gap-3 items-items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
-              <Edit className="h-4 w-4" />
-              Edit Project
-            </Button>
-            <Button
-              variant="outline"
-              onClick={() => fileInputRef.current?.click()}
-              disabled={isUploading}
-              className="flex items-center gap-2"
-            >
-              <Upload className="h-4 w-4" />
-              {isUploading ? "Uploading..." : "Change Picture"}
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDeleteProject}
-              className="flex items-center gap-2 text-red-500 hover:text-red-600"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete Project
-            </Button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="image/*"
-              onChange={handleImageUpload}
-              className="hidden"
-            />
-          </div>
-        )}
-
-        {/* Project Header - Adjusted Layout: 1/3 image, 2/3 info */}
-        <div className="grid grid-cols-1 md:grid-cols-7 gap-3 items-start">
-          {/* Left: Project Image - 1 column */}
-          <div className="md:col-span-2 bg-background rounded-lg border-2 border-border overflow-hidden">
-            <div className="aspect-square w-full bg-background flex items-center justify-center">
-              {project.pic ? (
-                <img
-                  src={project.pic}
-                  alt={project.title}
-                  className="w-full h-full object-contain"
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+          {/* Admin Controls */}
+          {user?.role === "admin" && (
+            <div className="ml-auto flex items-center gap-2">
+              <Button
+                variant="outline"
+                onClick={() => setEditDialogOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                <span className="hidden md:inline">Edit Project</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={isUploading}
+                className="flex items-center gap-2"
+              >
+                <Upload className="h-4 w-4" />
+                <span className="hidden md:inline">{isUploading ? "Uploading..." : "Change Picture"}</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDeleteProject}
+                className="flex items-center gap-2 text-red-500 hover:text-red-600"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="hidden md:inline">Delete Project</span>
+              </Button>
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
                 />
-              ) : (
-                <div className="w-full h-full bg-card flex items-center justify-center">
-                  <ImageIcon className="h-16 w-16 text-muted-foreground/30" />
-                </div>
-              )}
             </div>
-          </div>
+          )}
+        </div>
 
-          {/* Right: Project Info & Progress - 2 columns */}
-          <div className="md:col-span-5 space-y-2 flex flex-col">
+  {/* Project Header */}
+  <div className="grid grid-cols-1 md:grid-cols-7 gap-3">
+    {/* Left: Project Image */}
+    <div className="md:col-span-2 bg-background rounded-lg border-2 border-border overflow-hidden flex items-center justify-center">
+      <div className="w-full aspect-square bg-background flex items-center justify-center relative">
+        {project.pic ? (
+          <img
+            src={project.pic}
+            alt={project.title}
+            className="absolute inset-0 w-full h-full object-contain p-1"
+          />
+        ) : (
+          <ImageIcon className="h-16 w-16 text-muted-foreground/30" />
+        )}
+      </div>
+    </div>
+
+  {/* Right: Project Info & Progress */}
+  <div className="md:col-span-5 space-y-2 flex flex-col min-h-[16rem]">
             {/* Description */}
             <div className="bg-background rounded-lg border-2 border-border p-4">
               <p className="text-muted-foreground text-base">

@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { Plus, Trash2, Edit } from "lucide-react";
+import { Plus, Trash2, Edit, ArrowLeft } from "lucide-react";
 import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
@@ -87,7 +87,7 @@ export const TaskGroupDetailScreen = () => {
   // Filter tasks for progress calculation (only user's tasks for members, all for admin)
   const myTasks = user?.role === "admin" 
     ? tasks 
-    : tasks.filter(t => t.responsibleId === user?.userId);
+    : tasks.filter(t => t.responsibleId === user?.id);
 
   const totalTasks = myTasks.length;
   const pendingTasks = myTasks.filter(t => t.status === "Pending").length;
@@ -122,27 +122,36 @@ export const TaskGroupDetailScreen = () => {
   return (
     <AuthorizedLayout title={taskGroup.title}>
       <div className="space-y-6">
-        {/* Admin Controls */}
-        {user?.role === "admin" && (
-          <div className="flex justify-end gap-3">
-            <Button
-              variant="outline"
-              onClick={() => setEditDialogOpen(true)}
-              className="flex items-center gap-2"
+        <div className="flex gap-3 items-center">
+          <button
+            onClick={() => navigate(-1)}
+            className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
             >
-              <Edit className="h-4 w-4" />
-              Edit
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDeleteTaskGroup}
-              className="flex items-center gap-2 text-red-500 hover:text-red-600"
-            >
-              <Trash2 className="h-4 w-4" />
-              Delete
-            </Button>
-          </div>
-        )}
+            <ArrowLeft className="h-4 w-4" />
+            Back
+          </button>
+          {/* Admin Controls */}
+          {user?.role === "admin" && (
+            <div className="ml-auto flex items-center gap-3">
+              <Button
+                variant="outline"
+                onClick={() => setEditDialogOpen(true)}
+                className="flex items-center gap-2"
+              >
+                <Edit className="h-4 w-4" />
+                <span className="hidden md:inline">Edit</span>
+              </Button>
+              <Button
+                variant="outline"
+                onClick={handleDeleteTaskGroup}
+                className="flex items-center gap-2 text-red-500 hover:text-red-600"
+              >
+                <Trash2 className="h-4 w-4" />
+                <span className="hidden md:inline">Delete</span>
+              </Button>
+            </div>
+          )}
+        </div>
 
         {/* Task Group Info & Progress */}
         <div className="bg-background rounded-lg border-2 border-border p-6 space-y-4">
@@ -231,7 +240,7 @@ export const TaskGroupDetailScreen = () => {
           ) : (
             <div className="space-y-3">
               {tasks.map((task) => {
-                const isMyTask = user?.role === "admin" || task.responsibleId === user?.userId;
+                const isMyTask = user?.role === "admin" || task.responsibleId === user?.id;
                 return (
                   <div
                     key={task.id}

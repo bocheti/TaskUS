@@ -1,10 +1,11 @@
 import { Task } from '@/types';
 import { X, Calendar, Clock, User } from 'lucide-react';
-import { useState } from 'react';
-import { taskService } from '@/services/api';
+import { useState, useEffect } from 'react';
+import { taskService, userService } from '@/services/api';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
 import { Trash2 } from 'lucide-react';
+
 
 
 interface TaskModalProps {
@@ -18,6 +19,20 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
   const [currentTask, setCurrentTask] = useState(task);
   const { user } = useAuth();
+  const [responsibleUser, setResponsibleUser] = useState<{ firstName: string; lastName: string } | null>(null);
+
+  useEffect(() => {
+    const fetchResponsibleUser = async () => {
+      try {
+        const user = await userService.getUserInfo(currentTask.responsibleId);
+        setResponsibleUser({ firstName: user.firstName, lastName: user.lastName });
+      } catch (error) {
+        console.error('Error fetching responsible user:', error);
+      }
+    };
+
+    fetchResponsibleUser();
+  }, [currentTask.responsibleId]);
   
   if (!isOpen) return null;
 
@@ -43,7 +58,7 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
       if (onTaskUpdated) {
         onTaskUpdated(updatedTask);
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to update task status');
     } finally {
       setIsTogglingStatus(false);
@@ -65,7 +80,7 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
         // Refresh parent by passing a deleted flag or trigger refetch
         window.location.reload(); // Simple approach, or pass callback from parent
       }
-    } catch (error) {
+    } catch {
       toast.error('Failed to delete task');
     }
   };
@@ -186,17 +201,22 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
               </div>
             )}
 
-            {/* Responsible (placeholder for now) */}
+            {/* Responsible */}
             <div className="flex items-center gap-2 text-sm">
               <User size={16} className="text-muted-foreground" />
               <span className="text-muted-foreground">Assigned to:</span>
-              <span className="text-foreground font-medium">You</span>
+              <span className="text-foreground font-medium">
+                {responsibleUser 
+                  ? `${responsibleUser.firstName} ${responsibleUser.lastName}${currentTask.responsibleId === user?.id ? ' (You)' : ''}`
+                  : 'Loading...'
+                }
+              </span>
             </div>
           </div>
 
           {/* Actions */}
           <div className="pt-4 border-t border-border">
-            {(user?.role === "admin" || currentTask.responsibleId === user?.userId) ? (
+            {(user?.role === "admin" || currentTask.responsibleId === user?.id) ? (
               <div className="flex gap-3">
                 <button
                   onClick={handleToggleStatus}

@@ -7,7 +7,6 @@ import {
   CreateAccountRequest,
   CreateUserRequest,
   UpdateUserRoleRequest,
-  UploadPicResponse,
 } from '@/types';
 
 export const userService = {
@@ -41,11 +40,11 @@ export const userService = {
     await apiClient.delete('/user/self');
   },
 
-  uploadPic: async (file: File): Promise<UploadPicResponse> => {
+  uploadPic: async (file: File): Promise<User> => {
     const formData = new FormData();
     formData.append('pic', file);
     
-    const response = await apiClient.post<UploadPicResponse>(
+    const response = await apiClient.post<User>(
       '/user/uploadPic',
       formData,
       {

@@ -8,7 +8,7 @@ export const ProfileScreen = () => {
   
   // If userId is provided, viewing another user's profile (admin mode)
   // If no userId, viewing own profile
-  const isOwnProfile = !userId || userId === user?.userId;
+  const isOwnProfile = !userId || userId === user?.id;
   
   return (
     <AuthorizedLayout title={isOwnProfile ? 'My Profile' : 'User Profile'}>

@@ -21,6 +21,7 @@ import { UserManagementScreen } from '@/pages/admin/UserManagementScreen';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 import { NotFoundScreen } from './pages/NotFoundScreen';
 import { AboutUsScreen } from './pages/authorised/AboutUsScreen';
+import { AllTasksScreen } from './pages/authorised/AllTasksScreen';
 
 function App() {
   const { user } = useAuth();
@@ -77,6 +78,14 @@ function App() {
             element={
               <ProtectedRoute>
                 <TaskGroupDetailScreen />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/tasks"
+            element={
+              <ProtectedRoute>
+                <AllTasksScreen />
               </ProtectedRoute>
             }
           />

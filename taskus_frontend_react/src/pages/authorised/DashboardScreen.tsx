@@ -8,6 +8,7 @@ import { StatsOverviewCard } from '@/components/dashboard/StatsOverviewCard';
 import { RecentCompletedCard } from '@/components/dashboard/RecentCompletedCard';
 import { TaskCard } from '@/components/task/TaskCard';
 import { TaskModal } from '@/components/task/TaskModal';
+import { useNavigate } from 'react-router-dom';
 
 export const DashboardScreen = () => {
   const { user } = useAuth();
@@ -15,13 +16,14 @@ export const DashboardScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         const userTasks = await taskService.getTasksByUser();
         setTasks(userTasks);
-      } catch (error) {
+      } catch {
         toast.error('Failed to load tasks');
       } finally {
         setIsLoading(false);
@@ -82,10 +84,13 @@ export const DashboardScreen = () => {
         {/* left column */}
         <div className="lg:col-span-2 space-y-4">
           <div className="flex items-center space-x-6">
-            <h3 className="text-lg md:text-lg font-semibold text-foreground">
+            <h3 className="text-sm md:text-lg font-semibold text-foreground">
               Tasks Requiring Attention
             </h3>
-            <button className="text-xs  text-primary hover:underline">
+            <button 
+              onClick={() => navigate('/tasks')}
+              className="text-xs text-primary hover:underline"
+            >
               View All Tasks
             </button>
           </div>
