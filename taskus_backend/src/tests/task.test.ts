@@ -319,21 +319,84 @@ describe('Task routes', () => {
     expect(res.status).toBe(401);
   });
 
-  // GET /task/byUser
-  it('GET /task/byUser - valid', async () => {
-    const res = await request(app)
-      .get('/task/byUser')
-      .set('Authorization', `Bearer ${memberToken}`);
-    expect(res.status).toBe(200);
-    expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.length).toBeGreaterThan(0);
-  });
+// GET /task/byUser/:userId
 
-  it('GET /task/byUser - no auth token', async () => {
-    const res = await request(app)
-      .get('/task/byUser');
-    expect(res.status).toBe(401);
-  });
+it('GET /task/byUser/:userId - valid as member (own tasks)', async () => {
+  const res = await request(app)
+    .get(`/task/byUser/${memberId}`)
+    .set('Authorization', `Bearer ${memberToken}`);
+
+  expect(res.status).toBe(200);
+  expect(Array.isArray(res.body)).toBe(true);
+  expect(res.body.length).toBeGreaterThan(0);
+});
+
+it('GET /task/byUser/:userId - valid as admin (member tasks, same org)', async () => {
+  const res = await request(app)
+    .get(`/task/byUser/${memberId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+
+  expect(res.status).toBe(200);
+  expect(Array.isArray(res.body)).toBe(true);
+  expect(res.body.length).toBeGreaterThan(0);
+});
+
+it('GET /task/byUser/:userId - valid as admin (own tasks)', async () => {
+  const res = await request(app)
+    .get(`/task/byUser/${adminId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+
+  expect(res.status).toBe(200);
+  expect(Array.isArray(res.body)).toBe(true);
+});
+
+it('GET /task/byUser/:userId - invalid as member fetching another user', async () => {
+  const res = await request(app)
+    .get(`/task/byUser/${adminId}`)
+    .set('Authorization', `Bearer ${memberToken}`);
+
+  expect(res.status).toBe(403);
+  expect(res.body.error).toBeDefined();
+});
+
+it('GET /task/byUser/:userId - invalid as admin from another organisation', async () => {
+  const res = await request(app)
+    .get(`/task/byUser/${memberId}`)
+    .set('Authorization', `Bearer ${otherOrgToken}`);
+
+  expect(res.status).toBe(403);
+  expect(res.body.error).toBeDefined();
+});
+
+it('GET /task/byUser/:userId - no auth token', async () => {
+  const res = await request(app)
+    .get(`/task/byUser/${memberId}`);
+
+  expect(res.status).toBe(401);
+});
+
+it('GET /task/byUser/:userId - user has no tasks', async () => {
+  const newUserRes = await request(app)
+    .post('/user/create')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({
+      firstName: 'No',
+      lastName: 'Tasks',
+      email: 'notasks@test.com',
+      password: 'password123',
+      role: 'member'
+    });
+
+  const newUserId = newUserRes.body.id;
+
+  const res = await request(app)
+    .get(`/task/byUser/${newUserId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+
+  expect(res.status).toBe(200);
+  expect(Array.isArray(res.body)).toBe(true);
+  expect(res.body.length).toBe(0);
+});
 
   // GET /task/byTaskGroup/:taskGroupId
   it('GET /task/byTaskGroup/:taskGroupId - valid as admin', async () => {

@@ -55,10 +55,6 @@ export interface CreateUserRequest {
   role: UserRole;
 }
 
-export interface UpdateUserRoleRequest {
-  newRole: UserRole;
-}
-
 export interface Organisation {
   id: string;
   name: string;

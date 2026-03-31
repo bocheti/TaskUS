@@ -69,15 +69,40 @@ export const toggleStatus = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// GET /task/byUser
+// GET /task/byUser/:userId
 export const getTasksByUser = async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.id;
-    try {
-        const tasks = await prisma.task.findMany({ where: { responsibleId: userId } });
-        res.json(tasks);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+  const { userId } = req.params as { userId: string };
+  try {
+    const targetUser = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+    if (!targetUser) {
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
+    if (req.user!.id === userId) {
+      const tasks = await prisma.task.findMany({
+        where: { responsibleId: userId }
+      });
+      res.json(tasks);
+      return;
+    }
+    if (
+      req.user!.role === 'admin' &&
+      targetUser.organisationId === req.user!.organisationId
+    ) {
+      const tasks = await prisma.task.findMany({
+        where: { responsibleId: userId }
+      });
+      res.json(tasks);
+      return;
+    }
+    res.status(403).json({
+      error: 'Unauthorized: You can only access your own tasks or users in your organisation as an admin'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 // GET /task/byTaskGroup/:taskGroupId

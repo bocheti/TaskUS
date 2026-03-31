@@ -15,7 +15,7 @@ import {
 const router = Router();
 
 // Protected
-router.get('/byUser', authenticate, getTasksByUser);
+router.get('/byUser/:userId', authenticate, getTasksByUser);
 router.get('/byTaskGroup/:taskGroupId', authenticate, getTasksByTaskGroup);
 router.get('/:taskId', authenticate, getTask);
 router.put('/status/:taskId', authenticate, toggleStatus);

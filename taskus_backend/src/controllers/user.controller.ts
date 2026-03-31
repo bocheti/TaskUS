@@ -92,15 +92,33 @@ export const requestAccount = async (req: Request, res: Response) => {
     }
 };
 
-// DELETE /user/self
+// DELETE /user/:userId
 export const removeUser = async (req: AuthRequest, res: Response) => {
-    const userId = req.user!.id;
-    try {
-        await prisma.user.delete({ where: { id: userId } });
-        res.json({ message: 'Account deleted successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
+  const { userId } = req.params as { userId: string };
+  try {
+    const userToBeRemoved = await prisma.user.findUnique({
+      where: { id: userId }
+    });
+    if (!userToBeRemoved) {
+      res.status(404).json({ error: 'User not found' });
+      return;
     }
+    if (req.user!.id === userId) {
+      await prisma.user.delete({ where: { id: userId } });
+      res.json({ message: 'User removed successfully' });
+      return;
+    }
+    if (req.user!.role === 'admin' && userToBeRemoved.organisationId === req.user!.organisationId) {
+      await prisma.user.delete({ where: { id: userId } });
+      res.json({ message: 'User removed successfully' });
+      return;
+    }
+    res.status(403).json({
+      error: 'Unauthorized: You can only delete your own account or users in your organisation as an admin'
+    });
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 // POST /user/passwordRequest
@@ -284,47 +302,22 @@ export const rejectUserRequest = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// DELETE /user/:userId (admin)
-export const removeUserFromOrganisation = async (req: AuthRequest, res: Response) => {
-    const { userId } = req.params as { userId: string };
-    try {
-        const userToBeRemoved = await prisma.user.findUnique({ where: { id: userId } });
-        if (!userToBeRemoved) {
-            res.status(404).json({ error: 'User not found' });
-            return;
-        }
-        if (userToBeRemoved.organisationId !== req.user!.organisationId) {
-            res.status(403).json({ error: 'Unauthorized: This user does not belong to your organisation' });
-            return;
-        }
-        await prisma.user.delete({ where: { id: userId } });
-        res.json({ message: 'User removed successfully' });
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
-};
-
 // PUT /user/:userId/role (admin)
 export const updateRole = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params as { userId: string };
-    const { newRole } = req.body;
-    if (!newRole) {
-        res.status(400).json({ error: 'newRole is required' });
-        return;
-    }
-    if (newRole !== 'admin' && newRole !== 'member') {
-        res.status(400).json({ error: 'newRole must be either admin or member' });
-        return;
-    }
     try {
         const userToBeUpdated = await prisma.user.findUnique({ where: { id: userId } });
         if (!userToBeUpdated) {
             res.status(404).json({ error: 'User not found' });
             return;
         }
+        if (userToBeUpdated.organisationId !== req.user!.organisationId) {
+            res.status(403).json({ error: 'Unauthorized: This user does not belong to your organisation' });
+            return;
+        }
         const updated = await prisma.user.update({
             where: { id: userId },
-            data: { role: newRole },
+            data: { role: userToBeUpdated.role === 'admin' ? 'member' : 'admin' },
             select: { id: true, firstName: true, lastName: true, email: true, role: true, pic: true }
         });
         res.json(updated);

@@ -6,7 +6,6 @@ import {
   LoginResponse,
   CreateAccountRequest,
   CreateUserRequest,
-  UpdateUserRoleRequest,
 } from '@/types';
 
 export const userService = {
@@ -36,8 +35,8 @@ export const userService = {
     return response.data;
   },
 
-  deleteUser: async (): Promise<void> => {
-    await apiClient.delete('/user/self');
+  deleteUser: async (userId: string): Promise<void> => {
+    await apiClient.delete(`/user/${userId}`);
   },
 
   uploadPic: async (file: File): Promise<User> => {
@@ -81,7 +80,7 @@ export const userService = {
     await apiClient.post(`/user/${userRequestId}/reject`);
   },
 
-  updateUserRole: async (userId: string, data: UpdateUserRoleRequest): Promise<void> => {
-    await apiClient.put(`/user/${userId}/role`, data);
+  updateUserRole: async (userId: string): Promise<void> => {
+    await apiClient.put(`/user/${userId}/role`);
   },
 };

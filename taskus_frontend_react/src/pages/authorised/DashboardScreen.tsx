@@ -21,7 +21,7 @@ export const DashboardScreen = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const userTasks = await taskService.getTasksByUser();
+        const userTasks = await taskService.getTasksByUser(user!.id);
         setTasks(userTasks);
       } catch {
         toast.error('Failed to load tasks');

@@ -90,8 +90,6 @@ export const ProjectDetailScreen = () => {
     try {
       setIsUploading(true);
       const response = await projectService.uploadPic(projectId, file);
-      
-      // Update local state
       if (project) {
         setProject({ ...project, pic: response.pic });
       }
@@ -102,7 +100,6 @@ export const ProjectDetailScreen = () => {
       toast.error("Failed to upload picture");
     } finally {
       setIsUploading(false);
-      // Reset file input
       if (fileInputRef.current) {
         fileInputRef.current.value = '';
       }

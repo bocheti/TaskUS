@@ -11,7 +11,6 @@ import {
     getAllRequests,
     acceptUserRequest,
     rejectUserRequest,
-    removeUserFromOrganisation,
     updateRole,
     resetPassword,
     uploadUserPic
@@ -29,13 +28,12 @@ router.post('/resetPassword', sensitiveLimiter, resetPassword);
 router.get('/all', authenticate, isAdmin, getAllUsers); //(this one is from admin too, needed to put it here to have static routes before dynamic ones)
 router.get('/requests', authenticate, isAdmin, getAllRequests); //and this one too
 router.get('/:userId', authenticate, getUserInfo);
-router.delete('/self', authenticate, removeUser);
+router.delete('/:userId', authenticate, removeUser);
 router.post('/uploadPic', authenticate, uploadLimiter, upload.single('pic'), uploadUserPic);
 
 router.post('/create', authenticate, isAdmin, createAccount);
 router.post('/:userRequestId/accept', authenticate, isAdmin, acceptUserRequest);
 router.post('/:userRequestId/reject', authenticate, isAdmin, rejectUserRequest);
-router.delete('/:userId', authenticate, isAdmin, removeUserFromOrganisation);
 router.put('/:userId/role', authenticate, isAdmin, updateRole);
 
 

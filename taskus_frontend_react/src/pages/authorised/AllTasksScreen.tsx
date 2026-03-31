@@ -7,10 +7,12 @@ import { TaskCard } from '@/components/task/TaskCard';
 import { TaskModal } from '@/components/task/TaskModal';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/hooks/useAuth';
 
 type FilterStatus = 'All' | TaskStatus;
 
 export const AllTasksScreen = () => {
+  const { user } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
@@ -24,7 +26,7 @@ export const AllTasksScreen = () => {
 
   const fetchTasks = async () => {
     try {
-      const userTasks = await taskService.getTasksByUser();
+      const userTasks = await taskService.getTasksByUser(user!.id);
       setTasks(userTasks);
     } catch {
       toast.error('Failed to load tasks');

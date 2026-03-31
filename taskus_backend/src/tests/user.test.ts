@@ -7,6 +7,7 @@ describe('User routes', () => {
   let userId: string;
   let memberToken: string;
   let userRequestId: string;
+  let otherOrgToken: string;
 
   beforeAll(async () => {
     const res = await request(app)
@@ -23,7 +24,6 @@ describe('User routes', () => {
     organisationId = res.body.userInfo.organisationId;
     userId = res.body.userInfo.id;
 
-    // create a member user
     await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
@@ -39,7 +39,6 @@ describe('User routes', () => {
       .send({ email: 'testmember@test.com', password: 'password123' });
     memberToken = memberLogin.body.authToken;
 
-    // create a user request
     const reqRes = await request(app)
       .post('/user/request')
       .send({
@@ -50,6 +49,17 @@ describe('User routes', () => {
         organisationId
       });
     userRequestId = reqRes.body.requestId;
+    const otherOrg = await request(app)
+      .post('/organisation')
+      .send({
+        organisationName: 'Other Task Organisation',
+        organisationDescription: 'Other description',
+        firstName: 'Other',
+        lastName: 'Admin',
+        email: 'othertaskadmin@test.com',
+        password: 'password123'
+      });
+    otherOrgToken = otherOrg.body.authToken;
   });
 
   // POST /user/login
@@ -270,7 +280,7 @@ describe('User routes', () => {
   });
 
   // Admin - PUT /user/:userId/role
-  it('PUT /user/:userId/role - valid', async () => {
+  it('PUT /user/:userId/role - valid (toggles role)', async () => {
     const memberRes = await request(app)
       .get('/user/all')
       .set('Authorization', `Bearer ${authToken}`);
@@ -278,35 +288,27 @@ describe('User routes', () => {
 
     const res = await request(app)
       .put(`/user/${member.id}/role`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ newRole: 'admin' });
+      .set('Authorization', `Bearer ${authToken}`);
     expect(res.status).toBe(200);
-    expect(res.body).toHaveProperty('role', 'admin');
+    expect(res.body.role).not.toBe(member.role);
   });
 
-  it('PUT /user/:userId/role - invalid role', async () => {
-    const memberRes = await request(app)
-      .get('/user/all')
-      .set('Authorization', `Bearer ${authToken}`);
-    const member = memberRes.body.find((u: any) => u.email === 'testmember@test.com');
-
+it('PUT /user/:userId/role - not found', async () => {
     const res = await request(app)
-      .put(`/user/${member.id}/role`)
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({ newRole: 'superadmin' });
-    expect(res.status).toBe(400);
+      .put('/user/nonexistentid/role')
+      .set('Authorization', `Bearer ${authToken}`);
+    expect(res.status).toBe(404);
   });
 
   it('PUT /user/:userId/role - non admin', async () => {
     const res = await request(app)
       .put(`/user/${userId}/role`)
-      .set('Authorization', `Bearer ${memberToken}`)
-      .send({ newRole: 'admin' });
+      .set('Authorization', `Bearer ${memberToken}`);
     expect(res.status).toBe(403);
   });
 
-  // Admin - DELETE /user/:userId
-  it('DELETE /user/:userId - valid', async () => {
+  // DELETE /user/:userId
+  it('DELETE /user/:userId - admin deletes user in same organisation', async () => {
     const created = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
@@ -321,42 +323,53 @@ describe('User routes', () => {
     const res = await request(app)
       .delete(`/user/${created.body.id}`)
       .set('Authorization', `Bearer ${authToken}`);
+
     expect(res.status).toBe(200);
   });
 
-  it('DELETE /user/:userId - non admin', async () => {
-    const res = await request(app)
-      .delete(`/user/${userId}`)
-      .set('Authorization', `Bearer ${memberToken}`);
-    expect(res.status).toBe(403);
-  });
-
-  // DELETE /user/self
-  it('DELETE /user/self - valid', async () => {
+  it('DELETE /user/:userId - user deletes themselves', async () => {
     const created = await request(app)
       .post('/user/create')
       .set('Authorization', `Bearer ${authToken}`)
       .send({
         firstName: 'Self',
         lastName: 'Delete',
-        email: 'selfdeletion@test.com',
+        email: 'selfdelete@test.com',
         password: 'password123',
         role: 'member'
       });
-    const selfLogin = await request(app)
+
+    const login = await request(app)
       .post('/user/login')
-      .send({ email: 'selfdeletion@test.com', password: 'password123' });
-    const selfToken = selfLogin.body.authToken;
+      .send({ email: 'selfdelete@test.com', password: 'password123' });
 
     const res = await request(app)
-      .delete(`/user/self`)
-      .set('Authorization', `Bearer ${selfToken}`);
+      .delete(`/user/${created.body.id}`)
+      .set('Authorization', `Bearer ${login.body.authToken}`);
+
     expect(res.status).toBe(200);
   });
 
-  it('DELETE /user/self - no auth token', async () => {
+  it('DELETE /user/:userId - member cannot delete another user', async () => {
     const res = await request(app)
-      .delete(`/user/self`);
+      .delete(`/user/${userId}`) // admin user
+      .set('Authorization', `Bearer ${memberToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it('DELETE /user/:userId - admin from another organisation cannot delete user', async () => {
+    const res = await request(app)
+      .delete(`/user/${userId}`)
+      .set('Authorization', `Bearer ${otherOrgToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it('DELETE /user/:userId - no auth token', async () => {
+    const res = await request(app)
+      .delete(`/user/${userId}`);
+
     expect(res.status).toBe(401);
   });
 });

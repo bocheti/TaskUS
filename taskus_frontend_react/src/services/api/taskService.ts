@@ -20,8 +20,8 @@ export const taskService = {
     return response.data;
   },
 
-  getTasksByUser: async (): Promise<Task[]> => {
-    const response = await apiClient.get<Task[]>('/task/byUser');
+  getTasksByUser: async (userId: string): Promise<Task[]> => {
+    const response = await apiClient.get<Task[]>(`/task/byUser/${userId}`);
     return response.data;
   },
 
