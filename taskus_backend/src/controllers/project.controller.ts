@@ -252,9 +252,9 @@ export const uploadProjectPic = async (req: AuthRequest, res: Response) => {
     return;
   }
   const { projectId } = req.params as { projectId: string };
-  const fileName = `${projectId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
+  const fileName = `${projectId}.jpg`;
   try {
-    const url = await uploadImage('project-pics', fileName, req.file.buffer, req.file.mimetype);
+    const url = await uploadImage('project-pics', fileName, req.file.buffer);
     const updated = await prisma.project.update({
       where: { id: projectId },
       data: { pic: url }

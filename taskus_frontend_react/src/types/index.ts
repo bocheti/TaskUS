@@ -16,7 +16,7 @@ export interface UserRequest {
   firstName: string;
   lastName: string;
   email: string;
-  timestamp: string;
+  createdAt: string;
   pic: string | null;
 }
 

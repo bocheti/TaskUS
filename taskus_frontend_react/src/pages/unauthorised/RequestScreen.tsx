@@ -25,7 +25,7 @@ export const RequestScreen = () => {
       try {
         const orgs = await organisationService.getAllOrganisations();
         setOrganisations(orgs);
-      } catch (error) {
+      } catch {
         toast.error('Failed to load organisations');
       } finally {
         setIsLoadingOrgs(false);

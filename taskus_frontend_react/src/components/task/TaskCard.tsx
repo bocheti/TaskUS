@@ -55,8 +55,7 @@ export const TaskCard = ({ task, onClick }: TaskCardProps) => {
     <div
       onClick={onClick}
       className={`bg-background rounded-lg p-4 border-2 border-border transition-all ${
-        onClick ? 'cursor-pointer hover:shadow-md hover:border-primary' : ''
-      }`}
+        onClick ? 'cursor-pointer hover:shadow-md hover:border-primary' : ''}`}
     >
       <div className="flex items-start justify-between gap-3 mb-2">
         <h4 className="font-semibold text-foreground flex-1">{task.title}</h4>

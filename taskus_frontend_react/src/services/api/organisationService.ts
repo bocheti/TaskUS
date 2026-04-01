@@ -5,7 +5,6 @@ import {
   CreateOrganisationRequest,
   CreateOrganisationResponse,
   UpdateOrganisationRequest,
-  UploadPicResponse,
 } from '@/types';
 
 export const organisationService = {
@@ -24,8 +23,8 @@ export const organisationService = {
 
   // authenticated routes
   
-  getOrganisation: async (organisationId: string): Promise<Organisation> => {
-    const response = await apiClient.get<Organisation>(`/organisation/${organisationId}`);
+  getOrganisation: async (): Promise<Organisation> => {
+    const response = await apiClient.get<Organisation>('/organisation');
     return response.data;
   },
 
@@ -34,11 +33,11 @@ export const organisationService = {
     return response.data;
   },
 
-  uploadPic: async (file: File): Promise<UploadPicResponse> => {
+  uploadPic: async (file: File): Promise<Organisation> => {
     const formData = new FormData();
     formData.append('pic', file);
     
-    const response = await apiClient.post<UploadPicResponse>(
+    const response = await apiClient.post<Organisation>(
       '/organisation/uploadPic',
       formData,
       {

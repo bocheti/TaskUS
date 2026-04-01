@@ -5,6 +5,7 @@ import { User } from "@/types";
 import { toast } from "sonner";
 import { X, UserMinus, UserPlus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useNavigate } from "react-router-dom";
 
 interface ProjectMembersModalProps {
   open: boolean;
@@ -25,6 +26,7 @@ export const ProjectMembersModal = ({
   const [allUsers, setAllUsers] = useState<User[]>([]);
   const [showAddUser, setShowAddUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (open && user?.role === "admin") {
@@ -88,15 +90,11 @@ export const ProjectMembersModal = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center">
-      {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black/50"
         onClick={() => onOpenChange(false)}
       />
-      
-      {/* Modal */}
       <div className="relative bg-background rounded-lg shadow-lg w-full max-w-[600px] max-h-[80vh] mx-4 p-6 z-50 flex flex-col">
-        {/* Header */}
         <div className="flex items-start justify-between mb-4">
           <div>
             <h2 className="text-2xl font-semibold">
@@ -114,45 +112,50 @@ export const ProjectMembersModal = ({
           </button>
         </div>
 
-        {/* Members List */}
         <div className="flex-1 overflow-y-auto space-y-2 mb-4">
-          {members.map((member) => (
-            <div
-              key={member.id}
-              className="flex items-center justify-between p-3 bg-background border border-border rounded-lg"
-            >
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center font-medium">
-                  {member.firstName[0]}{member.lastName[0]}
-                </div>
-                <div>
-                  <div className="font-medium">
-                    {member.firstName} {member.lastName}
-                  </div>
-                  <div className="text-sm text-muted-foreground">
-                    {member.email}
-                  </div>
-                </div>
-                {member.role === "admin" && (
-                  <span className="text-xs bg-primary/20 text-primary px-2 py-1 rounded">
-                    Admin
-                  </span>
-                )}
-              </div>
+  {members.map((member) => (
+    <div
+      key={member.id}
+      className={`flex items-center justify-between p-3 bg-background rounded-lg border-2 border-border ${
+        user?.role === "admin" ? "cursor-pointer hover:shadow-md transition-shadow" : ""
+      }`}
+      onClick={() => user?.role === "admin" && navigate(`/profile/${member.id}`)}
+    >
+      <div className="flex items-center gap-3">
+        <div className="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center text-sm font-medium">
+          {member.firstName[0]}{member.lastName[0]}
+        </div>
+        <div>
+          <div className="font-semibold text-base">
+            {member.firstName} {member.lastName}
+          </div>
+          <div className="text-[0.625rem] md:text-sm text-muted-foreground">
+            {member.email}
+          </div>
+        </div>
+        {member.role === "admin" && (
+          <span className="text-xs bg-primary/20 text-primary px-2 py-0.5 rounded">
+            Admin
+          </span>
+        )}
+      </div>
 
-              {user?.role === "admin" && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleRemoveMember(member.id)}
-                  disabled={isLoading}
-                  className="text-red-500 hover:text-red-600"
-                >
-                  <UserMinus className="h-4 w-4" />
-                </Button>
-              )}
-            </div>
-          ))}
+      {user?.role === "admin" && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={(e) => {
+            e.stopPropagation();
+            handleRemoveMember(member.id);
+          }}
+          disabled={isLoading}
+          className="text-red-500 hover:text-red-600 flex-shrink-0"
+        >
+          <UserMinus className="h-4 w-4" />
+        </Button>
+      )}
+    </div>
+  ))}
 
           {members.length === 0 && (
             <div className="text-center py-8 text-muted-foreground">
@@ -161,7 +164,6 @@ export const ProjectMembersModal = ({
           )}
         </div>
 
-        {/* Add Member Section (Admin Only) */}
         {user?.role === "admin" && (
           <div className="border-t border-border pt-4">
             {!showAddUser ? (

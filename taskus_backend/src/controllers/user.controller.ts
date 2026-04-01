@@ -172,23 +172,30 @@ export const resetPassword = async (req: Request, res: Response) => {
 
 // POST /user/uploadPic
 export const uploadUserPic = async (req: AuthRequest, res: Response) => {
-    if (!req.file) {
-        res.status(400).json({ error: 'No file provided' });
-        return;
-    }
-    const userId = req.user!.id;
-    const fileName = `${userId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
-    try {
-        const url = await uploadImage('user-pics', fileName, req.file.buffer, req.file.mimetype);
-        const updated = await prisma.user.update({
-            where: { id: userId },
-            data: { pic: url },
-            select: { id: true, firstName: true, lastName: true, email: true, role: true, pic: true }
-        });
-        res.json(updated);
-    } catch (error) {
-        res.status(500).json({ error: 'Internal server error' });
-    }
+  if (!req.file) {
+    res.status(400).json({ error: 'No file provided' });
+    return;
+  }
+  const userId = req.user!.id;
+  const fileName = `${userId}.jpg`;
+  try {
+    const url = await uploadImage('user-pics', fileName, req.file.buffer);
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { pic: url },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        pic: true
+      }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
 };
 
 // POST /user/create (admin)
@@ -302,7 +309,7 @@ export const rejectUserRequest = async (req: AuthRequest, res: Response) => {
     }
 };
 
-// PUT /user/:userId/role (admin)
+// PUT /user/:userId (admin)
 export const updateRole = async (req: AuthRequest, res: Response) => {
     const { userId } = req.params as { userId: string };
     try {

@@ -85,9 +85,9 @@ export const getAllOrganisations = async (req: Request, res: Response) => {
   }
 };
 
-// GET /organisation/:organisationId
+// GET /organisation
 export const getOrganisation = async (req: AuthRequest, res: Response) => {
-  const { organisationId } = req.params as { organisationId: string };
+  const organisationId = req.user!.organisationId;
   try {
     const organisation = await prisma.organisation.findUnique({ where: { id: organisationId } });
     if (!organisation) {
@@ -133,9 +133,9 @@ export const uploadOrganisationPic = async (req: AuthRequest, res: Response) => 
     return;
   }
   const organisationId = req.user!.organisationId;
-  const fileName = `${organisationId}-${Date.now()}.${req.file.mimetype.split('/')[1]}`;
+  const fileName = `${organisationId}.jpg`;
   try {
-    const url = await uploadImage('organisation-pics', fileName, req.file.buffer, req.file.mimetype);
+    const url = await uploadImage('organisation-pics', fileName, req.file.buffer);
     const updated = await prisma.organisation.update({
       where: { id: organisationId },
       data: { pic: url }
