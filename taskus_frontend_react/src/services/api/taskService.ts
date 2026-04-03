@@ -55,4 +55,9 @@ export const taskService = {
     const response = await apiClient.get<Task[]>(`/task/byProject/${projectId}`);
     return response.data;
   },
+
+  getAllTasks: async (): Promise<Task[]> => {
+    const response = await apiClient.get<Task[]>('/task/all');
+    return response.data;
+  }
 };

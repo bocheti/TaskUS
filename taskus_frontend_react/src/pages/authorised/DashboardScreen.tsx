@@ -9,6 +9,7 @@ import { RecentCompletedCard } from '@/components/dashboard/RecentCompletedCard'
 import { TaskCard } from '@/components/task/TaskCard';
 import { TaskModal } from '@/components/task/TaskModal';
 import { useNavigate } from 'react-router-dom';
+import { TaskCalendar } from '@/components/dashboard/TaskCalendar';
 
 export const DashboardScreen = () => {
   const { user } = useAuth();
@@ -21,7 +22,12 @@ export const DashboardScreen = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const userTasks = await taskService.getTasksByUser(user!.id);
+        let userTasks: Task[] = [];
+        if (user?.role === 'admin') {
+          userTasks = await taskService.getAllTasks();
+        } else {
+          userTasks = await taskService.getTasksByUser(user!.id);
+        }
         setTasks(userTasks);
       } catch {
         toast.error('Failed to load tasks');
@@ -69,7 +75,6 @@ export const DashboardScreen = () => {
 
   return (
     <AuthorizedLayout title="My Dashboard">
-      {/* greeting */}
       <div className="mb-8 text-center">
         <h2 className="text-2xl md:text-3xl font-bold text-foreground">
           {getGreeting()}, {user?.firstName}!
@@ -117,8 +122,17 @@ export const DashboardScreen = () => {
               ))
             )}
           </div>
+          <h3 className="text-sm md:text-lg font-semibold text-foreground pt-4">
+            Deadlines calendar
+          </h3>
+            <TaskCalendar
+              tasks={tasks}
+              onTaskClick={(task) => {
+                setSelectedTask(task);
+                setIsModalOpen(true);
+              }}
+            />
         </div>
-
         {/* right column */}
         <div className="space-y-4">
           <StatsOverviewCard tasks={tasks} isLoading={isLoading} />

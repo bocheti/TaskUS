@@ -138,6 +138,7 @@ export const requestPasswordChange = async (req: Request, res: Response) => {
         const resetLink = `https://taskus.app/reset-password?token=${resetToken}`;
         await sendPasswordResetEmail(email, resetLink);
     } catch (error) {
+        console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };

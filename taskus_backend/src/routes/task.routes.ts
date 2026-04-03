@@ -9,7 +9,8 @@ import {
   getTasksByUserAndProject,
   createTask,
   deleteTask,
-  editTask
+  editTask,
+  getAllTasks
 } from '../controllers/task.controller';
 
 const router = Router();
@@ -17,6 +18,7 @@ const router = Router();
 // Protected
 router.get('/byUser/:userId', authenticate, getTasksByUser);
 router.get('/byTaskGroup/:taskGroupId', authenticate, getTasksByTaskGroup);
+router.get('/all', authenticate, isAdmin, getAllTasks); //(this one is from admin too, needed to put it here to have static routes before dynamic ones)
 router.get('/:taskId', authenticate, getTask);
 router.put('/status/:taskId', authenticate, toggleStatus);
 router.get('/byUserAndProject/:projectId', authenticate, getTasksByUserAndProject);

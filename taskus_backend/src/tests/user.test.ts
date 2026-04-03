@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '../app';
+import jwt from 'jsonwebtoken';
 
 describe('User routes', () => {
   let authToken: string;
@@ -149,6 +150,48 @@ describe('User routes', () => {
     const res = await request(app)
       .get(`/user/${userId}`);
     expect(res.status).toBe(401);
+  });
+
+  it('POST /user/resetPasswordRequest - missing email', async () => {
+    const res = await request(app)
+      .post('/user/resetPasswordRequest')
+      .send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /user/resetPasswordRequest - email does not exist', async () => {
+    const res = await request(app)
+      .post('/user/resetPasswordRequest')
+      .send({ email: 'idontexist@test.com' });
+    expect(res.status).toBe(200);
+  });
+
+  it('POST /user/resetPassword - missing fields', async () => {
+    const res = await request(app)
+      .post('/user/resetPassword')
+      .send({});
+    expect(res.status).toBe(400);
+  });
+
+  it('POST /user/resetPassword - invalid token', async () => {
+    const res = await request(app)
+      .post('/user/resetPassword')
+      .send({ token: 'invalidtoken', newPassword: 'password123' });
+
+    expect(res.status).toBe(401);
+  });
+
+  it('POST /user/resetPassword - valid', async () => {
+    const token = jwt.sign(
+      { id: userId, purpose: 'password-reset' },
+      process.env.JWT_SECRET!
+    );
+
+    const res = await request(app)
+      .post('/user/resetPassword')
+      .send({ token, newPassword: 'newpassword123' });
+
+    expect(res.status).toBe(200);
   });
 
   // Admin - POST /user/create

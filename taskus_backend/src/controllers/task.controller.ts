@@ -301,3 +301,33 @@ export const editTask = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// GET /task/all (admin)
+export const getAllTasks = async (req: AuthRequest, res: Response) => {
+  try {
+    const organisationId = req.user!.organisationId;
+
+    const tasks = await prisma.task.findMany({
+      where: {
+        taskGroup: {
+          project: {
+            organisationId,
+          },
+        },
+      },
+      include: {
+        taskGroup: {
+          include: {
+            project: true,
+          },
+        },
+        responsible: true,
+      },
+    });
+
+    res.json(tasks);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal server error" });
+  }
+};

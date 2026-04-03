@@ -43,29 +43,22 @@ describe('Organisation routes', () => {
   });
 
   // GET /organisation/:organisationId
-  it('GET /organisation/:organisationId - valid', async () => {
+  it('GET /organisation - valid', async () => {
     const res = await request(app)
-      .get(`/organisation/${organisationId}`)
+      .get(`/organisation`)
       .set('Authorization', `Bearer ${authToken}`);
     expect(res.status).toBe(200);
     expect(res.body).toHaveProperty('name', 'Test Organisation');
   });
 
-  it('GET /organisation/:organisationId - not found', async () => {
+  it('GET /organisation - no auth token', async () => {
     const res = await request(app)
-      .get('/organisation/nonexistentid')
-      .set('Authorization', `Bearer ${authToken}`);
-    expect(res.status).toBe(404);
-  });
-
-  it('GET /organisation/:organisationId - no auth token', async () => {
-    const res = await request(app)
-      .get(`/organisation/${organisationId}`);
+      .get(`/organisation`);
     expect(res.status).toBe(401);
   });
 
-  it('GET /organisation/:organisationId - unauthorized (wrong org)', async () => {
-    const res2 = await request(app)
+  it('GET /organisation - returns correct organisation for different users', async () => {
+    const otherOrg = await request(app)
       .post('/organisation')
       .send({
         organisationName: 'Other Organisation',
@@ -75,12 +68,18 @@ describe('Organisation routes', () => {
         email: 'otheradmin@test.com',
         password: 'password123'
       });
-    const otherOrgId = res2.body.userInfo.organisationId;
 
-    const res = await request(app)
-      .get(`/organisation/${otherOrgId}`)
+    const otherToken = otherOrg.body.authToken;
+
+    const res1 = await request(app)
+      .get('/organisation')
       .set('Authorization', `Bearer ${authToken}`);
-    expect(res.status).toBe(403);
+
+    const res2 = await request(app)
+      .get('/organisation')
+      .set('Authorization', `Bearer ${otherToken}`);
+
+    expect(res1.body.id).not.toBe(res2.body.id);
   });
 
   // PUT /organisation

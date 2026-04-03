@@ -11,6 +11,7 @@ describe('Task routes', () => {
   let taskGroupId: string;
   let taskId: string;
   let otherOrgToken: string;
+  let otherOrgAdminId: string;
 
   beforeAll(async () => {
     const res = await request(app)
@@ -80,6 +81,7 @@ describe('Task routes', () => {
         password: 'password123'
       });
     otherOrgToken = otherOrg.body.authToken;
+    otherOrgAdminId = otherOrg.body.userInfo.id;
   });
 
   // POST /task
@@ -634,4 +636,71 @@ it('GET /task/byUserAndProject/:projectId - no auth token', async () => {
       .set('Authorization', `Bearer ${otherOrgToken}`);
     expect(res.status).toBe(403);
   });
+
+  // GET /task/all
+  it('GET /task/all - valid as admin', async () => {
+    const res = await request(app)
+      .get('/task/all')
+      .set('Authorization', `Bearer ${authToken}`);
+
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+    expect(res.body.length).toBeGreaterThan(0);
+  });
+
+  it('GET /task/all - returns all tasks in organisation', async () => {
+    const res = await request(app)
+      .get('/task/all')
+      .set('Authorization', `Bearer ${authToken}`);
+
+    const taskIds = res.body.map((t: any) => t.id);
+
+    expect(taskIds).toContain(taskId);
+  });
+
+  it('GET /task/all - does not include tasks from another organisation', async () => {
+    // create project in other org
+    const otherProject = await request(app)
+      .post('/project')
+      .set('Authorization', `Bearer ${otherOrgToken}`)
+      .send({ title: 'Other Project', description: 'Other' });
+
+    const otherGroup = await request(app)
+      .post('/taskGroup')
+      .set('Authorization', `Bearer ${otherOrgToken}`)
+      .send({ title: 'Other Group', projectId: otherProject.body.id });
+
+    const otherTask = await request(app)
+      .post('/task')
+      .set('Authorization', `Bearer ${otherOrgToken}`)
+      .send({
+        title: 'Other Org Task',
+        responsibleId: otherOrgAdminId,
+        taskGroupId: otherGroup.body.id
+      });
+
+    const res = await request(app)
+      .get('/task/all')
+      .set('Authorization', `Bearer ${authToken}`);
+
+    const taskIds = res.body.map((t: any) => t.id);
+
+    expect(taskIds).not.toContain(otherTask.body.id);
+  });
+
+  it('GET /task/all - blocked by middleware (non-admin)', async () => {
+    const res = await request(app)
+      .get('/task/all')
+      .set('Authorization', `Bearer ${memberToken}`);
+
+    expect(res.status).toBe(403);
+  });
+
+  it('GET /task/all - no auth token', async () => {
+    const res = await request(app)
+      .get('/task/all');
+
+    expect(res.status).toBe(401);
+  });
+
 });
