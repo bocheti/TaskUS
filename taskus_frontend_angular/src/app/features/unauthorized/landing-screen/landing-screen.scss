@@ -1,0 +1,114 @@
+.screen-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.content-side {
+  width: 100%;
+  height: 65vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem 2rem;
+
+  @media (min-width: 768px) {
+    width: 50%;
+    min-height: 100vh;
+    padding: 1.5rem 4rem;
+  }
+}
+
+.content-wrapper {
+  width: 100%;
+  
+  // space-y-6 logic
+  > * + * {
+    margin-top: 1.5rem;
+  }
+}
+
+.text-center {
+  text-align: center;
+}
+
+.welcome-title {
+  font-size: 2.25rem; 
+  font-weight: 700; /* Make it extra bold */
+  color: hsl(var(--foreground));
+  margin-bottom: 0.75rem;
+  margin-top: 0;
+
+  @media (min-width: 768px) {
+    font-size: 2.25rem; /* Make it way bigger on desktop! */
+  }
+}
+
+.welcome-desc {
+  font-size: 1rem; // text-base
+  color: hsl(var(--foreground));
+  line-height: 1.625; // leading-relaxed
+  padding: 0 1rem;
+  margin: 0;
+
+  @media (min-width: 768px) {
+    font-size: 1.125rem; // text-lg
+  }
+}
+
+.actions-container {
+  padding-top: 0.75rem;
+  max-width: 28rem; 
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  
+  > * + * {
+    margin-top: 1.25rem; /* Increased from 1.5rem for more space between buttons */
+  }
+}
+
+.action-block {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  > * + * {
+    margin-top: 0rem;
+  }
+}
+
+.action-text {
+  text-align: center;
+  color: hsl(var(--foreground));
+  font-weight: 100; // font-thin
+  margin: 0.5rem;
+}
+
+.action-btn {
+  width: 100%;
+  background-color: hsl(var(--primary));
+  color: hsl(var(--primary-foreground));
+  text-align: center;
+  padding: 0.875rem 0;
+  border-radius: 0.5rem;
+  text-decoration: none;
+  font-weight: 500;
+  transition: opacity 0.2s;
+  display: block; // anchor tags need this to take width
+
+  &:hover {
+    opacity: 0.9;
+  }
+
+  @media (min-width: 768px) {
+    width: 60%; // md:w-3/5
+  }
+}
