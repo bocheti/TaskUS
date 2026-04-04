@@ -1,0 +1,67 @@
+<div class="screen-layout">
+  <app-landing-banner></app-landing-banner>
+
+  <div class="content-side">
+    <div class="content-wrapper">
+      
+      <div class="title-container">
+        <h1 class="form-title">Log in</h1>
+      </div>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+        
+        <div class="input-group">
+          <label for="email" class="input-label">Email address</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password" class="input-label">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-input"
+            placeholder="Enter your password"
+            required
+          />
+          <div class="forgot-password-container">
+            <a routerLink="/reset-password-request" class="forgot-password-link">
+              Forgot password?
+            </a>
+          </div>
+        </div>
+
+        <div class="submit-container">
+          <button
+            type="submit"
+            [disabled]="isLoading"
+            class="submit-btn"
+          >
+            {{ isLoading ? 'Logging in...' : 'Log in' }}
+          </button>
+        </div>
+
+      </form>
+
+      <div class="bottom-links-container">
+        <p class="bottom-text">
+          Don't have an account? 
+          <a routerLink="/request" class="bottom-link">Request an account</a>
+        </p>
+        <p class="bottom-text">
+          Are you a business? 
+          <a routerLink="/create-org" class="bottom-link">Create an organisation</a>
+        </p>
+      </div>
+
+    </div>
+  </div>
+</div>

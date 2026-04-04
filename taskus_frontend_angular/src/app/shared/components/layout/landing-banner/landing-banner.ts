@@ -8,7 +8,7 @@ import { RouterModule } from '@angular/router';
   templateUrl: './landing-banner.html',
   styleUrls: ['./landing-banner.scss']
 })
-export class LandingBannerComponent {
+export class LandingBanner {
   openGithub() {
     window.open('https://github.com/bocheti', '_blank');
   }

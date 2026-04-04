@@ -1,0 +1,118 @@
+<div class="screen-layout">
+  <app-landing-banner></app-landing-banner>
+
+  <div class="content-side">
+    <div class="content-wrapper">
+      <div class="title-container">
+        <h1 class="form-title">Request an Account</h1>
+      </div>
+
+      <form [formGroup]="requestForm" (ngSubmit)="onSubmit()" class="request-form">
+        
+        <div class="input-group">
+          <label for="organisation" class="input-label">Organisation</label>
+          <div class="select-wrapper">
+            <select
+              id="organisation"
+              formControlName="organisationId"
+              class="form-input select-input"
+              required
+            >
+              <option value="" disabled selected>
+                {{ isLoadingOrgs ? 'Loading organisations...' : 'Select an organisation' }}
+              </option>
+              <option *ngFor="let org of organisations" [value]="org.id">
+                {{ org.name }}
+              </option>
+            </select>
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="select-chevron">
+              <path d="m6 9 6 6 6-6"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="name-row">
+          <div class="input-group">
+            <label for="firstName" class="input-label">First Name</label>
+            <input
+              id="firstName"
+              type="text"
+              formControlName="firstName"
+              class="form-input"
+              placeholder="First name"
+              required
+            />
+          </div>
+          <div class="input-group">
+            <label for="lastName" class="input-label">Last Name</label>
+            <input
+              id="lastName"
+              type="text"
+              formControlName="lastName"
+              class="form-input"
+              placeholder="Last name"
+              required
+            />
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label for="email" class="input-label">Email address</label>
+          <input
+            id="email"
+            type="email"
+            formControlName="email"
+            class="form-input"
+            placeholder="Enter your email"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="password" class="input-label">Password</label>
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            class="form-input"
+            placeholder="Enter your password"
+            required
+          />
+        </div>
+
+        <div class="input-group">
+          <label for="repeatPassword" class="input-label">Repeat Password</label>
+          <input
+            id="repeatPassword"
+            type="password"
+            formControlName="repeatPassword"
+            class="form-input"
+            placeholder="Repeat your password"
+            required
+          />
+        </div>
+
+        <div class="submit-container">
+          <button
+            type="submit"
+            [disabled]="isLoading || isLoadingOrgs"
+            class="submit-btn"
+          >
+            {{ isLoading ? 'Requesting...' : 'Request Account' }}
+          </button>
+        </div>
+      </form>
+
+      <div class="bottom-links-container">
+        <p class="bottom-text">
+          Already have an account? 
+          <a routerLink="/login" class="bottom-link">Log in</a>
+        </p>
+        <p class="bottom-text">
+          Want to create your own organisation? 
+          <a routerLink="/create-org" class="bottom-link">Create organisation</a>
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
