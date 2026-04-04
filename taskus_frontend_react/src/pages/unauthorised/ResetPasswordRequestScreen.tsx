@@ -62,7 +62,7 @@ export const ResetPasswordRequestScreen = () => {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-background text-foreground px-4 py-2 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full bg-background text-foreground px-4 py-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Enter your email"
                 required
                 disabled={isLoading}

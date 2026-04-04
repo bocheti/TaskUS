@@ -74,7 +74,7 @@ export const ResetPasswordScreen = () => {
                 type="password"
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
-                className="w-full bg-background text-foreground px-4 py-2 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full bg-background text-foreground px-4 py-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Enter your new password"
                 required
                 disabled={isLoading}
@@ -89,7 +89,7 @@ export const ResetPasswordScreen = () => {
                 type="password"
                 value={repeatPassword}
                 onChange={(e) => setRepeatPassword(e.target.value)}
-                className="w-full bg-background text-foreground px-4 py-2 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
+                className="w-full bg-background text-foreground px-4 py-3 rounded-lg border-2 border-primary focus:outline-none focus:ring-2 focus:ring-ring"
                 placeholder="Repeat your new password"
                 required
                 disabled={isLoading}
