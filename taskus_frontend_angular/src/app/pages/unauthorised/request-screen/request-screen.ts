@@ -1,15 +1,18 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandingBanner } from '../../../shared/components/layout/landing-banner/landing-banner';
 import { OrganisationService } from '../../../core/services/organisation';
 import { UserService } from '../../../core/services/user';
+import { toast } from 'ngx-sonner';
+import { finalize } from 'rxjs/operators';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-request-screen',
   standalone: true,
-  imports: [CommonModule, RouterModule, ReactiveFormsModule, LandingBanner],
+  imports: [CommonModule, RouterModule, ReactiveFormsModule, LandingBanner, MatIconModule],
   templateUrl: './request-screen.html',
   styleUrls: ['./request-screen.scss']
 })
@@ -25,7 +28,8 @@ export class RequestScreen implements OnInit {
     private fb: FormBuilder,
     private router: Router,
     private orgService: OrganisationService,
-    private userService: UserService
+    private userService: UserService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -46,49 +50,57 @@ export class RequestScreen implements OnInit {
       next: (orgs) => {
         this.organisations = orgs;
         this.isLoadingOrgs = false;
+        this.cdr.detectChanges(); 
       },
       error: () => {
-        alert('Failed to load organisations');
+        toast.error('Failed to load organisations');
         this.isLoadingOrgs = false;
+        this.cdr.detectChanges();
       }
     });
   }
 
   onSubmit(): void {
-    if (this.requestForm.invalid) return;
-
     const formValues = this.requestForm.value;
 
-    if (formValues.password !== formValues.repeatPassword) {
-      alert('Passwords do not match'); // TODO: Toast
+    if (formValues.password && formValues.password.length < 8) {
+      toast.error('Password must be at least 8 characters long.');
       return;
     }
-
-    if (formValues.password.length < 8) {
-      alert('Password must be at least 8 characters'); // TODO: Toast
+    if (formValues.password !== formValues.repeatPassword) {
+      toast.error('Passwords do not match.');
+      return;
+    }
+    if (this.requestForm.invalid) {
+      toast.error('Please fill out all required fields correctly.');
       return;
     }
 
     this.isLoading = true;
 
-    this.userService.requestAccount(formValues).subscribe({
-      next: () => {
-        alert('Account request sent! Please wait for admin approval.');
-        this.router.navigate(['/login']);
-      },
-      error: (err) => {
-        const status = err.status;
-        const message = err.error?.error;
-
-        if (status === 409) {
-          alert('An account with this email already exists');
-        } else if (message) {
-          alert(message);
-        } else {
-          alert('Failed to request account. Please try again.');
+    this.userService.requestAccount(formValues)
+      .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+      .subscribe({
+        next: () => {
+          toast.success('Account request sent! Please wait for admin approval.');
+          this.router.navigate(['/login']);
+        },
+        error: (err) => {
+          const status = err.status;
+          const message = err.error?.error;
+          if (status === 409) {
+            toast.error('An account with this email already exists');
+          } else if (message) {
+            toast.error(message);
+          } else {
+            toast.error('Failed to request account. Please try again.');
+          }
         }
-        this.isLoading = false;
-      }
-    });
+      });
   }
 }

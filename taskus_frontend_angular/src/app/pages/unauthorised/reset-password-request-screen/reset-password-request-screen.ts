@@ -4,6 +4,7 @@ import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandingBanner } from '../../../shared/components/layout/landing-banner/landing-banner';
 import { UserService } from '../../../core/services/user';
+import { toast } from 'ngx-sonner'; 
 
 @Component({
   selector: 'app-reset-password-request-screen',
@@ -36,15 +37,15 @@ export class ResetPasswordRequestScreen implements OnInit {
 
     this.userService.requestPasswordReset(email).subscribe({
       next: () => {
-        alert('Password reset email sent! Check your inbox.');
+        toast.success('Password reset email sent! Check your inbox.');
         this.router.navigate(['/login']);
       },
       error: (err) => {
         const message = err.error?.error;
         if (message) {
-          alert(message);
+          toast.error(message);
         } else {
-          alert('Failed to send reset email. Please try again.');
+          toast.error('Failed to send reset email. Please try again.');
         }
         this.isLoading = false;
       }

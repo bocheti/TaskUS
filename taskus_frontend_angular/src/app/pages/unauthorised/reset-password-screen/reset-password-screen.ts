@@ -4,6 +4,7 @@ import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandingBanner } from '../../../shared/components/layout/landing-banner/landing-banner';
 import { UserService } from '../../../core/services/user';
+import { toast } from 'ngx-sonner';
 
 @Component({
   selector: 'app-reset-password-screen',
@@ -38,19 +39,19 @@ export class ResetPasswordScreen implements OnInit {
     if (this.resetForm.invalid) return;
 
     if (!this.token) {
-      alert('Invalid or missing reset token'); // TODO: Toast
+      toast.error('Invalid or missing reset token');
       return;
     }
 
     const { newPassword, repeatPassword } = this.resetForm.value;
 
-    if (newPassword !== repeatPassword) {
-      alert('Passwords do not match'); // TODO: Toast
+      if (newPassword !== repeatPassword) {
+      toast.error('Passwords do not match');
       return;
     }
 
     if (newPassword.length < 8) {
-      alert('Password must be at least 8 characters'); // TODO: Toast
+      toast.error('Password must be at least 8 characters');
       return;
     }
 
@@ -58,15 +59,15 @@ export class ResetPasswordScreen implements OnInit {
 
     this.userService.resetPassword(this.token, newPassword).subscribe({
       next: () => {
-        alert('Password reset successful! You can now log in.');
+        toast.success('Password reset successful! You can now log in.');
         this.router.navigate(['/login']);
       },
       error: (err) => {
         const message = err.error?.error;
         if (message) {
-          alert(message);
+          toast.error(message);
         } else {
-          alert('Failed to reset password. The link may have expired.');
+          toast.error('Failed to reset password. The link may have expired.');
         }
         this.isLoading = false;
       }

@@ -1,10 +1,12 @@
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandingBanner } from '../../../shared/components/layout/landing-banner/landing-banner';
 import { AuthService } from '../../../core/services/auth';
 import { OrganisationService } from '../../../core/services/organisation';
+import { toast } from 'ngx-sonner';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-create-org-screen',
@@ -21,7 +23,8 @@ export class CreateOrgScreen implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private orgService: OrganisationService
+    private orgService: OrganisationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -36,29 +39,42 @@ export class CreateOrgScreen implements OnInit {
   }
 
   onSubmit(): void {
-    if (this.createOrgForm.invalid) return;
-
     const formValues = this.createOrgForm.value;
 
+    if (formValues.password && formValues.password.length < 8) {
+      toast.error('Password must be at least 8 characters long.');
+      return;
+    }
     if (formValues.password !== formValues.repeatPassword) {
-      alert('Passwords do not match'); // TODO: Replace with Toast
+      toast.error('Passwords do not match.');
       return;
     }
-
-    if (formValues.password.length < 8) {
-      alert('Password must be at least 8 characters'); // TODO: Replace with Toast
+    if (this.createOrgForm.invalid) {
+      toast.error('Please fill out all required fields correctly.');
       return;
     }
-
     this.isLoading = true;
 
-    this.isLoading = true;
+    const { orgName, firstName, lastName, email, password } = formValues;
+    const apiPayload = {
+      organisationName: orgName,
+      firstName,
+      lastName,
+      email,
+      password
+    };
 
-    this.orgService.createOrganisation(formValues).subscribe({
+    this.orgService.createOrganisation(apiPayload)
+    .pipe(
+        finalize(() => {
+          this.isLoading = false;
+          this.cdr.detectChanges();
+        })
+      )
+    .subscribe({
       next: (response) => {
-        // Assuming your backend returns { authToken, userInfo } just like the React version
         this.authService.setAuthData(response.authToken, response.userInfo);
-        alert(`Organisation created successfully! Welcome, ${formValues.firstName} ${formValues.lastName}!`);
+        toast.success(`Organisation created successfully! Welcome, ${formValues.firstName} ${formValues.lastName}!`);
         this.router.navigate(['/dashboard']);
       },
       error: (err) => {
@@ -66,13 +82,12 @@ export class CreateOrgScreen implements OnInit {
         const message = err.error?.error;
         
         if (status === 409) {
-          alert('An account with this email already exists');
+          toast.error('An account with this email already exists');
         } else if (message) {
-          alert(message);
+          toast.error(message);
         } else {
-          alert('Failed to create organisation. Please try again.');
+          toast.error('Failed to create organisation. Please try again.');
         }
-        this.isLoading = false;
       }
     });
   }

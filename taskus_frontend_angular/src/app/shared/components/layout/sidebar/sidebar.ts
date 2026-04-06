@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, NavigationEnd } from '@angular/router';
 import { filter } from 'rxjs/operators';
 import { AuthService } from '../../../../core/services/auth';
+import { toast } from 'ngx-sonner';
+import { MatIconModule } from '@angular/material/icon';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, MatIconModule],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss']
 })
@@ -42,7 +44,7 @@ export class Sidebar {
   handleLogout(): void {
     sessionStorage.setItem('isLoggingOut', 'true');
     this.authService.logout();
-    alert('Logged out successfully'); // TODO: Replace with Toast
+    toast.success('Logged out successfully');
   }
 
   toggleProfile(): void {
