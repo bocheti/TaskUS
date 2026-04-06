@@ -1,0 +1,143 @@
+/* Main Layout Wrapper: flex min-h-screen bg-background */
+.layout-wrapper {
+  display: flex;
+  min-height: 100vh;
+  background-color: hsl(var(--background));
+}
+
+/* Mobile Menu Button: fixed top-4 left-4 z-30 p-2 rounded-lg bg-muted... md:hidden */
+.mobile-menu-btn {
+  position: fixed;
+  top: 1rem;
+  left: 1rem;
+  z-index: 30;
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  background-color: hsl(var(--muted));
+  color: hsl(var(--foreground));
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: hsl(var(--background));
+  }
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* Main Content: flex-1 flex flex-col p-4 md:p-8 md:pb-4 pt-16 md:pt-8 md:ml-48 */
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 4rem 1rem 1rem 1rem; /* pt-16, p-4 */
+  width: 100%;
+
+  @media (min-width: 768px) {
+    padding: 2rem 2rem 1rem 2rem; /* md:pt-8, md:p-8, md:pb-4 */
+    margin-left: 12rem; /* md:ml-48 (12rem = 48 * 0.25rem) */
+  }
+}
+
+/* Header Section: mb-4 md:mb-6 */
+.header-section {
+  margin-bottom: 1rem;
+
+  @media (min-width: 768px) {
+    margin-bottom: 1.5rem;
+  }
+}
+
+/* Page Title: text-2xl md:text-4xl font-bold text-foreground mb-2 md:mb-4 */
+.page-title {
+  font-size: 1.5rem; /* text-2xl */
+  line-height: 2rem;
+  font-weight: 700;
+  color: hsl(var(--foreground));
+  margin-top: 0;
+  margin-bottom: 0.5rem; /* mb-2 */
+
+  @media (min-width: 768px) {
+    font-size: 2.25rem; /* text-4xl */
+    line-height: 2.5rem;
+    margin-bottom: 1rem; /* md:mb-4 */
+  }
+}
+
+/* Title Divider: border-border border-t-2 */
+.title-divider {
+  border: 0;
+  border-top: 2px solid hsl(var(--border));
+  margin: 0;
+}
+
+/* Content Card: flex-1 bg-banner-bg rounded-2xl p-4 md:p-6 md:pb-4 relative flex flex-col */
+.content-card {
+  flex: 1;
+  background-color: hsl(var(--banner-bg)); /* Assuming this variable is in your global css */
+  border-radius: 1rem; /* rounded-2xl */
+  padding: 1rem; /* p-4 */
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem 1.5rem 1rem 1.5rem; /* md:p-6 md:pb-4 */
+  }
+}
+
+/* Content Body: flex-1 */
+.content-body {
+  flex: 1;
+}
+
+/* Footer: mt-4 md:mt-6 pt-3 md:pt-4 flex flex-row justify-center items-center gap-2 */
+.footer {
+  margin-top: 1rem; /* mt-4 */
+  padding-top: 0.75rem; /* pt-3 */
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem; /* gap-2 */
+
+  @media (min-width: 768px) {
+    margin-top: 1.5rem; /* md:mt-6 */
+    padding-top: 1rem; /* md:pt-4 */
+  }
+}
+
+/* Footer Text: text-xs text-foreground text-center */
+.footer-text {
+  font-size: 0.75rem; /* text-xs */
+  line-height: 1rem;
+  color: hsl(var(--foreground));
+  text-align: center;
+  margin: 0;
+}
+
+/* Social Links: flex gap-3 */
+.social-links {
+  display: flex;
+  gap: 0.75rem; /* gap-3 */
+}
+
+/* Social Buttons: text-foreground hover:text-primary transition-colors */
+.social-btn {
+  background: none;
+  border: none;
+  padding: 0;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  transition: color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    color: hsl(var(--primary));
+  }
+}

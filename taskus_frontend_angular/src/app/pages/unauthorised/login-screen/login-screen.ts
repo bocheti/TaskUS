@@ -41,15 +41,12 @@ export class LoginScreen implements OnInit {
     this.authService.login(credentials).subscribe({
       next: () => {
         // TODO: Replace with Material Toast later
-        console.log('Login successful!'); 
+        console.log('Login successful with credentials:', credentials);
         this.isLoading = false;
-        // Navigation is handled inside authService.login() based on your service setup
-      },
+        this.router.navigate(['/dashboard']);},
       error: (err) => {
         const status = err.status;
         const message = err.error?.error;
-        
-        // Exact logic from your catch block
         if (status === 401 || status === 403) {
           alert('Invalid email or password'); // TODO: Toast
         } else if (message) {

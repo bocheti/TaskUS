@@ -33,28 +33,22 @@ export class AuthService {
     return this.tokenSubject.value;
   }
 
-  // 1. The Login Method
   login(credentials: LoginCredentials): Observable<LoginResponse> {
     return this.http.post<LoginResponse>(`${this.API_URL}/user/login`, credentials).pipe(
-      // 'tap' lets us do something with the response before passing it back to the component
       tap((response) => {
         this.setAuthData(response.authToken, response.userInfo);
       })
     );
   }
 
-  // 2. The Logout Method
   logout(): void {
     this.userSubject.next(null);
     this.tokenSubject.next(null);
-    
     localStorage.removeItem('authToken');
     localStorage.removeItem('user');
-    
     this.router.navigate(['/login']);
   }
 
-  // 3. The SetAuthData Method (used for login and create-org)
   setAuthData(token: string, user: User): void {
     this.tokenSubject.next(token);
     this.userSubject.next(user);
@@ -63,7 +57,6 @@ export class AuthService {
     localStorage.setItem('user', JSON.stringify(user));
   }
 
-  // 4. The UpdateUser Method (used when changing profile pic or details)
   updateUser(updatedUser: User): void {
     this.userSubject.next(updatedUser);
     localStorage.setItem('user', JSON.stringify(updatedUser));

@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandingBanner } from '../../../shared/components/layout/landing-banner/landing-banner';
-// import { OrganisationService } from '../../../core/services/organisation';
-// import { UserService } from '../../../core/services/user';
+import { OrganisationService } from '../../../core/services/organisation';
+import { UserService } from '../../../core/services/user';
 
 @Component({
   selector: 'app-request-screen',
@@ -23,9 +23,9 @@ export class RequestScreen implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
-    // private orgService: OrganisationService,
-    // private userService: UserService
+    private router: Router,
+    private orgService: OrganisationService,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -42,15 +42,16 @@ export class RequestScreen implements OnInit {
   }
 
   fetchOrganisations(): void {
-    // TODO: Replace with actual this.orgService.getAllOrganisations().subscribe(...)
-    console.log('Fetching organisations...');
-    setTimeout(() => {
-      this.organisations = [
-        { id: '1', name: 'Acme Corporation' },
-        { id: '2', name: 'Beta Industries' }
-      ];
-      this.isLoadingOrgs = false;
-    }, 800);
+    this.orgService.getAllOrganisations().subscribe({
+      next: (orgs) => {
+        this.organisations = orgs;
+        this.isLoadingOrgs = false;
+      },
+      error: () => {
+        alert('Failed to load organisations');
+        this.isLoadingOrgs = false;
+      }
+    });
   }
 
   onSubmit(): void {
@@ -70,13 +71,24 @@ export class RequestScreen implements OnInit {
 
     this.isLoading = true;
 
-    // TODO: Replace with actual this.userService.requestAccount(formValues).subscribe(...)
-    console.log('Simulating account request with:', formValues);
-    
-    setTimeout(() => {
-      alert('Account request sent! Please wait for admin approval.'); // TODO: Toast
-      this.router.navigate(['/login']);
-      this.isLoading = false;
-    }, 1000);
+    this.userService.requestAccount(formValues).subscribe({
+      next: () => {
+        alert('Account request sent! Please wait for admin approval.');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        const status = err.status;
+        const message = err.error?.error;
+
+        if (status === 409) {
+          alert('An account with this email already exists');
+        } else if (message) {
+          alert(message);
+        } else {
+          alert('Failed to request account. Please try again.');
+        }
+        this.isLoading = false;
+      }
+    });
   }
 }

@@ -1,0 +1,196 @@
+/* Mobile Overlay: fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 40;
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* Sidebar: fixed top-0 left-0 w-48 h-screen bg-muted flex flex-col justify-between px-4 py-8 transition-transform duration-300 z-50 */
+.sidebar-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 12rem; /* w-48 */
+  height: 100vh;
+  background-color: hsl(var(--muted));
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 2rem 1rem; /* py-8 px-4 */
+  transition: transform 0.3s ease-in-out;
+  z-index: 50;
+  
+  /* Mobile Hidden State (-translate-x-full) */
+  transform: translateX(-100%);
+
+  /* Mobile Open State OR Desktop Default State */
+  &.is-open {
+    transform: translateX(0);
+  }
+
+  @media (min-width: 768px) {
+    transform: translateX(0);
+  }
+}
+
+/* Mobile Close Button */
+.mobile-close-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  background: none;
+  border: none;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+  padding: 0;
+
+  &:hover {
+    color: hsl(var(--primary));
+  }
+
+  @media (min-width: 768px) {
+    display: none;
+  }
+}
+
+/* Logo Section */
+.logo-section {
+  margin-bottom: 1.5rem; /* mb-6 */
+}
+
+.sidebar-logo {
+  width: 100%;
+  cursor: pointer;
+  transition: opacity 0.2s;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+/* Navigation Container */
+.nav-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 0.75rem; /* space-y-3 */
+}
+
+/* Nav Links */
+.nav-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem; /* gap-3 */
+  padding: 0.75rem; /* px-3 py-3 */
+  border-radius: 0.5rem; /* rounded-lg */
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.2s, color 0.2s;
+  
+  /* Inactive State */
+  color: hsl(var(--foreground));
+  
+  &:hover:not(.active) {
+    background-color: hsl(var(--background));
+  }
+
+  /* Active State */
+  &.active {
+    background-color: hsl(var(--primary));
+    color: hsl(var(--primary-foreground));
+  }
+
+  &.w-full {
+    width: 100%;
+  }
+}
+
+.nav-text {
+  font-size: 1rem; /* text-base */
+  font-weight: 500; /* font-medium */
+}
+
+/* Admin Divider */
+.divider-container {
+  padding: 1rem 0 0.5rem 0; /* pt-4 pb-2 */
+}
+
+.nav-divider {
+  border: 0;
+  border-top: 1px solid hsl(var(--border));
+  margin: 0;
+}
+
+/* Profile Dropdown Section */
+.profile-section {
+  position: relative;
+}
+
+/* Dropdown Menu */
+.profile-dropdown {
+  position: absolute;
+  bottom: 3.5rem; /* bottom-14 */
+  left: 0;
+  width: 10rem; /* w-40 */
+  background-color: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.5rem; /* rounded-lg */
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-lg */
+  z-index: 50;
+  display: flex;
+  flex-direction: column;
+  
+  /* Replicating animate-in fade-in zoom-in-95 */
+  animation: dropdownFadeIn 0.2s ease-out forwards;
+}
+
+.dropdown-item {
+  width: 100%;
+  text-align: left;
+  padding: 0.5rem 1rem; /* px-4 py-2 */
+  font-size: 0.875rem; /* text-sm */
+  background: none;
+  border: none;
+  color: hsl(var(--foreground));
+  cursor: pointer;
+
+  &:hover {
+    background-color: #f1f5f9; /* hover:bg-slate-100 */
+  }
+
+  &.rounded-top {
+    border-top-left-radius: 0.5rem;
+    border-top-right-radius: 0.5rem;
+  }
+
+  &.rounded-bottom {
+    border-bottom-left-radius: 0.5rem;
+    border-bottom-right-radius: 0.5rem;
+  }
+
+  &.text-danger {
+    color: #ef4444;
+  }
+}
+
+@keyframes dropdownFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

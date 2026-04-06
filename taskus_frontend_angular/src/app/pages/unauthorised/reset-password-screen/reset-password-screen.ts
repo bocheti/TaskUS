@@ -3,8 +3,7 @@ import { CommonModule } from '@angular/common';
 import { RouterModule, Router, ActivatedRoute } from '@angular/router';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LandingBanner } from '../../../shared/components/layout/landing-banner/landing-banner';
-
-// import { UserService } from '../../../core/services/user';
+import { UserService } from '../../../core/services/user';
 
 @Component({
   selector: 'app-reset-password-screen',
@@ -21,8 +20,8 @@ export class ResetPasswordScreen implements OnInit {
   constructor(
     private fb: FormBuilder,
     private router: Router,
-    private route: ActivatedRoute // <-- This replaces useSearchParams()
-    // private userService: UserService
+    private route: ActivatedRoute,
+    private userService: UserService
   ) {}
 
   ngOnInit(): void {
@@ -57,13 +56,20 @@ export class ResetPasswordScreen implements OnInit {
 
     this.isLoading = true;
 
-    // TODO: Replace with actual this.userService.resetPassword(this.token, newPassword).subscribe(...)
-    console.log('Resetting password using token:', this.token);
-    
-    setTimeout(() => {
-      alert('Password reset successful! You can now log in.'); // TODO: Toast
-      this.router.navigate(['/login']);
-      this.isLoading = false;
-    }, 1000);
+    this.userService.resetPassword(this.token, newPassword).subscribe({
+      next: () => {
+        alert('Password reset successful! You can now log in.');
+        this.router.navigate(['/login']);
+      },
+      error: (err) => {
+        const message = err.error?.error;
+        if (message) {
+          alert(message);
+        } else {
+          alert('Failed to reset password. The link may have expired.');
+        }
+        this.isLoading = false;
+      }
+    });
   }
 }

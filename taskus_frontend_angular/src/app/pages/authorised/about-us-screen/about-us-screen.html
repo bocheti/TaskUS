@@ -1,0 +1,12 @@
+<app-authorized-layout title="About Us">
+  
+  <div *ngIf="authService.user$ | async as user" class="placeholder-content">
+    <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>
+    <p>Welcome to this screen.</p>
+  </div>
+
+  <div *ngIf="!(authService.user$ | async)" class="placeholder-content">
+    <h2>Loading user data...</h2>
+  </div>
+
+</app-authorized-layout>
