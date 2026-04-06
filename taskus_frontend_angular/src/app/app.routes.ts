@@ -8,11 +8,11 @@ export const routes: Routes = [
   { path: 'login', loadComponent: () => import('./features/unauthorized/login-screen/login-screen').then(m => m.LoginScreen) },
   { path: 'create-org', loadComponent: () => import('./features/unauthorized/create-org-screen/create-org-screen').then(m => m.CreateOrgScreen) },
   { path: 'request', loadComponent: () => import('./features/unauthorized/request-screen/request-screen').then(m => m.RequestScreen) },
-  /*{ path: 'reset-password-request', loadComponent: () => import('./features/unauthorized/reset-password-request-screen/reset-password-request-screen').then(m => m.ResetPasswordRequestScreen) },
+  { path: 'reset-password-request', loadComponent: () => import('./features/unauthorized/reset-password-request-screen/reset-password-request-screen').then(m => m.ResetPasswordRequestScreen) },
   { path: 'reset-password', loadComponent: () => import('./features/unauthorized/reset-password-screen/reset-password-screen').then(m => m.ResetPasswordScreen) },
 
   // AUTHORIZED SCREENS
-  { path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard-screen/dashboard-screen').then(m => m.DashboardScreen) },
+  /*{ path: 'dashboard', canActivate: [authGuard], loadComponent: () => import('./features/dashboard/dashboard-screen/dashboard-screen').then(m => m.DashboardScreen) },
   { path: 'tasks', canActivate: [authGuard], loadComponent: () => import('./features/tasks/all-tasks-screen/all-tasks-screen').then(m => m.AllTasksScreen) },
   { path: 'profile', canActivate: [authGuard], loadComponent: () => import('./features/auth/profile-screen/profile-screen').then(m => m.ProfileScreen) },
   { path: 'profile/:userId', canActivate: [authGuard], loadComponent: () => import('./features/auth/profile-screen/profile-screen').then(m => m.ProfileScreen) },

@@ -31,7 +31,7 @@
 }
 
 .logo-link {
-  margin-bottom: 1.5rem;
+  margin-bottom: 1.25rem;
   width: 91.666%; // w-11/12
   
   @media (min-width: 768px) {
@@ -42,7 +42,7 @@
 .logo-img {
   width: 100%;
   height: auto;
-  max-height: 25vh;
+  max-height: 25vh; /* Mobile can stay flexible */
   object-fit: contain;
   cursor: pointer;
   transition: opacity 0.2s;
@@ -52,21 +52,24 @@
   }
 
   @media (min-width: 768px) {
-    max-height: 42.25vh; /* Put a cap on the vertical height */
-    max-width: 100%;   /* Shrink the horizontal footprint */
-    margin: 0 auto;   /* Keep it centered */
+    max-height: 24rem;
+    max-width: 100%;  
+    margin: 0 auto;
   }
 }
 
 .slogan {
   font-size: 1.5rem; 
+  line-height: 2rem;
   text-align: center;
   color: hsl(var(--foreground));
   padding: 0.5rem 0;
   margin: 0;
   
   @media (min-width: 768px) {
-    font-size: 2.25rem; 
+    font-size: 2.25rem;  /* 36px font */
+    line-height: 2.5rem; /* 40px line-height */
+    padding: 1rem 0;     /* 16px top + 16px bottom = 32px padding. Total: 72px height! */
   }
 }
 
@@ -110,6 +113,6 @@
   align-items: center;
 
   &:hover {
-    color: hsl(359, 61%, 49%); /* Updated hover color */
+    color: hsl(359, 61%, 49%);
   }
 }
