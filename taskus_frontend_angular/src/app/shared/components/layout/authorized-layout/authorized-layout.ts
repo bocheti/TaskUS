@@ -11,7 +11,7 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrls: ['./authorized-layout.scss']
 })
 export class AuthorizedLayout {
-  @Input() title: string = '';
+  @Input() pageTitle: string = '';
   
   isSidebarOpen = false;
 

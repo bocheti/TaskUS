@@ -1,0 +1,24 @@
+<div class="task-card" [class.interactive]="isInteractive">
+  <div class="task-header">
+    <h4 class="task-title">{{ task.title }}</h4>
+    <div class="status-indicator" [ngClass]="statusColorClass"></div>
+  </div>
+  
+  <p class="task-description">
+    {{ task.description }}
+  </p>
+  
+  <div class="task-meta">
+    <div class="meta-item">
+      <mat-icon svgIcon="calendar"></mat-icon>
+      <span>Created {{ task.createdAt | date:'shortDate' }}</span>
+    </div>
+    
+    @if (deadlineInfo) {
+      <div class="meta-item" [class.overdue]="deadlineInfo.isOverdue">
+        <mat-icon svgIcon="clock"></mat-icon>
+        <span>{{ deadlineInfo.text }}</span>
+      </div>
+    }
+  </div>
+</div>

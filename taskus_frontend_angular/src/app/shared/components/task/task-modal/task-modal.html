@@ -1,0 +1,88 @@
+@if (isOpen) {
+  <div class="modal-backdrop" (click)="handleClose()"></div>
+
+  <div class="modal-container">
+    
+    <div class="modal-header">
+      <div class="header-content">
+        <div class="title-row">
+          <h2 class="task-title">{{ currentTask.title }}</h2>
+          <div class="status-indicator" [ngClass]="statusColorClass"></div>
+        </div>
+        <p class="status-text">
+          Status: <span class="status-highlight">{{ currentTask.status === 'InProgress' ? 'In Progress' : currentTask.status }}</span>
+        </p>
+      </div>
+      <button class="close-btn" (click)="handleClose()">
+        <mat-icon svgIcon="x"></mat-icon>
+      </button>
+    </div>
+
+    <div class="modal-body">
+      <div class="description-section">
+        <h3 class="section-label">Description</h3>
+        <p class="task-description">{{ currentTask.description }}</p>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-item">
+          <mat-icon svgIcon="calendar"></mat-icon>
+          <span class="detail-label">Created:</span>
+          <span class="detail-value">{{ currentTask.createdAt | date:'shortDate' }}</span>
+        </div>
+
+        <div class="detail-item">
+          <mat-icon svgIcon="clock"></mat-icon>
+          <span class="detail-label">Deadline:</span>
+          <span class="detail-value" [class.text-overdue]="isDeadlineOverdue">
+            {{ formattedDeadline }}
+          </span>
+        </div>
+
+        @if (currentTask.completedAt) {
+          <div class="detail-item">
+            <mat-icon svgIcon="calendar"></mat-icon>
+            <span class="detail-label">Completed:</span>
+            <span class="detail-value">{{ currentTask.completedAt | date:'shortDate' }}</span>
+          </div>
+        }
+
+        <div class="detail-item">
+          <mat-icon svgIcon="user"></mat-icon>
+          <span class="detail-label">Assigned to:</span>
+          <span class="detail-value">
+            @if (responsibleUser) {
+              {{ responsibleUser.firstName }} {{ responsibleUser.lastName }} 
+              {{ currentTask.responsibleId === currentUser?.id ? ' (You)' : '' }}
+            } @else {
+              Loading...
+            }
+          </span>
+        </div>
+      </div>
+
+      <div class="actions-section">
+        @if (currentUser?.role === 'admin' || currentTask.responsibleId === currentUser?.id) {
+          <div class="button-group">
+            <button 
+              class="btn-primary flex-1" 
+              (click)="handleToggleStatus()" 
+              [disabled]="isTogglingStatus"
+            >
+              {{ isTogglingStatus ? 'Updating...' : nextStatusText }}
+            </button>
+            
+            @if (currentUser?.role === 'admin') {
+              <button class="btn-danger" (click)="handleDeleteTask()">
+                <mat-icon svgIcon="trash"></mat-icon>
+                Delete
+              </button>
+            }
+          </div>
+        } @else {
+          <p class="readonly-text">This task is assigned to another user.</p>
+        }
+      </div>
+    </div>
+  </div>
+}

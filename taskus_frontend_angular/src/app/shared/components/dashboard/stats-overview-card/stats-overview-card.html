@@ -1,0 +1,62 @@
+<div class="stats-card">
+  <h3 class="card-title">Stats Overview</h3>
+  
+  @if (isLoading) {
+    <p class="loading-text">Loading stats...</p>
+  } @else {
+    <div class="stats-content">
+      <div class="stat-block">
+        <p class="stat-label">Total Tasks</p>
+        <p class="stat-value total">{{ totalTasks }}</p>
+      </div>
+      
+      <div class="progress-breakdown">
+        
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Pending</span>
+            <span class="progress-count">{{ pendingTasksCount }}</span>
+          </div>
+          <div class="progress-track">
+            <div 
+              class="progress-fill status-pending"
+              [style.width.%]="getPercentage(pendingTasksCount)"
+            ></div>
+          </div>
+        </div>
+        
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">In Progress</span>
+            <span class="progress-count">{{ inProgressTasksCount }}</span>
+          </div>
+          <div class="progress-track">
+            <div 
+              class="progress-fill status-progress"
+              [style.width.%]="getPercentage(inProgressTasksCount)"
+            ></div>
+          </div>
+        </div>
+        
+        <div class="progress-item">
+          <div class="progress-header">
+            <span class="progress-label">Done</span>
+            <span class="progress-count">{{ doneTasksCount }}</span>
+          </div>
+          <div class="progress-track">
+            <div 
+              class="progress-fill status-done"
+              [style.width.%]="getPercentage(doneTasksCount)"
+            ></div>
+          </div>
+        </div>
+        
+      </div>
+      
+      <div class="completion-rate">
+        <p class="stat-label">Completion Rate</p>
+        <p class="stat-value primary">{{ completionRate }}%</p>
+      </div>
+    </div>
+  }
+</div>

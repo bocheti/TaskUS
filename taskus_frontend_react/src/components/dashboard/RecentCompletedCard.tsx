@@ -23,7 +23,7 @@ export const RecentCompletedCard = ({ tasks, isLoading }: RecentCompletedCardPro
       ) : (
         <div className="space-y-2">
           {recentlyCompleted.map(task => (
-            <div key={task.taskId} className="pb-2 border-b border-border last:border-0">
+            <div key={task.id} className="pb-2 border-b border-border last:border-0">
               <p className="text-sm font-medium text-foreground">{task.title}</p>
               <p className="text-xs text-muted-foreground">
                 {new Date(task.completedAt!).toLocaleDateString()}

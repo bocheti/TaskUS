@@ -1,48 +1,30 @@
-// src/styles.scss
 @use '@angular/material' as mat;
 
-// Include the essential structural styles for Angular Material.
 @include mat.core();
 
-// Global CSS Variables (Hue changed to 359)
 :root {
-  /* Base Colors */
-  --background: 0 0% 100%;          
-  --foreground: 359 20% 20%;        
-  
-  /* Content Container Backgrounds */
-  --banner-bg: 359 30% 95%;         
-  --card: 359 40% 40%;              
-  --muted: 359 40% 80%;             
-  
-  /* Primary Action Color */
-  --primary: 359 40% 40%;           
-  --primary-foreground: 0 0% 100%;  
-  
-  /* Borders & Dividers */
-  --border: 359 20% 80%;            
-  --input: 359 20% 80%;             
-  
-  /* Status Colors (Task States) */
-  --status-pending: 359 60% 50%;    
-  --status-progress: 58 60% 50%;    
-  --status-done: 106 60% 50%;       
-  
-  /* Text Colors */
-  --muted-foreground: 359 20% 40%;  
+  --background: hsl(0, 0%, 100%);
+  --foreground: hsl(359, 20%, 20%);
+  --banner-bg: hsl(359, 30%, 95%);
+  --card: hsl(359, 40%, 40%);
+  --muted: hsl(359, 40%, 80%);
+  --primary: hsl(359, 40%, 40%);
+  --primary-foreground: hsl(0, 0%, 100%);
+  --border: hsl(359, 20%, 80%);
+  --input: hsl(359, 20%, 80%);
+  --status-pending: hsl(359, 60%, 50%);
+  --status-progress: hsl(58, 60%, 50%);
+  --status-done: hsl(106, 60%, 50%);
+  --muted-foreground: hsl(359, 20%, 40%);
 }
 
-/* Global Resets */
 html, body {
   height: 100%;
   margin: 0;
   padding: 0;
-  /* Set Geologica as the default body font, matching React */
   font-family: 'Geologica', sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--background);
+  color: var(--foreground);
 }
 
 img, svg, mat-icon {
@@ -54,7 +36,6 @@ img, svg, mat-icon {
   box-sizing: border-box;
 }
 
-/* Utility class for League Spartan (for your logo and headings) */
 .font-spartan {
   font-family: 'League Spartan', sans-serif;
 }

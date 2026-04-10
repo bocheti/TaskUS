@@ -8,6 +8,7 @@ import { UserService } from '../../../core/services/user';
 import { toast } from 'ngx-sonner';
 import { finalize } from 'rxjs/operators';
 import { MatIconModule } from '@angular/material/icon';
+import { OrganisationListItem } from '../../../core/models/app.models';
 
 @Component({
   selector: 'app-request-screen',
@@ -20,9 +21,7 @@ export class RequestScreen implements OnInit {
   requestForm!: FormGroup;
   isLoading = false;
   isLoadingOrgs = true;
-  
-  // Replace with actual OrganisationListItem type from your models
-  organisations: any[] = []; 
+  organisations: OrganisationListItem[] = []; 
 
   constructor(
     private fb: FormBuilder,

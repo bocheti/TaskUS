@@ -1,0 +1,52 @@
+.recent-card {
+  background-color: var(--background);
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid var(--border);
+}
+
+.card-title {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0 0 16px 0; 
+}
+
+.empty-state {
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 20px; 
+  margin: 0;
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; 
+}
+
+.task-item {
+  padding-bottom: 8px; 
+  border-bottom: 1px solid var(--border);
+  
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  .task-title {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+    color: var(--foreground);
+    margin: 0 0 2px 0;
+  }
+
+  .task-date {
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--muted-foreground);
+    margin: 0;
+  }
+}

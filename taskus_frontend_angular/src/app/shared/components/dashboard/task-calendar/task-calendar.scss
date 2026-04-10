@@ -1,0 +1,65 @@
+.calendar-container {
+  background-color: var(--background, #ffffff);
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid var(--border, #e5e7eb);
+}
+
+
+::ng-deep {
+  .fc {
+    font-family: inherit;
+    color: var(--foreground, #111827);
+  }
+  
+  .fc-theme-standard th, 
+  .fc-theme-standard td, 
+  .fc-theme-standard .fc-scrollgrid {
+    border-color: var(--border, #e5e7eb);
+  }
+
+  .fc-button-primary {
+    background-color: var(--primary, #0056b3) !important;
+    border-color: var(--primary, #0056b3) !important;
+    text-transform: capitalize;
+    
+    &:disabled {
+      opacity: 0.5;
+    }
+  }
+
+  .fc-event {
+    cursor: pointer;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+
+  .calendar-event-custom {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10px;
+    width: 100%;
+    overflow: hidden;
+    padding: 2px 4px;
+
+    .event-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      
+      &.status-pending { background-color: hsl(359, 60%, 50%); }
+      &.status-progress { background-color: hsl(58, 60%, 50%); }
+      &.status-done { background-color: hsl(106, 60%, 50%); }
+    }
+
+    .event-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--foreground, #111827);
+    }
+  }
+}

@@ -1,4 +1,4 @@
-<app-authorized-layout title="Profile">
+<app-authorized-layout pageTitle="Profile">
   
   <div *ngIf="authService.user$ | async as user" class="placeholder-content">
     <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>

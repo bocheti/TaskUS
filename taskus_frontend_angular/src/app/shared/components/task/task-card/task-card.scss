@@ -1,0 +1,83 @@
+.task-card {
+  background-color: var(--background);
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid var(--border);
+  transition: all 0.2s ease-in-out;
+
+  &.interactive {
+    cursor: pointer;
+    &:hover {
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+      border-color: var(--primary);
+    }
+  }
+}
+
+.task-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+
+  .task-title {
+    font-size: 16px;
+    line-height: 24px;
+    font-weight: 600;
+    flex: 1;
+    margin: 0;
+  }
+
+  .status-indicator {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    margin-top: 4px;
+    flex-shrink: 0;
+    
+    &.bg-status-pending { background-color: var(--status-pending); }
+    &.bg-status-progress { background-color: var(--status-progress); }
+    &.bg-status-done { background-color: var(--status-done); }
+    &.bg-muted { background-color: var(--muted); }
+  }
+}
+
+.task-description {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--muted-foreground);
+  margin-bottom: 12px;
+  
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  line-clamp: 2; 
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted-foreground);
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+
+    mat-icon {
+      width: 14px;
+      height: 14px;
+      font-size: 14px;
+    }
+
+    &.overdue {
+      color: #ef4444; 
+      font-weight: 600;
+    }
+  }
+}

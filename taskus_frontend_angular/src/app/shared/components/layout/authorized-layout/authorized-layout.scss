@@ -2,7 +2,7 @@
 .layout-wrapper {
   display: flex;
   min-height: 100vh;
-  background-color: hsl(var(--background));
+  background-color: var(--background);
 }
 
 /* Mobile Menu Button: fixed top-4 left-4 z-30 p-2 rounded-lg bg-muted... md:hidden */
@@ -13,15 +13,15 @@
   z-index: 30;
   padding: 0.5rem;
   border-radius: 0.5rem;
-  background-color: hsl(var(--muted));
-  color: hsl(var(--foreground));
+  background-color: var(--muted);
+  color: var(--foreground);
   border: none;
   cursor: pointer;
   transition: background-color 0.2s;
   
 
   &:hover {
-    background-color: hsl(var(--background));
+    background-color: var(--background);
   }
 
   @media (min-width: 768px) {
@@ -57,7 +57,7 @@
   font-size: 1.5rem; /* text-2xl */
   line-height: 2rem;
   font-weight: 700;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   margin-top: 0;
   margin-bottom: 0.5rem; /* mb-2 */
 
@@ -71,14 +71,14 @@
 /* Title Divider: border-border border-t-2 */
 .title-divider {
   border: 0;
-  border-top: 2px solid hsl(var(--border));
+  border-top: 2px solid var(--border);
   margin: 0;
 }
 
 /* Content Card: flex-1 bg-banner-bg rounded-2xl p-4 md:p-6 md:pb-4 relative flex flex-col */
 .content-card {
   flex: 1;
-  background-color: hsl(var(--banner-bg)); /* Assuming this variable is in your global css */
+  background-color: var(--banner-bg); /* Assuming this variable is in your global css */
   border-radius: 1rem; /* rounded-2xl */
   padding: 1rem; /* p-4 */
   position: relative;
@@ -115,7 +115,7 @@
 .footer-text {
   font-size: 0.75rem; /* text-xs */
   line-height: 1rem;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   text-align: center;
   margin: 0;
 }
@@ -131,7 +131,7 @@
   background: none;
   border: none;
   padding: 0;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   cursor: pointer;
   transition: color 0.2s;
   display: flex;
@@ -139,7 +139,7 @@
   justify-content: center;
 
   &:hover {
-    color: hsl(var(--primary));
+    color: var(--primary);
   }
 }
 

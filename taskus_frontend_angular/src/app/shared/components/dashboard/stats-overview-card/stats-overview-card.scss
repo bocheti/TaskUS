@@ -1,0 +1,110 @@
+.stats-card {
+  background-color: var(--background);
+  border-radius: 8px;
+  padding: 16px;
+  border: 2px solid var(--border);
+}
+
+.card-title {
+  font-size: 18px;
+  line-height: 28px;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0 0 16px 0;
+}
+
+.loading-text {
+  color: var(--muted-foreground);
+  font-size: 14px;
+  line-height: 20px;
+  margin: 0;
+}
+
+.stats-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stat-block {
+  .stat-label {
+    font-size: 14px;
+    line-height: 20px; 
+    color: var(--muted-foreground);
+    margin: 0 0 4px 0;
+  }
+  .stat-value {
+    font-weight: 700;
+    margin: 0;
+    
+    &.total {
+      font-size: 24px;
+      line-height: 32px;
+      color: var(--foreground);
+    }
+  }
+}
+
+.progress-breakdown {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.progress-item {
+  .progress-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 4px; 
+
+    .progress-label {
+      font-size: 14px;
+      line-height: 20px; 
+      color: var(--muted-foreground);
+    }
+    .progress-count {
+      font-size: 14px;
+      line-height: 20px;
+      font-weight: 600;
+      color: var(--foreground);
+    }
+  }
+
+  .progress-track {
+    width: 100%;
+    background-color: var(--muted);
+    border-radius: 9999px;
+    height: 8px;
+    overflow: hidden;
+
+    .progress-fill {
+      height: 100%;
+      border-radius: 9999px;
+      transition: width 0.3s ease-in-out;
+      
+      &.status-pending { background-color: var(--status-pending); }
+      &.status-progress { background-color: var(--status-progress); }
+      &.status-done { background-color: var(--status-done); }
+    }
+  }
+}
+
+.completion-rate {
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  
+  .stat-label {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--muted-foreground);
+    margin: 0 0 4px 0;
+  }
+  .stat-value.primary {
+    font-size: 20px;
+    line-height: 28px;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 0;
+  }
+}

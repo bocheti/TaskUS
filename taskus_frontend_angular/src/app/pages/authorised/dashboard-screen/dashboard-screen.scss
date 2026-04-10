@@ -1,4 +1,112 @@
-.placeholder-content {
-  padding: 2rem;
-  color: hsl(var(--foreground));
+.dashboard-header {
+  text-align: center;
+  margin-bottom: 32px; 
+
+  .greeting {
+    font-size: 24px;
+    line-height: 32px; 
+    font-weight: 700;
+    color: var(--foreground);
+    margin: 0;
+    
+    @media (min-width: 768px) {
+      font-size: 30px; 
+      line-height: 36px; 
+    }
+  }
+
+  .current-date {
+    font-size: 16px;
+    line-height: 24px; 
+    color: var(--muted-foreground);
+    margin: 4px 0 0 0;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px; 
+
+  @media (min-width: 1024px) { 
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+.main-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+  
+  @media (min-width: 1024px) {
+    grid-column: span 2 / span 2; 
+  }
+}
+
+.side-column {
+  display: flex;
+  flex-direction: column;
+  gap: 16px; 
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 24px; 
+}
+
+.section-title {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 600;
+  color: var(--foreground);
+  margin: 0;
+
+  @media (min-width: 768px) {
+    font-size: 18px; 
+    line-height: 28px; 
+  }
+
+  &.calendar-title {
+    padding-top: 16px;
+  }
+}
+
+.view-all-btn {
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 12px;
+  line-height: 16px; 
+  color: var(--primary);
+  cursor: pointer;
+  padding: 0;
+  
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.tasks-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px; 
+}
+
+.loading-text {
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.empty-state {
+  background-color: var(--background);
+  border-radius: 8px;
+  padding: 24px;
+  border: 2px solid var(--border);
+  text-align: center;
+
+  p {
+    color: var(--muted-foreground);
+    margin: 0;
+  }
 }

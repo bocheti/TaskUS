@@ -1,0 +1,18 @@
+<div class="recent-card">
+  <h3 class="card-title">Recently Completed</h3>
+  
+  @if (isLoading) {
+    <p class="empty-state">Loading...</p>
+  } @else if (recentlyCompleted.length === 0) {
+    <p class="empty-state">No completed tasks yet.</p>
+  } @else {
+    <div class="task-list">
+      @for (task of recentlyCompleted; track task.id) {
+        <div class="task-item">
+          <p class="task-title">{{ task.title }}</p>
+          <p class="task-date">{{ task.completedAt | date:'shortDate' }}</p>
+        </div>
+      }
+    </div>
+  }
+</div>

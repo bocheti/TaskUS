@@ -30,6 +30,8 @@ export class App {
     this.registerCustomIcon('users', '/icons/users.svg');
     this.registerCustomIcon('organisation', '/icons/organisation.svg');
     this.registerCustomIcon('profile', '/icons/profile.svg');
+    this.registerCustomIcon('calendar', '/icons/calendar.svg');
+    this.registerCustomIcon('clock', '/icons/clock.svg');
   }
 
   private registerCustomIcon(name: string, path: string): void {

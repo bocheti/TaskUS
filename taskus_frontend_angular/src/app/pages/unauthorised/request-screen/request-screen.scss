@@ -44,7 +44,7 @@
   font-size: 1.875rem; 
   line-height: 2.25rem; 
   font-weight: 700;   
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   margin-bottom: 1rem; 
   margin-top: 0;
 
@@ -87,7 +87,7 @@
 
 /* Label: 24px height fixed */
 .input-label {
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   font-weight: 100; 
   text-align: left;
   font-size: 1rem; 
@@ -97,11 +97,11 @@
 /* PERFECTED INPUT */
 .form-input {
   width: 100%;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--background);
+  color: var(--foreground);
   padding: 0.875rem; 
   border-radius: 0.5rem; 
-  border: 2px solid hsl(var(--primary));
+  border: 2px solid var(--primary);
   font-family: inherit; 
   font-size: 1rem; 
   transition: box-shadow 0.2s;
@@ -112,7 +112,7 @@
 
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--border)); 
+    box-shadow: 0 0 0 2px var(--border); 
   }
 
   &:disabled {
@@ -141,7 +141,7 @@
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none; /* Allows clicking "through" the icon to open the select */
-  color: hsl(var(--foreground));
+  color: var(--foreground);
 }
 
 /* Submit Container */
@@ -155,8 +155,8 @@
 /* PERFECTED SUBMIT BUTTON */
 .submit-btn {
   width: 100%;
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   padding: 0.875rem 0;
   border-radius: 0.5rem; 
   font-weight: 500; 
@@ -183,7 +183,7 @@
 /* Bottom Links */
 .bottom-links-container {
   text-align: center;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   padding-top: 1rem; 
 }
 
@@ -197,7 +197,7 @@
 }
 
 .bottom-link {
-  color: hsl(var(--primary));
+  color: var(--primary);
   font-weight: 500; 
   text-decoration: none;
   transition: color 0.2s;

@@ -10,7 +10,7 @@
 .banner-container {
   width: 100%;
   height: 50vh;
-  background-color: hsl(var(--banner-bg));
+  background-color: var(--banner-bg);
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -62,19 +62,18 @@
   font-size: 1.5rem; 
   line-height: 2rem;
   text-align: center;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   padding: 0.5rem 0;
   margin: 0;
   
   @media (min-width: 768px) {
-    font-size: 2.25rem;  /* 36px font */
-    line-height: 2.5rem; /* 40px line-height */
-    padding: 1rem 0;     /* 16px top + 16px bottom = 32px padding. Total: 72px height! */
+    font-size: 2.25rem; 
+    line-height: 2.5rem; 
+    padding: 1rem 0;     
   }
 }
 
 .highlight-text {
-  // Converted hsl(193,61%,49%) to hue 359
   color: hsl(359, 61%, 49%);
 }
 
@@ -88,7 +87,7 @@
 
 .footer-text {
   font-size: 0.75rem; // text-xs
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   text-align: center;
   margin: 0;
 
@@ -107,7 +106,7 @@
   border: none;
   padding: 0;
   cursor: pointer;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   transition: color 0.2s;
   display: flex;
   align-items: center;

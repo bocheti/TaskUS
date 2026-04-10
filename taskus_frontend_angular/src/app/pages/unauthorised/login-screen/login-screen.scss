@@ -40,7 +40,7 @@
   font-size: 2.25rem;
   line-height: 2.5rem;
   font-weight: 700;   
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   margin-bottom: 0.5rem;
   margin-top: 0;
 
@@ -78,7 +78,7 @@
 }
 
 .input-label {
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   font-weight: 100;
   text-align: left;
   font-size: 1rem; 
@@ -87,11 +87,11 @@
 
 .form-input {
   width: 100%;
-  background-color: hsl(var(--background));
-  color: hsl(var(--foreground));
+  background-color: var(--background);
+  color: var(--foreground);
   padding: 0.875rem;
   border-radius: 0.5rem; 
-  border: 2px solid hsl(var(--primary));
+  border: 2px solid var(--primary);
   font-family: inherit; 
   font-size: 1rem; 
   transition: box-shadow 0.2s;
@@ -100,7 +100,7 @@
   }
   &:focus {
     outline: none;
-    box-shadow: 0 0 0 2px hsl(var(--border)); 
+    box-shadow: 0 0 0 2px var(--border);
   }
   &:disabled {
     opacity: 0.5;
@@ -114,7 +114,7 @@
 
 .forgot-password-link {
   font-size: 0.75rem;
-  color: hsl(var(--primary));
+  color: var(--primary);
   text-decoration: none;
   transition: color 0.2s;
 
@@ -133,8 +133,8 @@
 
 .submit-btn {
   width: 100%;
-  background-color: hsl(var(--primary));
-  color: hsl(var(--primary-foreground));
+  background-color: var(--primary);
+  color: var(--primary-foreground);
   padding: 0.875rem 0;
   border-radius: 0.5rem; 
   font-weight: 500; 
@@ -157,7 +157,7 @@
 
 .bottom-links-container {
   text-align: center;
-  color: hsl(var(--foreground));
+  color: var(--foreground);
   padding-top: 0.5rem;
 
   @media (min-width: 768px) {
@@ -175,12 +175,12 @@
 }
 
 .bottom-link {
-  color: hsl(var(--primary));
-  font-weight: 500; /* font-medium */
+  color: var(--primary);
+  font-weight: 500; 
   text-decoration: none;
   transition: color 0.2s;
   &:hover {
-    color: hsl(359, 61%, 49%); /* New hover color */
+    color: hsl(359, 61%, 49%);
     text-decoration: underline;
   }
 }
