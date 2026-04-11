@@ -1,12 +1,95 @@
 <app-authorized-layout pageTitle="All Tasks">
-  
-  <div *ngIf="authService.user$ | async as user" class="placeholder-content">
-    <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>
-    <p>Welcome to this screen.</p>
+  <div class="screen-container">
+    
+    <div class="top-controls">
+      <button class="back-btn" (click)="goBack()">
+        <mat-icon svgIcon="arrow-left"></mat-icon>
+        Back
+      </button>
+
+      <div class="toggle-wrapper">
+        <div class="view-toggle">
+          <button 
+            [class.active]="viewMode === 'kanban'" 
+            (click)="setViewMode('kanban')">
+            Kanban View
+          </button>
+          <button 
+            [class.active]="viewMode === 'list'" 
+            (click)="setViewMode('list')">
+            List View
+          </button>
+        </div>
+      </div>
+    </div>
+
+    @if (isLoading) {
+      <div class="empty-state-card">
+        <p>Loading tasks...</p>
+      </div>
+    } @else if (viewMode === 'kanban') {
+      <app-kanban-board
+        [tasks]="tasks"
+        (taskClick)="openTaskModal($event)"
+        (statusChange)="handleStatusChange($event)">
+      </app-kanban-board>
+    } @else {
+      @if (filteredTasks.length === 0 && filterStatus === 'All') {
+        <div class="empty-state-card">
+          <p>You don't have any tasks yet</p>
+        </div>
+      } @else {
+        <div class="list-view-container">
+          
+          <div class="filter-tabs">
+          @for (status of filterOptions; track status) {
+            <button 
+              class="filter-btn" 
+              [class.active]="filterStatus === status"
+              (click)="setFilter(status)"> <span class="mobile-only">
+                @if (status === 'All') {
+                  All
+                } @else {
+                  <span class="status-dot" [ngClass]="getStatusColorClass(status)"></span> 
+                }
+              </span>
+
+              <span class="desktop-only label">
+                {{ status === 'InProgress' ? 'In Progress' : status }}
+              </span>
+              <span class="desktop-only count">
+                ({{ statusCounts[status] }}) 
+              </span>
+            </button>
+          }
+          </div>
+
+          @if (filteredTasks.length === 0) {
+            <div class="empty-state-card">
+              <p>No {{ filterStatus === 'InProgress' ? 'In Progress' : filterStatus | lowercase }} tasks</p>
+            </div>
+          } @else {
+            <div class="tasks-grid">
+              @for (task of filteredTasks; track task.id) {
+                <app-task-card
+                  [task]="task"
+                  [isInteractive]="true"
+                  (click)="openTaskModal(task)">
+                </app-task-card>
+              }
+            </div>
+          }
+        </div>
+      }
+    }
   </div>
 
-  <div *ngIf="!(authService.user$ | async)" class="placeholder-content">
-    <h2>Loading user data...</h2>
-  </div>
-
+  @if (selectedTask) {
+    <app-task-modal
+      [task]="selectedTask"
+      [isOpen]="isModalOpen"
+      (closeModal)="closeTaskModal()"
+      (taskUpdated)="handleTaskUpdated($event)">
+    </app-task-modal>
+  }
 </app-authorized-layout>

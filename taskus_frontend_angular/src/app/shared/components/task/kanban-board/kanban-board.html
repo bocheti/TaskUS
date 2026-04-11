@@ -1,0 +1,72 @@
+<div class="kanban-grid" cdkDropListGroup>
+
+    <div class="kanban-column">
+    <div
+      class="drop-list"
+      id="Pending"
+      [class.drag-active]="activeListId === 'Pending'"
+      cdkDropList
+      [cdkDropListData]="pendingTasks"
+      (cdkDropListEntered)="activeListId = 'Pending'"
+      (cdkDropListDropped)="drop($event)">
+
+      @for (task of pendingTasks; track task.id) {
+        <div 
+          class="drag-item" 
+          cdkDrag
+          (cdkDragStarted)="activeListId = 'Pending'"
+          (cdkDragEnded)="activeListId = null">
+          <app-task-card [task]="task" [isInteractive]="true" (click)="taskClick.emit(task)"></app-task-card>
+        </div>
+      }
+      @if (pendingTasks.length === 0) { <div class="empty-state">No pending tasks</div> }
+    </div>
+  </div>
+
+  <div class="kanban-column">
+    <div
+      class="drop-list"
+      id="InProgress"
+      [class.drag-active]="activeListId === 'InProgress'"
+      cdkDropList
+      [cdkDropListData]="inProgressTasks"
+      (cdkDropListEntered)="activeListId = 'InProgress'"
+      (cdkDropListDropped)="drop($event)">
+
+      @for (task of inProgressTasks; track task.id) {
+        <div 
+          class="drag-item" 
+          cdkDrag
+          (cdkDragStarted)="activeListId = 'InProgress'"
+          (cdkDragEnded)="activeListId = null">
+          <app-task-card [task]="task" [isInteractive]="true" (click)="taskClick.emit(task)"></app-task-card>
+        </div>
+      }
+      @if (inProgressTasks.length === 0) { <div class="empty-state">No in progress tasks</div> }
+    </div>
+  </div>
+
+  <div class="kanban-column">
+    <div
+      class="drop-list"
+      id="Done"
+      [class.drag-active]="activeListId === 'Done'"
+      cdkDropList
+      [cdkDropListData]="doneTasks"
+      (cdkDropListEntered)="activeListId = 'Done'"
+      (cdkDropListDropped)="drop($event)">
+
+      @for (task of doneTasks; track task.id) {
+        <div 
+          class="drag-item" 
+          cdkDrag
+          (cdkDragStarted)="activeListId = 'Done'"
+          (cdkDragEnded)="activeListId = null">
+          <app-task-card [task]="task" [isInteractive]="true" (click)="taskClick.emit(task)"></app-task-card>
+        </div>
+      }
+      @if (doneTasks.length === 0) { <div class="empty-state">No done tasks</div> }
+    </div>
+  </div>
+
+</div>

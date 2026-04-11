@@ -35,6 +35,7 @@ export class App {
     this.registerCustomIcon('trash', '/icons/trash.svg');
     this.registerCustomIcon('user', '/icons/user.svg');
     this.registerCustomIcon('x', '/icons/x.svg');
+    this.registerCustomIcon('arrow-left', '/icons/arrow-left.svg'); 
   }
 
   private registerCustomIcon(name: string, path: string): void {
