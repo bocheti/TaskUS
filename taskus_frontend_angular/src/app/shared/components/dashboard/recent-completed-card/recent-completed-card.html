@@ -10,7 +10,7 @@
       @for (task of recentlyCompleted; track task.id) {
         <div class="task-item">
           <p class="task-title">{{ task.title }}</p>
-          <p class="task-date">{{ task.completedAt | date:'shortDate' }}</p>
+          <p class="task-date">{{ task.completedAt | date:'M/d/yyyy' }}</p>
         </div>
       }
     </div>

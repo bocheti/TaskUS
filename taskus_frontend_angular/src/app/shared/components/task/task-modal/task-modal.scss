@@ -46,6 +46,7 @@
 
     .task-title {
       font-size: 24px;
+      line-height: 32px;
       font-weight: 700;
       color: var(--foreground, #111827);
       margin: 0;
@@ -65,13 +66,10 @@
 
   .status-text {
     font-size: 14px;
-    color: var(--muted-foreground, #6b7280);
+    line-height: 20px;
+    color: var(--foreground, #6b7280);
     margin: 0;
 
-    .status-highlight {
-      font-weight: 500;
-      color: var(--foreground, #111827);
-    }
   }
 
   .close-btn {
@@ -97,8 +95,9 @@
 .description-section {
   .section-label {
     font-size: 14px;
-    font-weight: 600;
-    color: var(--muted-foreground, #6b7280);
+    line-height: 20px;
+    font-weight: 800;
+    color: var(--foreground);
     margin: 0 0 8px 0;
   }
   .task-description {
@@ -127,19 +126,19 @@
       width: 16px;
       height: 16px;
       font-size: 16px;
-      color: var(--muted-foreground, #6b7280);
+      color: var(--foreground);
     }
 
     .detail-label {
-      color: var(--muted-foreground, #6b7280);
+      color: var(--foreground);
     }
 
     .detail-value {
-      font-weight: 500;
-      color: var(--foreground, #111827);
+      font-weight: 400;
+      color: var(--foreground);
 
       &.text-overdue {
-        color: #ef4444; /* Red color for overdue */
+        color: var(--status-pending); 
       }
     }
   }
@@ -152,14 +151,17 @@
   .button-group {
     display: flex;
     gap: 12px;
+    height: 52px;
   }
 
   .btn-primary {
     background-color: var(--primary, #0056b3);
-    color: white; /* or var(--primary-foreground) */
+    color: white;
     padding: 12px;
     border-radius: 8px;
-    font-weight: 500;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 400;
     border: none;
     cursor: pointer;
     transition: opacity 0.2s;
@@ -182,7 +184,9 @@
     border: 2px solid #ef4444;
     color: #ef4444;
     background: transparent;
-    font-weight: 500;
+    font-size: 16px;
+    font-family: inherit;
+    font-weight: 400;
     cursor: pointer;
     transition: all 0.2s;
 

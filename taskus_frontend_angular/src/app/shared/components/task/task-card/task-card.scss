@@ -24,7 +24,7 @@
   .task-title {
     font-size: 16px;
     line-height: 24px;
-    font-weight: 600;
+    font-weight: 800;
     flex: 1;
     margin: 0;
   }
@@ -46,8 +46,8 @@
 .task-description {
   font-size: 14px;
   line-height: 20px;
-  color: var(--muted-foreground);
   margin-bottom: 12px;
+  margin-top: 0px;
   
   display: -webkit-box;
   -webkit-line-clamp: 2;
@@ -61,8 +61,8 @@
   align-items: center;
   gap: 16px;
   font-size: 12px;
+  font-weight: 400;
   line-height: 16px;
-  color: var(--muted-foreground);
 
   .meta-item {
     display: flex;
@@ -76,8 +76,8 @@
     }
 
     &.overdue {
-      color: #ef4444; 
-      font-weight: 600;
+      color: var(--status-pending); 
+      font-weight: 800;
     }
   }
 }

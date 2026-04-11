@@ -10,7 +10,7 @@
           <div class="status-indicator" [ngClass]="statusColorClass"></div>
         </div>
         <p class="status-text">
-          Status: <span class="status-highlight">{{ currentTask.status === 'InProgress' ? 'In Progress' : currentTask.status }}</span>
+          Status: <span>{{ currentTask.status === 'InProgress' ? 'In Progress' : currentTask.status }}</span>
         </p>
       </div>
       <button class="close-btn" (click)="handleClose()">
@@ -28,7 +28,7 @@
         <div class="detail-item">
           <mat-icon svgIcon="calendar"></mat-icon>
           <span class="detail-label">Created:</span>
-          <span class="detail-value">{{ currentTask.createdAt | date:'shortDate' }}</span>
+          <span class="detail-value">{{ currentTask.createdAt | date:'M/d/yyyy' }}</span>
         </div>
 
         <div class="detail-item">
@@ -43,7 +43,7 @@
           <div class="detail-item">
             <mat-icon svgIcon="calendar"></mat-icon>
             <span class="detail-label">Completed:</span>
-            <span class="detail-value">{{ currentTask.completedAt | date:'shortDate' }}</span>
+            <span class="detail-value">{{ currentTask.completedAt | date:'M/d/yyyy' }}</span>
           </div>
         }
 

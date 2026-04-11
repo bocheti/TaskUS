@@ -1,4 +1,4 @@
-import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Task, User } from '../../../../core/models/app.models';
@@ -31,7 +31,8 @@ export class TaskModal implements OnChanges {
   constructor(
     private taskService: TaskService,
     private userService: UserService,
-    private authService: AuthService
+    private authService: AuthService,
+    private cdr: ChangeDetectorRef
   ) {
     this.currentUser = this.authService.currentUserValue; 
   }
@@ -48,8 +49,12 @@ export class TaskModal implements OnChanges {
     this.userService.getUserInfo(this.currentTask.responsibleId).subscribe({
       next: (user) => {
         this.responsibleUser = { firstName: user.firstName, lastName: user.lastName };
+        this.cdr.detectChanges();
       },
-      error: (err) => console.error('Error fetching responsible user:', err)
+      error: (err) => {
+        console.error('Error fetching responsible user:', err)
+        this.cdr.detectChanges();
+      }
     });
   }
 
@@ -75,10 +80,12 @@ export class TaskModal implements OnChanges {
         toast.success(`Task status updated to ${newStatus}`);
         this.taskUpdated.emit(updatedTask);
         this.isTogglingStatus = false;
+        this.cdr.detectChanges();
       },
       error: () => {
         toast.error('Failed to update task status');
         this.isTogglingStatus = false;
+        this.cdr.detectChanges();
       }
     });
   }

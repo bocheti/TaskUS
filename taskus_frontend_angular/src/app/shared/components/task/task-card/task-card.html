@@ -11,7 +11,7 @@
   <div class="task-meta">
     <div class="meta-item">
       <mat-icon svgIcon="calendar"></mat-icon>
-      <span>Created {{ task.createdAt | date:'shortDate' }}</span>
+      <span>Created {{ task.createdAt | date:'M/d/yyyy' }}</span>
     </div>
     
     @if (deadlineInfo) {
