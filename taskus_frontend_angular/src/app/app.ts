@@ -44,6 +44,7 @@ export class App {
     this.registerCustomIcon('user-minus', '/icons/user-minus.svg');
     this.registerCustomIcon('folder-open', '/icons/folder-open.svg');
     this.registerCustomIcon('edit', '/icons/edit.svg');
+    this.registerCustomIcon('check', '/icons/check.svg');
   }
 
   private registerCustomIcon(name: string, path: string): void {

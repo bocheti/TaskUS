@@ -1,0 +1,68 @@
+@if (isOpen) {
+  <div class="modal-wrapper">
+    <div class="modal-backdrop" (click)="handleCancel()"></div>
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Edit Organisation</h2>
+          <p class="modal-subtitle">Update organisation details</p>
+        </div>
+        <button class="close-btn" (click)="handleCancel()">
+          <mat-icon svgIcon="x"></mat-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="handleSubmit()" class="modal-form">
+        <div class="form-group">
+          <label for="org-name" class="form-label">
+            Organisation Name <span class="required-asterisk">*</span>
+          </label>
+          <input
+            id="org-name"
+            name="name"
+            type="text"
+            [(ngModel)]="name"
+            placeholder="Enter organisation name"
+            maxlength="100"
+            [disabled]="isSubmitting"
+            class="form-input"
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="org-description" class="form-label">Description</label>
+          <textarea
+            id="org-description"
+            name="description"
+            [(ngModel)]="description"
+            placeholder="Enter organisation description (optional)"
+            rows="4"
+            maxlength="500"
+            [disabled]="isSubmitting"
+            class="form-textarea"
+          ></textarea>
+          <p class="char-count">{{ description.length }} / 500</p>
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn-outline" 
+            (click)="handleCancel()" 
+            [disabled]="isSubmitting">
+            Cancel
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isSubmitting || !name.trim()">
+            {{ isSubmitting ? 'Updating...' : 'Update' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -1,0 +1,27 @@
+<div class="user-request-card">
+  <div class="card-content">
+    
+    <div class="avatar">
+      {{ request.firstName[0] }}{{ request.lastName[0] }}
+    </div>
+
+    <div class="request-info">
+      <h3 class="name">{{ request.firstName }} {{ request.lastName }}</h3>
+      <p class="email">{{ request.email }}</p>
+      <div class="date-container">
+        <mat-icon svgIcon="calendar"></mat-icon>
+        <span>Created {{ request.createdAt | date:'shortDate' }}</span>
+      </div>
+    </div>
+
+    <div class="action-buttons">
+      <button class="btn-action accept" (click)="handleAccept()">
+        <mat-icon svgIcon="check"></mat-icon>
+      </button>
+      <button class="btn-action reject" (click)="handleReject()">
+        <mat-icon svgIcon="x"></mat-icon>
+      </button>
+    </div>
+    
+  </div>
+</div>

@@ -1,0 +1,27 @@
+<div class="user-card" (click)="navigateToProfile()">
+  <div class="card-content">
+    
+    <div class="avatar">
+      @if (user.pic) {
+        <img [src]="user.pic" [alt]="user.firstName" class="avatar-img" />
+      } @else {
+        {{ user.firstName[0] }}{{ user.lastName[0] }}
+      }
+    </div>
+
+    <div class="user-info">
+      <div class="name-row">
+        <h3 class="name">{{ user.firstName }} {{ user.lastName }}</h3>
+        @if (user.role === 'admin') {
+          <span class="admin-badge">Admin</span>
+        }
+      </div>
+      <p class="email">{{ user.email }}</p>
+    </div>
+
+    <button class="btn-destructive-sm" (click)="handleDeleteUser($event)">
+      Delete
+    </button>
+    
+  </div>
+</div>

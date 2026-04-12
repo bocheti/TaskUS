@@ -1,7 +1,6 @@
 .project-list-container {
   display: flex;
   flex-direction: column;
-  gap: 16px; /* space-y-4 */
 }
 
 .header-actions {
@@ -27,7 +26,7 @@
   white-space: nowrap;
   cursor: pointer;
   transition: opacity 0.2s;
-
+  margin: 0 0 16px 0; /* mb-4 */
   mat-icon { width: 16px; height: 16px; font-size: 16px; }
 
   &:hover {

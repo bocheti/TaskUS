@@ -23,8 +23,7 @@ export const OrganisationSettingsScreen = () => {
       setIsLoading(true);
       const orgData = await organisationService.getOrganisation();
       setOrganisation(orgData);
-    } catch (error) {
-      console.error("Error fetching organisation:", error);
+    } catch {
       toast.error("Failed to load organisation");
     } finally {
       setIsLoading(false);

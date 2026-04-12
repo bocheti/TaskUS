@@ -1,12 +1,72 @@
 <app-authorized-layout pageTitle="Organisation Settings">
   
-  <div *ngIf="authService.user$ | async as user" class="placeholder-content">
-    <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>
-    <p>Welcome to this screen.</p>
-  </div>
+  @if (isLoading) {
+    <div class="empty-state">Loading...</div>
+  } @else if (!organisation) {
+    <div class="empty-state">
+      <p class="error-msg">Organisation not found</p>
+    </div>
+  } @else {
+    <div class="screen-container">
+      
+      <div class="org-header-card">
+        <div class="org-header-flex">
+          
+          <div class="pic-container">
+            <div class="org-pic-wrapper">
+              @if (organisation.pic) {
+                <img [src]="organisation.pic" [alt]="organisation.name" class="org-img" />
+              } @else {
+                {{ organisation.name[0] }}
+              }
+            </div>
+          </div>
 
-  <div *ngIf="!(authService.user$ | async)" class="placeholder-content">
-    <h2>Loading user data...</h2>
-  </div>
+          <div class="info-container">
+            <h2 class="org-name">{{ organisation.name }}</h2>
+            <p class="org-description">
+              {{ organisation.description || 'No description provided' }}
+            </p>
+          </div>
 
+          <div class="action-buttons">
+            <input 
+              type="file" 
+              #fileInput 
+              accept="image/*" 
+              class="hidden" 
+              (change)="handleImageUpload($event)" 
+            />
+            
+            <button 
+              class="outline-btn" 
+              [disabled]="isUploading" 
+              (click)="fileInput.click()">
+              <mat-icon svgIcon="upload"></mat-icon>
+              <span class="desktop-text">{{ isUploading ? 'Uploading...' : 'Change Picture' }}</span>
+            </button>
+            
+            <button class="outline-btn" (click)="editDialogOpen = true">
+              <mat-icon svgIcon="edit"></mat-icon>
+              <span class="desktop-text">Edit</span>
+            </button>
+          </div>
+          
+        </div>
+      </div>
+
+      <div class="projects-section">
+        <h3 class="projects-title">Projects</h3>
+        <app-project-list [showCreateButton]="true"></app-project-list>
+      </div>
+
+    </div>
+
+    <app-edit-organisation-dialog
+      [isOpen]="editDialogOpen"
+      [organisation]="organisation"
+      (isOpenChange)="editDialogOpen = $event"
+      (organisationUpdated)="handleOrganisationUpdated($event)">
+    </app-edit-organisation-dialog>
+  }
 </app-authorized-layout>

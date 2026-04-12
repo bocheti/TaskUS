@@ -1,0 +1,146 @@
+.hidden {
+  display: none;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--muted-foreground);
+
+  .error-msg {
+    font-size: 20px;
+    line-height: 28px;
+    margin: 0;
+  }
+}
+
+.screen-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.org-header-card {
+  background-color: var(--background);
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  padding: 24px;
+}
+
+.org-header-flex {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  align-items: flex-start;
+
+  @media (min-width: 768px) {
+    flex-direction: row;
+  }
+}
+
+.pic-container {
+  flex-shrink: 0;
+}
+
+.org-pic-wrapper {
+  width: 144px;
+  height: 144px;
+  border-radius: 8px;
+  background-color: hsla(359, 40%, 40%, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 36px;
+  line-height: 40px;
+  font-weight: 700;
+  color: var(--foreground);
+  overflow: hidden;
+}
+
+.org-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.info-container {
+  flex: 1;
+}
+
+.org-name {
+  font-size: 30px;
+  line-height: 36px;
+  font-weight: 700;
+  margin: 0 0 8px 0;
+}
+
+.org-description {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--muted-foreground);
+  margin: 0 0 16px 0;
+}
+
+.action-buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 10px;
+  gap: 6px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 500;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+
+  mat-icon {
+    width: 16px;
+    height: 16px;
+    font-size: 16px;
+  }
+
+  &:hover:not(:disabled) {
+    background-color: var(--muted);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+
+  .desktop-text {
+    display: none;
+  }
+
+  @media (min-width: 768px) {
+    .desktop-text {
+      display: inline;
+    }
+  }
+}
+
+.projects-section {
+  display: flex;
+  flex-direction: column;
+  margin: 8px 0 0 0;
+}
+
+.projects-title {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  margin: 0;
+}
