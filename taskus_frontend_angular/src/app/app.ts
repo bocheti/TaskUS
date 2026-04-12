@@ -38,6 +38,8 @@ export class App {
     this.registerCustomIcon('arrow-left', '/icons/arrow-left.svg'); 
     this.registerCustomIcon('upload', '/icons/upload.svg');
     this.registerCustomIcon('user-cog', '/icons/user-cog.svg');
+    this.registerCustomIcon('image', '/icons/image.svg');
+    this.registerCustomIcon('plus', '/icons/plus.svg');
   }
 
   private registerCustomIcon(name: string, path: string): void {

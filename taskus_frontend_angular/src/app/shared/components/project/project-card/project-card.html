@@ -1,0 +1,40 @@
+<div class="project-card">
+  
+  <div class="image-container">
+    @if (project.pic) {
+      <img [src]="project.pic" [alt]="project.title" class="project-image" />
+    } @else {
+      <div class="image-fallback">
+        <mat-icon svgIcon="image"></mat-icon>
+      </div>
+    }
+  </div>
+
+  <div class="info-container">
+    <div class="header-info">
+      <h3 class="project-title">{{ project.title }}</h3>
+      <p class="project-description">
+        {{ project.description || 'No description provided' }}
+      </p>
+    </div>
+
+    @if (!isLoading && totalTasks > 0) {
+      <div class="progress-section">
+        
+        <div class="progress-header">
+          <span class="progress-label">Your Progress</span>
+          <span class="progress-count">{{ completedTasks }} / {{ totalTasks }} tasks</span>
+        </div>
+
+        <div class="progress-track">
+          <div class="progress-fill" [style.width.%]="completionPercentage"></div>
+        </div>
+
+        <div class="progress-footer">
+          <span class="progress-percentage">{{ completionPercentage }}% Complete</span>
+        </div>
+        
+      </div>
+    }
+  </div>
+</div>
