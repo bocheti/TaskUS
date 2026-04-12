@@ -1,4 +1,215 @@
-.placeholder-content {
-  padding: 2rem;
-  color: hsl(var(--foreground));
+.empty-state {
+  text-align: center;
+  padding: 48px 0;
+  color: var(--muted-foreground);
+  .error-msg { font-size: 20px; line-height: 28px; margin: 0 0 16px 0; }
+}
+
+.screen-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.back-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--muted-foreground);
+  background: transparent;
+  border: none;
+  font-family: inherit;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 0.2s;
+  mat-icon { width: 16px; height: 16px; font-size: 16px; }
+  &:hover { color: var(--foreground); }
+}
+
+.admin-controls {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.primary-btn, .outline-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 32px;
+  padding: 0 10px;
+  gap: 6px;
+  border-radius: 8px;
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  mat-icon { width: 16px; height: 16px; font-size: 16px; }
+  &:disabled { opacity: 0.5; cursor: not-allowed; }
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  border: none;
+  &:hover:not(:disabled) { opacity: 0.9; }
+}
+
+.outline-btn {
+  background-color: var(--background);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  &:hover:not(:disabled) { background-color: var(--muted); }
+  
+  &.danger {
+    color: #ef4444;
+    border-color: transparent;
+    background-color: hsla(0, 84%, 60%, 0.1);
+    &:hover:not(:disabled) { background-color: hsla(0, 84%, 60%, 0.2); }
+  }
+
+  .desktop-text { display: none; }
+  @media (min-width: 768px) { .desktop-text { display: inline; } }
+}
+
+.info-card {
+  background-color: var(--background);
+  border-radius: 8px;
+  border: 2px solid var(--border);
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card-title {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 800;
+  margin: 0 0 8px 0;
+}
+
+.card-description {
+  font-size: 16px;
+  line-height: 24px;
+  color: var(--muted-foreground);
+  margin: 0;
+}
+
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 24px;
+  line-height: 32px;
+  font-weight: 700;
+  &.text-pending { color: var(--status-pending); }
+  &.text-progress { color: var(--status-progress); }
+  &.text-done { color: var(--status-done); }
+}
+
+.stat-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--muted-foreground);
+}
+
+.segmented-bar {
+  width: 100%;
+  height: 16px;
+  background-color: var(--muted);
+  border-radius: 9999px;
+  overflow: hidden;
+  display: flex;
+}
+
+.segment {
+  height: 100%;
+  transition: width 0.3s ease-in-out;
+  &.bg-pending { background-color: var(--status-pending); }
+  &.bg-progress { background-color: var(--status-progress); }
+  &.bg-done { background-color: var(--status-done); }
+}
+
+.completion-text {
+  text-align: center;
+  margin-top: 2px;
+  .percent {
+    font-size: 14px;
+    line-height: 20px;
+    font-weight: 500;
+  }
+  .count {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--muted-foreground);
+    margin-left: 8px;
+  }
+}
+
+.tasks-section {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.section-title {
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: 800;
+  margin: 0;
+}
+
+.empty-tasks-state {
+  text-align: center;
+  padding: 48px 0;
+  background-color: var(--background);
+  border-radius: 8px;
+  border: 2px solid var(--border);
+
+  .empty-title {
+    color: var(--muted-foreground);
+    margin: 0 0 16px 0;
+  }
+  .empty-subtitle {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--muted-foreground);
+    margin: 0;
+  }
+}
+
+.tasks-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.dimmed {
+  opacity: 0.5;
 }

@@ -68,9 +68,9 @@
   .project-title {
     font-size: 20px; 
     line-height: 28px;
-    font-weight: 600; 
+    font-weight: 800; 
     margin: 0 0 8px 0; 
-    color: var(--foreground);
+    color: var(--banner-bg);
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
@@ -102,11 +102,11 @@
   line-height: 20px;
 
   .progress-label {
-    color: var(--muted-foreground);
+    color: var(--banner-bg);
   }
   .progress-count {
     font-weight: 500; 
-    color: var(--foreground);
+    color: var(--banner-bg);
   }
 }
 

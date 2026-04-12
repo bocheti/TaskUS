@@ -56,7 +56,7 @@ export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center bg-card">
+          <div className="w-full h-full flex items-center justify-center bg-white">
             <Image className="h-16 w-16 text-muted-foreground/50" />
           </div>
         )}
@@ -77,7 +77,7 @@ export const ProjectCard = ({ project, onClick }: ProjectCardProps) => {
         {!isLoading && totalTasks > 0 && (
           <div className="space-y-2">
             <div className="flex justify-between text-sm">
-              <span className="text-muted-foreground">Your Progress</span>
+              <span>Your Progress</span>
               <span className="font-medium">
                 {completedTasks} / {totalTasks} tasks
               </span>

@@ -142,9 +142,9 @@ export const TaskGroupDetailScreen = () => {
                 <span className="hidden md:inline">Edit</span>
               </Button>
               <Button
-                variant="outline"
+                variant="destructive"
                 onClick={handleDeleteTaskGroup}
-                className="flex items-center gap-2 text-red-500 hover:text-red-600"
+                className="flex items-center gap-2"
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="hidden md:inline">Delete</span>
@@ -202,7 +202,7 @@ export const TaskGroupDetailScreen = () => {
               </div>
 
               <div className="text-center">
-                <span className="text-sm font-medium">
+                <span className="text-sm font-medium text-foreground">
                   {Math.round(donePercentage)}% Complete
                 </span>
                 <span className="text-sm text-muted-foreground ml-2">

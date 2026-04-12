@@ -266,9 +266,9 @@ export const ProfileScreen = () => {
                     </span>
                   </Button>
                   <Button
-                    variant="outline"
+                    variant="destructive"
                     onClick={handleDeleteUser}
-                    className="flex items-center gap-2 text-red-500 hover:text-red-600"
+                    className="flex items-center gap-2"
                     >
                     <Trash2 className="h-4 w-4" />
                     <span className="hidden md:inline">Delete User</span>

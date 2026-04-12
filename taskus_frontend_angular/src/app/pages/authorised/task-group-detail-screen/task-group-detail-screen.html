@@ -1,12 +1,139 @@
-<app-authorized-layout pageTitle="Task Group Detail">
+<app-authorized-layout [pageTitle]="taskGroup ? taskGroup.title : 'Task Group'">
   
-  <div *ngIf="authService.user$ | async as user" class="placeholder-content">
-    <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>
-    <p>Welcome to this screen.</p>
-  </div>
+  @if (isLoading) {
+    <div class="empty-state">Loading task group...</div>
+  } @else if (!taskGroup) {
+    <div class="empty-state">
+      <p class="error-msg">Task group not found</p>
+      <button class="outline-btn" (click)="goBack()">Go Back</button>
+    </div>
+  } @else {
+    <div class="screen-container">
+      
+      <div class="top-controls">
+        <button class="back-btn" (click)="goBack()">
+          <mat-icon svgIcon="arrow-left"></mat-icon>
+          Back
+        </button>
 
-  <div *ngIf="!(authService.user$ | async)" class="placeholder-content">
-    <h2>Loading user data...</h2>
-  </div>
+        @if (currentUser?.role === 'admin') {
+          <div class="admin-controls">
+            <button class="outline-btn" (click)="editDialogOpen = true">
+              <mat-icon svgIcon="edit"></mat-icon>
+              <span class="desktop-text">Edit</span>
+            </button>
+            <button class="outline-btn danger" (click)="handleDeleteTaskGroup()">
+              <mat-icon svgIcon="trash"></mat-icon>
+              <span class="desktop-text">Delete</span>
+            </button>
+          </div>
+        }
+      </div>
 
+      <div class="info-card">
+        <div>
+          <h2 class="card-title">{{ taskGroup.title }}</h2>
+          <p class="card-description">
+            {{ taskGroup.description || 'No description provided' }}
+          </p>
+        </div>
+
+        @if (totalTasks > 0) {
+          <div class="progress-container">
+            <div class="stats-row">
+              <div class="stat-item">
+                <div class="stat-value text-pending">{{ pendingTasks }}</div>
+                <div class="stat-label">Pending</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value text-progress">{{ inProgressTasks }}</div>
+                <div class="stat-label">In Progress</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-value text-done">{{ doneTasks }}</div>
+                <div class="stat-label">Done</div>
+              </div>
+            </div>
+
+            <div class="segmented-bar">
+              @if (pendingPercentage > 0) {
+                <div class="segment bg-pending" [style.width.%]="pendingPercentage"></div>
+              }
+              @if (inProgressPercentage > 0) {
+                <div class="segment bg-progress" [style.width.%]="inProgressPercentage"></div>
+              }
+              @if (donePercentage > 0) {
+                <div class="segment bg-done" [style.width.%]="donePercentage"></div>
+              }
+            </div>
+
+            <div class="completion-text">
+              <span class="percent">{{ donePercentage | number:'1.0-0' }}% Complete</span>
+              <span class="count">({{ doneTasks }} / {{ totalTasks }} tasks)</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="tasks-section">
+        <div class="section-header">
+          <h3 class="section-title">Tasks</h3>
+          @if (currentUser?.role === 'admin') {
+            <button class="primary-btn" (click)="createDialogOpen = true">
+              <mat-icon svgIcon="plus"></mat-icon>
+              Create Task
+            </button>
+          }
+        </div>
+
+        @if (tasks.length === 0) {
+          <div class="empty-tasks-state">
+            <p class="empty-title">No tasks yet</p>
+            @if (currentUser?.role === 'admin') {
+              <p class="empty-subtitle">Create a task to get started</p>
+            }
+          </div>
+        } @else {
+          <div class="tasks-list">
+            @for (task of tasks; track task.id) {
+              <div [class.dimmed]="!isMyTask(task)">
+                <app-task-card 
+                  [task]="task" 
+                  [isInteractive]="true" 
+                  (click)="handleTaskClick(task)">
+                </app-task-card>
+              </div>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (selectedTask) {
+      <app-task-modal
+      [task]="selectedTask"
+      [isOpen]="isModalOpen"
+      (closeModal)="closeTaskModal()"
+      (taskUpdated)="handleTaskUpdated($event)">
+    </app-task-modal>
+    }
+
+    @if (currentUser?.role === 'admin' && taskGroupId) {
+      <app-create-task-dialog
+        [isOpen]="createDialogOpen"
+        [taskGroupId]="taskGroupId"
+        (isOpenChange)="createDialogOpen = $event"
+        (taskCreated)="handleTaskCreated()">
+      </app-create-task-dialog>
+    }
+
+    @if (currentUser?.role === 'admin' && taskGroup) {
+      <app-edit-taskgroup-dialog
+        [isOpen]="editDialogOpen"
+        [taskGroup]="taskGroup"
+        (isOpenChange)="editDialogOpen = $event"
+        (taskGroupUpdated)="handleTaskGroupUpdated($event)">
+      </app-edit-taskgroup-dialog>
+    }
+  }
 </app-authorized-layout>

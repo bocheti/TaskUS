@@ -1,0 +1,100 @@
+@if (isOpen) {
+  <div class="modal-wrapper">
+    <div class="modal-backdrop" (click)="handleCancel()"></div>
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Create Task</h2>
+          <p class="modal-subtitle">Add a new task to this group</p>
+        </div>
+        <button class="close-btn" (click)="handleCancel()">
+          <mat-icon svgIcon="x"></mat-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="handleSubmit()" class="modal-form">
+        
+        <div class="form-group">
+          <label for="task-title" class="form-label">
+            Title <span class="required-asterisk">*</span>
+          </label>
+          <input
+            id="task-title"
+            name="title"
+            type="text"
+            [(ngModel)]="title"
+            placeholder="Enter task title"
+            maxlength="100"
+            [disabled]="isSubmitting"
+            class="form-input"
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="task-description" class="form-label">Description</label>
+          <textarea
+            id="task-description"
+            name="description"
+            [(ngModel)]="description"
+            placeholder="Enter task description (optional)"
+            rows="3"
+            maxlength="500"
+            [disabled]="isSubmitting"
+            class="form-textarea"
+          ></textarea>
+        </div>
+
+        <div class="form-group">
+          <label for="task-responsible" class="form-label">
+            Assign To <span class="required-asterisk">*</span>
+          </label>
+          <select
+            id="task-responsible"
+            name="responsibleId"
+            [(ngModel)]="responsibleId"
+            [disabled]="isSubmitting"
+            class="form-select"
+          >
+            <option value="">Select a user</option>
+            @for (user of users; track user.id) {
+              <option [value]="user.id">
+                {{ user.firstName }} {{ user.lastName }} ({{ user.email }})
+              </option>
+            }
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label for="task-deadline" class="form-label">Deadline (optional)</label>
+          <input
+            id="task-deadline"
+            name="deadline"
+            type="date"
+            [(ngModel)]="deadline"
+            [disabled]="isSubmitting"
+            class="form-input"
+          />
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn-outline" 
+            (click)="handleCancel()" 
+            [disabled]="isSubmitting">
+            Cancel
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isSubmitting || !title.trim() || !responsibleId">
+            {{ isSubmitting ? 'Creating...' : 'Create Task' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

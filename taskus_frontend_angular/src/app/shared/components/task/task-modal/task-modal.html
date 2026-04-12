@@ -10,7 +10,7 @@
           <div class="status-indicator" [ngClass]="statusColorClass"></div>
         </div>
         <p class="status-text">
-          Status: <span>{{ currentTask.status === 'InProgress' ? 'In Progress' : currentTask.status }}</span>
+          Status: <span class="status-text-value">{{ currentTask.status === 'InProgress' ? 'In Progress' : currentTask.status }}</span>
         </p>
       </div>
       <button class="close-btn" (click)="handleClose()">

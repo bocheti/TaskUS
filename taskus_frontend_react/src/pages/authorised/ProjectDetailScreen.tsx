@@ -189,9 +189,9 @@ export const ProjectDetailScreen = () => {
                 <span className="hidden md:inline">{isUploading ? "Uploading..." : "Change Picture"}</span>
               </Button>
               <Button
-                variant="outline"
+                variant="destructive"
                 onClick={handleDeleteProject}
-                className="flex items-center gap-2 text-red-500 hover:text-red-600"
+                className="flex items-center gap-2"
               >
                 <Trash2 className="h-4 w-4" />
                 <span className="hidden md:inline">Delete Project</span>

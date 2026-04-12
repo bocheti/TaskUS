@@ -1,0 +1,69 @@
+@if (isOpen) {
+  <div class="modal-wrapper">
+    <div class="modal-backdrop" (click)="handleCancel()"></div>
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Edit Task Group</h2>
+          <p class="modal-subtitle">Update task group details</p>
+        </div>
+        <button class="close-btn" (click)="handleCancel()">
+          <mat-icon svgIcon="x"></mat-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="handleSubmit()" class="modal-form">
+        
+        <div class="form-group">
+          <label for="edit-taskgroup-title" class="form-label">
+            Title <span class="required-asterisk">*</span>
+          </label>
+          <input
+            id="edit-taskgroup-title"
+            name="title"
+            type="text"
+            [(ngModel)]="title"
+            placeholder="Enter task group title"
+            maxlength="100"
+            [disabled]="isSubmitting"
+            class="form-input"
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-taskgroup-description" class="form-label">Description</label>
+          <textarea
+            id="edit-taskgroup-description"
+            name="description"
+            [(ngModel)]="description"
+            placeholder="Enter task group description (optional)"
+            rows="4"
+            maxlength="500"
+            [disabled]="isSubmitting"
+            class="form-textarea"
+          ></textarea>
+          <p class="char-count">{{ description.length }} / 500</p>
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn-outline" 
+            (click)="handleCancel()" 
+            [disabled]="isSubmitting">
+            Cancel
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isSubmitting || !title.trim()">
+            {{ isSubmitting ? 'Updating...' : 'Update' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+}

@@ -142,14 +142,13 @@ export const ProjectMembersModal = ({
 
       {user?.role === "admin" && (
         <Button
-          variant="outline"
+          variant="destructive"
           size="sm"
           onClick={(e) => {
             e.stopPropagation();
             handleRemoveMember(member.id);
           }}
           disabled={isLoading}
-          className="text-red-500 hover:text-red-600 flex-shrink-0"
         >
           <UserMinus className="h-4 w-4" />
         </Button>

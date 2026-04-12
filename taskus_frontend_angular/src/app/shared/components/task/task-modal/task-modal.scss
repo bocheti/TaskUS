@@ -67,9 +67,15 @@
   .status-text {
     font-size: 14px;
     line-height: 20px;
-    color: var(--foreground, #6b7280);
+    color: var(--muted-foreground);
     margin: 0;
+  }
 
+  .status-text-value {
+    font-size: 14px;
+    line-height: 20px;
+    color: var(--foreground);
+    margin: 0;
   }
 
   .close-btn {
@@ -78,7 +84,7 @@
     cursor: pointer;
     color: var(--foreground, #111827);
     transition: color 0.2s ease;
-    
+    padding: 0;
     &:hover {
       color: var(--primary, #0056b3);
     }
@@ -131,6 +137,7 @@
 
     .detail-label {
       color: var(--foreground);
+      line-height: 20px;
     }
 
     .detail-value {
