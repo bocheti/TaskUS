@@ -1,0 +1,38 @@
+.not-found-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: var(--background);
+}
+
+.content-wrapper {
+  text-align: center;
+}
+
+.error-code {
+  font-size: 60px;
+  line-height: 1;
+  font-weight: 700; 
+  color: var(--foreground);
+  margin: 0 0 16px 0; 
+}
+
+.error-message {
+  font-size: 20px; 
+  line-height: 28px;
+  color: var(--muted-foreground);
+  margin: 0 0 32px 0; 
+}
+
+.home-link {
+  color: var(--primary);
+  font-size: 18px; 
+  line-height: 28px;
+  text-decoration: none;
+  transition: text-decoration 0.2s;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}

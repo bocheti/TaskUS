@@ -1,12 +1,63 @@
-<app-authorized-layout pageTitle="About Us">
-  
-  <div *ngIf="authService.user$ | async as user" class="placeholder-content">
-    <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>
-    <p>Welcome to this screen.</p>
-  </div>
+<app-authorized-layout pageTitle="About TaskUS">
+  <div class="screen-container">
+    
+    <div class="top-controls">
+      <button class="back-btn" (click)="goBack()">
+        <mat-icon svgIcon="arrow-left"></mat-icon>
+        Back
+      </button>
+    </div>
 
-  <div *ngIf="!(authService.user$ | async)" class="placeholder-content">
-    <h2>Loading user data...</h2>
-  </div>
+    <div class="banner-section">
+      <img 
+        src="bannerLogo.svg" 
+        alt="TaskUS Logo" 
+        class="banner-logo" 
+      />
+      <p class="banner-tagline">
+        Make task managing <span class="highlight-text">easier</span>
+      </p>
+    </div>
 
+    <div class="content-container">
+      
+      <div class="info-card">
+        <h2 class="card-title">About TaskUS</h2>
+        <div class="card-body">
+          <p>
+            TaskUS is a modern task management application designed specifically for organizations and their teams. Built with simplicity and
+            intuitiveness at its core, TaskUS enables seamless collaboration between administrators and members, making project coordination 
+            effortless and efficient.
+          </p>
+          <p>
+            The platform allows organizations to structure their work through projects and task groups, assign responsibilities to team members, track
+            progress in real-time, and maintain complete visibility over task status. Whether you're managing a small team or coordinating across 
+            multiple departments, TaskUS provides the tools you need without overwhelming complexity. Every feature is crafted to reduce friction in
+            team workflows, from intuitive dashboards that highlight what needs attention, to flexible role-based permissions that give admins control
+            while empowering members to focus on their work.
+          </p>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <h2 class="card-title">Academic Context</h2>
+        <div class="card-body">
+          <p>
+            TaskUS was developed by Salvador Ramón Espinosa Merino, whose LinkedIn and Github repository links can be found on the footer of every 
+            content container, as part of a Software Engineering bachelor's thesis at the Universidad de Sevilla. The project's primary objective is to
+            compare the development experience, performance, and maintainability of two of the most popular and widely-used frontend frameworks in
+            web development: Angular and React.
+          </p>
+          <p>
+            By implementing identical functionality in both frameworks against the same Node.js + Express backend, this thesis provides insights into
+            the practical differences between these technologies. <strong>The Angular implementation (the one you are currently seeing)</strong> utilizes pure SCSS and
+            Angular Material, while the React version employs Vite, TypeScript, Tailwind CSS, and shadcn/ui. This comparative approach allows for a
+            comprehensive evaluation of developer ergonomics, build performance and long-term maintainability—factors crucial for making informed
+            technology decisions in real-world software projects.
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </div>
 </app-authorized-layout>

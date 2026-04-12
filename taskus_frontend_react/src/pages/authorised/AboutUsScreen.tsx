@@ -56,10 +56,10 @@ export const AboutUsScreen = () => {
               </p>
               <p>
                 By implementing identical functionality in both frameworks against the same Node.js + Express backend, this thesis provides insights into
-                the practical differences between these technologies. The React implementation (the one you are currently seeing) utilizes Vite, TypeScript,
-                Tailwind CSS, and shadcn/ui, while the Angular version employs Angular Material. This comparative approach allows for a comprehensive
-                evaluation of developer ergonomics, build performance and long-term maintainability—factors crucial for making informed technology decisions
-                in real-world software projects.
+                the practical differences between these technologies. <strong>The React implementation (the one you are currently seeing)</strong> utilizes Vite, TypeScript,
+                Tailwind CSS, and shadcn/ui, while the Angular version employs pure SCSS and Angular Material. This comparative approach allows for a 
+                comprehensive evaluation of developer ergonomics, build performance and long-term maintainability—factors crucial for making informed
+                technology decisions in real-world software projects.
               </p>
             </div>
           </div>

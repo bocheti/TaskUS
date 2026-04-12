@@ -253,8 +253,8 @@ export const ProfileScreen = () => {
                 </>
               )}
 
-                <>
                 {isAdmin && !isOwnProfile && (
+                <>
                   <Button
                     variant="outline"
                     onClick={handleToggleRole}
@@ -265,16 +265,16 @@ export const ProfileScreen = () => {
                       {profileUser.role === "admin" ? "Demote to Member" : "Promote to Admin"}
                     </span>
                   </Button>
-                  )}
                   <Button
                     variant="outline"
                     onClick={handleDeleteUser}
                     className="flex items-center gap-2 text-red-500 hover:text-red-600"
-                  >
+                    >
                     <Trash2 className="h-4 w-4" />
                     <span className="hidden md:inline">Delete User</span>
                   </Button>
                 </>
+                )}
             </div>
           </div>
         </div>
