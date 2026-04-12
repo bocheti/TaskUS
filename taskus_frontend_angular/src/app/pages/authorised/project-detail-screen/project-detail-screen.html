@@ -1,12 +1,188 @@
-<app-authorized-layout pageTitle="Project Detail">
+<app-authorized-layout [pageTitle]="project ? project.title : 'Project Details'">
   
-  <div *ngIf="authService.user$ | async as user" class="placeholder-content">
-    <h2>Hi {{ user.firstName }} {{ user.lastName }}!</h2>
-    <p>Welcome to this screen.</p>
-  </div>
+  @if (isLoading) {
+    <div class="empty-state">Loading project...</div>
+  } @else if (!project) {
+    <div class="empty-state">
+      <p class="error-msg">Project not found</p>
+      <button class="primary-btn" routerLink="/projects">Back to Projects</button>
+    </div>
+  } @else {
+    <div class="screen-container">
+      
+      <div class="top-controls">
+        <button class="back-btn" (click)="goBack()">
+          <mat-icon svgIcon="arrow-left"></mat-icon>
+          Back
+        </button>
 
-  <div *ngIf="!(authService.user$ | async)" class="placeholder-content">
-    <h2>Loading user data...</h2>
-  </div>
+        @if (currentUser?.role === 'admin') {
+          <div class="admin-controls">
+            <button class="outline-btn" (click)="editDialogOpen = true">
+              <mat-icon svgIcon="edit"></mat-icon>
+              <span class="desktop-text">Edit Project</span>
+            </button>
+            
+            <input type="file" #fileInput accept="image/*" class="hidden" (change)="handleImageUpload($event)" />
+            <button class="outline-btn" [disabled]="isUploading" (click)="fileInput.click()">
+              <mat-icon svgIcon="upload"></mat-icon>
+              <span class="desktop-text">{{ isUploading ? 'Uploading...' : 'Change Picture' }}</span>
+            </button>
+            
+            <button class="outline-btn danger" (click)="handleDeleteProject()">
+              <mat-icon svgIcon="trash"></mat-icon>
+              <span class="desktop-text">Delete Project</span>
+            </button>
+          </div>
+        }
+      </div>
 
+      <div class="header-grid">
+        
+        <div class="image-card">
+          <div class="image-wrapper">
+            @if (project.pic) {
+              <img [src]="project.pic" [alt]="project.title" class="project-img" />
+            } @else {
+              <mat-icon svgIcon="image" class="fallback-icon"></mat-icon>
+            }
+          </div>
+        </div>
+
+        <div class="info-column">
+          
+          <div class="info-card">
+            <p class="description-text">{{ project.description || 'No description provided' }}</p>
+          </div>
+
+          <div class="info-card">
+            <div class="card-header-flex">
+              <h3 class="card-title">Members</h3>
+              <button class="view-all-link" (click)="membersModalOpen = true">
+                <mat-icon svgIcon="users"></mat-icon>
+                View All
+              </button>
+            </div>
+
+            @if (members.length > 0) {
+              <div class="members-preview-list">
+                @for (member of members.slice(0, 3); track member.id) {
+                  <div class="preview-member">
+                    <div class="avatar">{{ member.firstName[0] }}{{ member.lastName[0] }}</div>
+                    <span class="name">{{ member.firstName }} {{ member.lastName }}</span>
+                    @if (member.role === 'admin') {
+                      <span class="role-badge">Admin</span>
+                    }
+                  </div>
+                }
+                @if (members.length > 3) {
+                  <p class="more-members">+{{ members.length - 3 }} more</p>
+                }
+              </div>
+            } @else {
+              <p class="empty-text">No members yet</p>
+            }
+          </div>
+
+          <div class="info-card">
+            <h3 class="card-title mb-3">{{ currentUser?.role === 'admin' ? 'Overall Progress' : 'Your Progress' }}</h3>
+            
+            @if (totalTasks > 0) {
+              <div class="progress-container">
+                <div class="stats-row">
+                  <div class="stat-item">
+                    <div class="stat-value text-pending">{{ pendingTasks }}</div>
+                    <div class="stat-label">Pending</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value text-progress">{{ inProgressTasks }}</div>
+                    <div class="stat-label">In Progress</div>
+                  </div>
+                  <div class="stat-item">
+                    <div class="stat-value text-done">{{ doneTasks }}</div>
+                    <div class="stat-label">Done</div>
+                  </div>
+                </div>
+
+                <div class="segmented-bar">
+                  @if (pendingPercentage > 0) {
+                    <div class="segment bg-pending" [style.width.%]="pendingPercentage"></div>
+                  }
+                  @if (inProgressPercentage > 0) {
+                    <div class="segment bg-progress" [style.width.%]="inProgressPercentage"></div>
+                  }
+                  @if (donePercentage > 0) {
+                    <div class="segment bg-done" [style.width.%]="donePercentage"></div>
+                  }
+                </div>
+
+                <div class="completion-text">
+                  <span class="percent">{{ donePercentage | number:'1.0-0' }}% Complete</span>
+                  <span class="count">({{ doneTasks }} / {{ totalTasks }} tasks)</span>
+                </div>
+              </div>
+            } @else {
+              <p class="empty-text center py-2">No tasks yet</p>
+            }
+          </div>
+        </div>
+      </div>
+
+      <div class="taskgroups-section">
+        <div class="section-header">
+          <h3 class="section-title">Task Groups</h3>
+          @if (currentUser?.role === 'admin') {
+            <button class="primary-btn" (click)="createDialogOpen = true">
+              <mat-icon svgIcon="plus"></mat-icon>
+              Create Task Group
+            </button>
+          }
+        </div>
+
+        @if (taskGroups.length === 0) {
+          <div class="empty-groups-state">
+            <p class="empty-title">No task groups yet</p>
+            @if (currentUser?.role === 'admin') {
+              <p class="empty-subtitle">Create a task group to organize tasks</p>
+            }
+          </div>
+        } @else {
+          <div class="groups-grid">
+            @for (group of taskGroups; track group.id) {
+              <app-taskgroup-card 
+                [taskGroup]="group" 
+                (click)="handleTaskGroupClick(group.id)">
+              </app-taskgroup-card>
+            }
+          </div>
+        }
+      </div>
+    </div>
+
+    @if (currentUser?.role === 'admin' && projectId) {
+      <app-create-taskgroup-dialog
+        [isOpen]="createDialogOpen"
+        [projectId]="projectId"
+        (isOpenChange)="createDialogOpen = $event"
+        (taskGroupCreated)="handleTaskGroupCreated()">
+      </app-create-taskgroup-dialog>
+
+      <app-edit-project-dialog
+        [isOpen]="editDialogOpen"
+        [project]="project"
+        (isOpenChange)="editDialogOpen = $event"
+        (projectUpdated)="handleProjectUpdated($event)">
+      </app-edit-project-dialog>
+    }
+
+    @if (projectId) {
+      <app-project-members-modal
+        [isOpen]="membersModalOpen"
+        [projectId]="projectId"
+        [members]="members"
+        (isOpenChange)="membersModalOpen = $event"
+        (membersUpdated)="fetchProjectData()">
+      </app-project-members-modal>
+    }
+  }
 </app-authorized-layout>

@@ -1,0 +1,71 @@
+@if (isOpen) {
+  <div class="modal-wrapper">
+    <div class="modal-backdrop" (click)="handleCancel()"></div>
+    
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Edit Project</h2>
+          <p class="modal-subtitle">Update project details</p>
+        </div>
+        <button class="close-btn" (click)="handleCancel()">
+          <mat-icon svgIcon="x"></mat-icon>
+        </button>
+      </div>
+
+      <form (ngSubmit)="handleSubmit()" class="modal-form">
+        
+        <div class="form-group">
+          <label for="edit-project-title" class="form-label">
+            Project Title <span class="required-asterisk">*</span>
+          </label>
+          <input
+            id="edit-project-title"
+            name="title"
+            type="text"
+            [(ngModel)]="title"
+            placeholder="Enter project title"
+            maxlength="100"
+            [disabled]="isSubmitting"
+            class="form-input"
+            autofocus
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="edit-project-description" class="form-label">Description</label>
+          <textarea
+            id="edit-project-description"
+            name="description"
+            [(ngModel)]="description"
+            placeholder="Enter project description (optional)"
+            rows="4"
+            maxlength="500"
+            [disabled]="isSubmitting"
+            class="form-textarea"
+          ></textarea>
+          <p class="char-count">{{ description.length }} / 500</p>
+        </div>
+
+        <div class="modal-actions">
+          <button 
+            type="button" 
+            class="btn-outline" 
+            (click)="handleCancel()" 
+            [disabled]="isSubmitting">
+            Cancel
+          </button>
+          
+          <button 
+            type="submit" 
+            class="btn-primary" 
+            [disabled]="isSubmitting || !title.trim()">
+            {{ isSubmitting ? 'Updating...' : 'Update Project' }}
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+}

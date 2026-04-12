@@ -40,6 +40,10 @@ export class App {
     this.registerCustomIcon('user-cog', '/icons/user-cog.svg');
     this.registerCustomIcon('image', '/icons/image.svg');
     this.registerCustomIcon('plus', '/icons/plus.svg');
+    this.registerCustomIcon('user-plus', '/icons/user-plus.svg');
+    this.registerCustomIcon('user-minus', '/icons/user-minus.svg');
+    this.registerCustomIcon('folder-open', '/icons/folder-open.svg');
+    this.registerCustomIcon('edit', '/icons/edit.svg');
   }
 
   private registerCustomIcon(name: string, path: string): void {

@@ -1,0 +1,97 @@
+@if (isOpen) {
+  <div class="modal-wrapper">
+    <div class="modal-backdrop" (click)="closeModal()"></div>
+    
+    <div class="modal-content">
+      
+      <div class="modal-header">
+        <div>
+          <h2 class="modal-title">Project Members</h2>
+          <p class="modal-subtitle">
+            {{ members.length }} {{ members.length === 1 ? 'member' : 'members' }}
+          </p>
+        </div>
+        <button class="close-btn" (click)="closeModal()">
+          <mat-icon svgIcon="x"></mat-icon>
+        </button>
+      </div>
+
+      <div class="members-list">
+        @for (member of members; track member.id) {
+          <div 
+            class="member-item" 
+            [class.is-admin-view]="currentUser?.role === 'admin'"
+            (click)="navigateToProfile(member.id)">
+            
+            <div class="member-info">
+              <div class="avatar">
+                {{ member.firstName[0] }}{{ member.lastName[0] }}
+              </div>
+              <div>
+                <div class="member-name">{{ member.firstName }} {{ member.lastName }}</div>
+                <div class="member-email">{{ member.email }}</div>
+              </div>
+              @if (member.role === 'admin') {
+                <span class="role-badge">Admin</span>
+              }
+            </div>
+
+            @if (currentUser?.role === 'admin') {
+              <button 
+                class="outline-btn-sm danger" 
+                [disabled]="isLoading"
+                (click)="handleRemoveMember(member.id, $event)">
+                <mat-icon svgIcon="user-minus"></mat-icon>
+              </button>
+            }
+          </div>
+        }
+
+        @if (members.length === 0) {
+          <div class="empty-state">No members in this project</div>
+        }
+      </div>
+
+      @if (currentUser?.role === 'admin') {
+        <div class="add-member-section">
+          @if (!showAddUser) {
+            <button class="primary-btn full-width" (click)="showAddUser = true">
+              <mat-icon svgIcon="user-plus"></mat-icon>
+              Add Member
+            </button>
+          } @else {
+            <div class="add-user-controls">
+              <div class="add-header">
+                <h4 class="add-title">Add User to Project</h4>
+                <button class="cancel-link" (click)="showAddUser = false">Cancel</button>
+              </div>
+
+              @if (availableUsers.length > 0) {
+                <div class="available-users-list">
+                  @for (user of availableUsers; track user.id) {
+                    <div class="available-user-item">
+                      <div class="member-info">
+                        <div class="avatar small">
+                          {{ user.firstName[0] }}{{ user.lastName[0] }}
+                        </div>
+                        <div class="member-name small">{{ user.firstName }} {{ user.lastName }}</div>
+                      </div>
+                      <button 
+                        class="primary-btn-sm" 
+                        [disabled]="isLoading"
+                        (click)="handleAddMember(user.id)">
+                        Add
+                      </button>
+                    </div>
+                  }
+                </div>
+              } @else {
+                <p class="empty-state small">All users are already members of this project</p>
+              }
+            </div>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}
