@@ -2,20 +2,23 @@ import { useEffect, useState } from "react";
 import { Upload, Edit } from "lucide-react";
 import { AuthorizedLayout } from '@/components/layout/AuthorizedLayout';
 import { Button } from "@/components/ui/button";
-import { organisationService } from "@/services/api";
-import { Organisation } from "@/types";
+import { organisationService, taskService } from "@/services/api";
+import { Organisation, Task } from "@/types";
 import { toast } from "sonner";
 import { ProjectList } from "@/components/project/ProjectList";
 import { EditOrganisationDialog } from "@/components/organisation/EditOrganisationDialog";
+import { TaskStats } from "@/components/ui/TaskStats";
 
 export const OrganisationSettingsScreen = () => {
   const [organisation, setOrganisation] = useState<Organisation | null>(null);
+  const [orgTasks, setOrgTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
 
   useEffect(() => {
     fetchOrganisation();
+    fetchOrgTasks();
   }, []);
 
   const fetchOrganisation = async () => {
@@ -27,6 +30,15 @@ export const OrganisationSettingsScreen = () => {
       toast.error("Failed to load organisation");
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const fetchOrgTasks = async () => {
+    try {
+      const tasksData = await taskService.getAllTasks();
+      setOrgTasks(tasksData);
+    } catch (error) {
+      console.error("Error fetching org tasks:", error);
     }
   };
 
@@ -141,6 +153,12 @@ export const OrganisationSettingsScreen = () => {
             </div>
           </div>
         </div>
+
+        {/* Organisation Statistics */}
+        <TaskStats 
+          tasks={orgTasks} 
+          title="Organisation Statistics" 
+        />
 
         {/* Projects Section */}
         <div className="space-y-2">

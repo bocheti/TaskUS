@@ -2,13 +2,13 @@ import { Component, OnInit, ChangeDetectorRef, ViewChild, ElementRef } from '@an
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
-
-import { Organisation } from '../../../core/models/app.models';
 import { OrganisationService } from '../../../core/services/organisation';
-
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
 import { ProjectList } from '../../../shared/components/project/project-list/project-list';
 import { EditOrganisationDialog } from '../../../shared/components/organisation/edit-organisation-dialog/edit-organisation-dialog';
+import { Organisation, Task } from '../../../core/models/app.models';
+import { TaskService } from '../../../core/services/task';
+import { TaskStats } from '../../../shared/components/ui/task-stats/task-stats';
 
 @Component({
   selector: 'app-organisation-settings-screen',
@@ -18,7 +18,8 @@ import { EditOrganisationDialog } from '../../../shared/components/organisation/
     MatIconModule,
     AuthorizedLayout,
     ProjectList,
-    EditOrganisationDialog
+    EditOrganisationDialog,
+    TaskStats
   ],
   templateUrl: './organisation-settings-screen.html',
   styleUrls: ['./organisation-settings-screen.scss']
@@ -27,17 +28,20 @@ export class OrganisationSettingsScreen implements OnInit {
   @ViewChild('fileInput') fileInputRef!: ElementRef<HTMLInputElement>;
 
   organisation: Organisation | null = null;
+  orgTasks: Task[] = [];
   isLoading = true;
   isUploading = false;
   editDialogOpen = false;
 
   constructor(
     private organisationService: OrganisationService,
+    private taskService: TaskService,
     private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.fetchOrganisation();
+    this.fetchOrgTasks();
   }
 
   fetchOrganisation(): void {
@@ -94,5 +98,17 @@ export class OrganisationSettingsScreen implements OnInit {
   handleOrganisationUpdated(updatedOrg: Organisation): void {
     this.organisation = updatedOrg;
     this.cdr.detectChanges();
+  }
+
+  fetchOrgTasks(): void {
+    this.taskService.getAllTasks().subscribe({
+      next: (tasks) => {
+        this.orgTasks = tasks;
+        this.cdr.detectChanges();
+      },
+      error: (error) => {
+        console.error('Error fetching org tasks:', error);
+      }
+    });
   }
 }

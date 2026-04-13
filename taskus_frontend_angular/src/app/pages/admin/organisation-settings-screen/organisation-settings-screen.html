@@ -54,7 +54,12 @@
           
         </div>
       </div>
-
+      <div style="margin-top: 24px; margin-bottom: 24px;">
+        <app-task-stats 
+          [tasks]="orgTasks" 
+          title="Organisation Statistics">
+        </app-task-stats>
+      </div>
       <div class="projects-section">
         <h3 class="projects-title">Projects</h3>
         <app-project-list [showCreateButton]="true"></app-project-list>
