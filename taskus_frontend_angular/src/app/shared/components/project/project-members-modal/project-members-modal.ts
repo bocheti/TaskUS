@@ -7,11 +7,12 @@ import { User } from '../../../../core/models/app.models';
 import { AuthService } from '../../../../core/services/auth';
 import { UserService } from '../../../../core/services/user';
 import { ProjectService } from '../../../../core/services/project';
+import { ConfirmDialog } from '../../../../shared/components/ui/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-project-members-modal',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, ConfirmDialog],
   templateUrl: './project-members-modal.html',
   styleUrls: ['./project-members-modal.scss']
 })
@@ -27,6 +28,8 @@ export class ProjectMembersModal implements OnChanges {
   allUsers: User[] = [];
   showAddUser = false;
   isLoading = false;
+  isRemoveMemberDialogOpen = false;
+  selectedMemberToRemove: User | null = null;
 
   constructor(
     private authService: AuthService,
@@ -63,28 +66,33 @@ export class ProjectMembersModal implements OnChanges {
   }
 
   handleRemoveMember(userId: string, event: Event): void {
-    event.stopPropagation(); // Prevents navigating to the profile!
+    event.stopPropagation();
 
-    const memberToRemove = this.members.find(m => m.id === userId);
-    if (!memberToRemove) return;
+    const member = this.members.find(m => m.id === userId);
+    if (!member) return;
 
-    const confirmed = window.confirm(
-      `Remove ${memberToRemove.firstName} ${memberToRemove.lastName} from this project?`
-    );
+    this.selectedMemberToRemove = member;
+    this.isRemoveMemberDialogOpen = true;
+  }
 
-    if (!confirmed) return;
+  executeRemoveMember(): void {
+    if (!this.selectedMemberToRemove) return;
 
+    this.isRemoveMemberDialogOpen = false;
     this.isLoading = true;
-    this.projectService.removeUserFromProject(this.projectId, userId).subscribe({
+
+    this.projectService.removeUserFromProject(this.projectId, this.selectedMemberToRemove.id).subscribe({
       next: () => {
         toast.success('Member removed from project');
         this.membersUpdated.emit();
+        this.selectedMemberToRemove = null;
         this.isLoading = false;
         this.cdr.detectChanges();
       },
       error: (error) => {
         console.error('Error removing member:', error);
         toast.error('Failed to remove member');
+        this.selectedMemberToRemove = null; 
         this.isLoading = false;
         this.cdr.detectChanges();
       }

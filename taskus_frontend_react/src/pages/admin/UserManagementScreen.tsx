@@ -6,6 +6,7 @@ import { User, UserRequest } from "@/types";
 import { toast } from "sonner";
 import { UserCard } from "@/components/user/UserCard";
 import { UserRequestCard } from "@/components/user/UserRequestCard";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 type Tab = "users" | "requests";
 
@@ -14,6 +15,9 @@ export const UserManagementScreen = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [requests, setRequests] = useState<UserRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
+  const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
   useEffect(() => {
     fetchData();
@@ -47,89 +51,110 @@ export const UserManagementScreen = () => {
     }
   };
 
-  const handleRejectRequest = async (requestId: string) => {
-    const confirmed = window.confirm("Are you sure you want to reject this request?");
-    if (!confirmed) return;
+  const handleRejectClick = (requestId: string) => {
+    setSelectedRequestId(requestId);
+    setIsRejectDialogOpen(true);
+  };
+
+  const executeRejectRequest = async () => {
+    if (!selectedRequestId) return;
+    
+    setIsRejectDialogOpen(false);
 
     try {
-      await userService.rejectUserRequest(requestId);
+      await userService.rejectUserRequest(selectedRequestId);
       toast.success("User request rejected");
       fetchData();
     } catch (error) {
       console.error("Error rejecting request:", error);
       toast.error("Failed to reject request");
+    } finally {
+      setSelectedRequestId(null);
     }
   };
 
   return (
-    <AuthorizedLayout title="User Management">
-      <div className="space-y-6">
-        {/* Tab Toggle */}
-        <div className="flex justify-center">
-          <div className="bg-muted p-1 rounded-full inline-flex gap-1">
-            <button
-              onClick={() => setActiveTab("users")}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
-                activeTab === "users"
-                  ? "bg-background text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Users
-              <span className="ml-2 text-sm opacity-75">({users.length})</span>
-            </button>
-            <button
-              onClick={() => setActiveTab("requests")}
-              className={`px-6 py-2 rounded-full font-medium transition-all ${
-                activeTab === "requests"
-                  ? "bg-background text-primary shadow-sm"
-                  : "text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Requests
-              <span className="ml-2 text-sm opacity-75">({requests.length})</span>
-            </button>
+    <>
+      <AuthorizedLayout title="User Management">
+        <div className="space-y-6">
+          <div className="flex justify-center">
+            <div className="bg-muted p-1 rounded-full inline-flex gap-1">
+              <button
+                onClick={() => setActiveTab("users")}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                  activeTab === "users"
+                    ? "bg-background text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Users
+                <span className="ml-2 text-sm opacity-75">({users.length})</span>
+              </button>
+              <button
+                onClick={() => setActiveTab("requests")}
+                className={`px-6 py-2 rounded-full font-medium transition-all ${
+                  activeTab === "requests"
+                    ? "bg-background text-primary shadow-sm"
+                    : "text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                Requests
+                <span className="ml-2 text-sm opacity-75">({requests.length})</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {/* Content */}
-        {isLoading ? (
-          <div className="text-center py-12 text-muted-foreground">
-            Loading...
-          </div>
-        ) : activeTab === "users" ? (
-          <div className="space-y-3">
-            {users.length === 0 ? (
-              <div className="text-center py-12 bg-background rounded-lg border-2 border-border">
-                <p className="text-muted-foreground">No users found</p>
-              </div>
-            ) : (
-              users.map((user) => (
-                <UserCard key={user.id} user={user} onDelete={fetchData} />
-              ))
-            )}
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {requests.length === 0 ? (
-              <div className="text-center py-12 bg-background rounded-lg border-2 border-border">
-                <UserPlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
-                <p className="text-muted-foreground">No pending requests</p>
-              </div>
-            ) : (
-              requests.map((request) => (
-                <UserRequestCard
-                  key={request.id}
-                  request={request}
-                  onAccept={handleAcceptRequest}
-                  onReject={handleRejectRequest}
-                  onDelete={fetchData}
-                />
-              ))
-            )}
-          </div>
-        )}
-      </div>
-    </AuthorizedLayout>
+          {isLoading ? (
+            <div className="text-center py-12 text-muted-foreground">
+              Loading...
+            </div>
+          ) : activeTab === "users" ? (
+            <div className="space-y-3">
+              {users.length === 0 ? (
+                <div className="text-center py-12 bg-background rounded-lg border-2 border-border">
+                  <p className="text-muted-foreground">No users found</p>
+                </div>
+              ) : (
+                users.map((user) => (
+                  <UserCard key={user.id} user={user} onDelete={fetchData} />
+                ))
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {requests.length === 0 ? (
+                <div className="text-center py-12 bg-background rounded-lg border-2 border-border">
+                  <UserPlus className="h-12 w-12 mx-auto mb-4 text-muted-foreground/50" />
+                  <p className="text-muted-foreground">No pending requests</p>
+                </div>
+              ) : (
+                requests.map((request) => (
+                  <UserRequestCard
+                    key={request.id}
+                    request={request}
+                    onAccept={handleAcceptRequest}
+                    onReject={handleRejectClick}
+                    onDelete={fetchData}
+                  />
+                ))
+              )}
+            </div>
+          )}
+        </div>
+      </AuthorizedLayout>
+
+      <ConfirmDialog
+        isOpen={isRejectDialogOpen}
+        title="Reject Request"
+        message="Are you sure you want to reject this request?"
+        confirmText="Reject"
+        isDanger={true}
+        onConfirm={executeRejectRequest}
+        onCancel={() => {
+          setIsRejectDialogOpen(false);
+          setSelectedRequestId(null);
+        }}
+      />
+    </>
   );
 };

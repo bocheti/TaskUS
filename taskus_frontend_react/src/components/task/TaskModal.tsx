@@ -1,12 +1,10 @@
 import { Task } from '@/types';
-import { X, Calendar, Clock, User } from 'lucide-react';
+import { X, Calendar, Clock, User, Trash2 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { taskService, userService } from '@/services/api';
 import { toast } from 'sonner';
 import { useAuth } from '@/hooks/useAuth';
-import { Trash2 } from 'lucide-react';
-
-
+import { ConfirmDialog } from '@/components/ui/ConfirmDialog';
 
 interface TaskModalProps {
   task: Task;
@@ -17,6 +15,7 @@ interface TaskModalProps {
 
 export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalProps) => {
   const [isTogglingStatus, setIsTogglingStatus] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [currentTask, setCurrentTask] = useState(task);
   const { user } = useAuth();
   const [responsibleUser, setResponsibleUser] = useState<{ firstName: string; lastName: string } | null>(null);
@@ -40,21 +39,19 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
     setIsTogglingStatus(true);
 
     try {
-      // Determine next status
       let newStatus: 'Pending' | 'InProgress' | 'Done';
       if (currentTask.status === 'Pending') {
         newStatus = 'InProgress';
       } else if (currentTask.status === 'InProgress') {
         newStatus = 'Done';
       } else {
-        newStatus = 'Pending'; // Done → Pending (restart)
+        newStatus = 'Pending';
       }
 
       const updatedTask = await taskService.updateTaskStatus(currentTask.id, { newStatus });
       setCurrentTask(updatedTask);
       toast.success(`Task status updated to ${newStatus}`);
       
-      // Notify parent component
       if (onTaskUpdated) {
         onTaskUpdated(updatedTask);
       }
@@ -65,20 +62,18 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
     }
   };
 
-  const handleDeleteTask = async () => {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${currentTask.title}"? This action cannot be undone.`
-    );
+  const handleDeleteClick = () => {
+    setIsDeleteDialogOpen(true);
+  };
 
-    if (!confirmed) return;
-
+  const executeDeleteTask = async () => {
+    setIsDeleteDialogOpen(false);
     try {
       await taskService.deleteTask(currentTask.id);
       toast.success('Task deleted successfully');
       onClose();
       if (onTaskUpdated) {
-        // Refresh parent by passing a deleted flag or trigger refetch
-        window.location.reload(); // Simple approach, or pass callback from parent
+        window.location.reload();
       }
     } catch {
       toast.error('Failed to delete task');
@@ -130,15 +125,12 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
 
   return (
     <>
-      {/* Backdrop */}
       <div 
         className="fixed inset-0 bg-black bg-opacity-50 z-50"
         onClick={onClose}
       />
 
-      {/* Modal */}
       <div className="fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-full max-w-2xl max-h-[90vh] overflow-y-auto bg-background rounded-lg shadow-lg">
-        {/* Header */}
         <div className="sticky top-0 bg-background border-b-2 border-border p-6 flex items-start justify-between">
           <div className="flex-1 pr-8">
             <div className="flex items-center gap-3 mb-2">
@@ -158,17 +150,13 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6 space-y-6">
-          {/* Description */}
           <div>
             <h3 className="text-sm font-semibold text-muted-foreground mb-2">Description</h3>
             <p className="text-foreground">{currentTask.description}</p>
           </div>
 
-          {/* Task details */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Created date */}
             <div className="flex items-center gap-2 text-sm">
               <Calendar size={16} className="text-muted-foreground" />
               <span className="text-muted-foreground">Created:</span>
@@ -177,7 +165,6 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
               </span>
             </div>
 
-            {/* Deadline */}
             <div className="flex items-center gap-2 text-sm">
               <Clock size={16} className="text-muted-foreground" />
               <span className="text-muted-foreground">Deadline:</span>
@@ -190,7 +177,6 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
               </span>
             </div>
 
-            {/* Completed date (if done) */}
             {currentTask.completedAt && (
               <div className="flex items-center gap-2 text-sm">
                 <Calendar size={16} className="text-muted-foreground" />
@@ -201,7 +187,6 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
               </div>
             )}
 
-            {/* Responsible */}
             <div className="flex items-center gap-2 text-sm">
               <User size={16} className="text-muted-foreground" />
               <span className="text-muted-foreground">Assigned to:</span>
@@ -214,7 +199,6 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
             </div>
           </div>
 
-          {/* Actions */}
           <div className="pt-4 border-t border-border">
             {(user?.role === "admin" || currentTask.responsibleId === user?.id) ? (
               <div className="flex gap-3">
@@ -228,7 +212,7 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
                 
                 {user?.role === 'admin' && (
                   <button
-                    onClick={handleDeleteTask}
+                    onClick={handleDeleteClick}
                     className="px-4 py-3 rounded-lg border-2 border-red-500 text-red-500 hover:bg-red-500 hover:text-white transition-colors flex items-center gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
@@ -244,6 +228,16 @@ export const TaskModal = ({ task, isOpen, onClose, onTaskUpdated }: TaskModalPro
           </div>
         </div>
       </div>
+
+      <ConfirmDialog
+        isOpen={isDeleteDialogOpen}
+        title="Delete Task"
+        message={`Are you sure you want to delete "${currentTask.title}"? This action cannot be undone.`}
+        confirmText="Delete"
+        isDanger={true}
+        onConfirm={executeDeleteTask}
+        onCancel={() => setIsDeleteDialogOpen(false)}
+      />
     </>
   );
 };

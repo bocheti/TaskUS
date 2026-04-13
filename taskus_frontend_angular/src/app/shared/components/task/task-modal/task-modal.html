@@ -84,5 +84,14 @@
         }
       </div>
     </div>
+    <app-confirm-dialog
+      [isOpen]="isDeleteDialogOpen"
+      title="Delete Task"
+      [message]="'Are you sure you want to delete \'' + currentTask?.title + '\'? This action cannot be undone.'"
+      confirmText="Delete"
+      [isDanger]="true"
+      (confirm)="executeDeleteTask()"
+      (cancel)="isDeleteDialogOpen = false">
+    </app-confirm-dialog>
   </div>
 }

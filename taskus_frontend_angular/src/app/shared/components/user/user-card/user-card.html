@@ -24,4 +24,14 @@
     </button>
     
   </div>
+    <app-confirm-dialog
+    (click)="$event.stopPropagation()"
+    [isOpen]="isDeleteDialogOpen"
+    title="Delete User"
+    [message]="'Are you sure you want to delete ' + user.firstName + ' ' + user.lastName + '? This action cannot be undone.'"
+    confirmText="Delete"
+    [isDanger]="true"
+    (confirm)="executeDeleteUser()"
+    (cancel)="isDeleteDialogOpen = false">
+  </app-confirm-dialog>
 </div>

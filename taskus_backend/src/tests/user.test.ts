@@ -351,68 +351,193 @@ it('PUT /user/:userId/role - not found', async () => {
   });
 
   // DELETE /user/:userId
-  it('DELETE /user/:userId - admin deletes user in same organisation', async () => {
-    const created = await request(app)
-      .post('/user/create')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        firstName: 'To',
-        lastName: 'Delete',
-        email: 'tobedeleted@test.com',
-        password: 'password123',
-        role: 'member'
-      });
+it('DELETE /user/:userId - admin deletes user with no projects or tasks', async () => {
+  const created = await request(app)
+    .post('/user/create')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({
+      firstName: 'To',
+      lastName: 'Delete',
+      email: 'tobedeleted@test.com',
+      password: 'password123',
+      role: 'member'
+    });
 
-    const res = await request(app)
-      .delete(`/user/${created.body.id}`)
-      .set('Authorization', `Bearer ${authToken}`);
+  const res = await request(app)
+    .delete(`/user/${created.body.id}`)
+    .set('Authorization', `Bearer ${authToken}`);
+  expect(res.status).toBe(200);
+});
 
-    expect(res.status).toBe(200);
-  });
+it('DELETE /user/:userId - admin deletes user who is a project member', async () => {
+  const created = await request(app)
+    .post('/user/create')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({
+      firstName: 'Project',
+      lastName: 'Member',
+      email: 'projectmembertodelete@test.com',
+      password: 'password123',
+      role: 'member'
+    });
+  const createdId = created.body.id;
 
-  it('DELETE /user/:userId - user deletes themselves', async () => {
-    const created = await request(app)
-      .post('/user/create')
-      .set('Authorization', `Bearer ${authToken}`)
-      .send({
-        firstName: 'Self',
-        lastName: 'Delete',
-        email: 'selfdelete@test.com',
-        password: 'password123',
-        role: 'member'
-      });
+  const project = await request(app)
+    .post('/project')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Delete Test Project', description: 'test' });
+  const projectId = project.body.id;
 
-    const login = await request(app)
-      .post('/user/login')
-      .send({ email: 'selfdelete@test.com', password: 'password123' });
+  await request(app)
+    .post(`/project/${projectId}/member/${createdId}`)
+    .set('Authorization', `Bearer ${authToken}`);
 
-    const res = await request(app)
-      .delete(`/user/${created.body.id}`)
-      .set('Authorization', `Bearer ${login.body.authToken}`);
+  const res = await request(app)
+    .delete(`/user/${createdId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+  expect(res.status).toBe(200);
 
-    expect(res.status).toBe(200);
-  });
+  // verify user is removed from project members
+  const members = await request(app)
+    .get(`/project/${projectId}/members`)
+    .set('Authorization', `Bearer ${authToken}`);
+  expect(members.body.find((u: any) => u.id === createdId)).toBeUndefined();
+});
 
-  it('DELETE /user/:userId - member cannot delete another user', async () => {
-    const res = await request(app)
-      .delete(`/user/${userId}`) // admin user
-      .set('Authorization', `Bearer ${memberToken}`);
+it('DELETE /user/:userId - admin deletes user who has tasks', async () => {
+  const created = await request(app)
+    .post('/user/create')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({
+      firstName: 'Task',
+      lastName: 'Owner',
+      email: 'taskownerdelete@test.com',
+      password: 'password123',
+      role: 'member'
+    });
+  const createdId = created.body.id;
 
-    expect(res.status).toBe(403);
-  });
+  const project = await request(app)
+    .post('/project')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Task Delete Test Project', description: 'test' });
+  const projectId = project.body.id;
 
-  it('DELETE /user/:userId - admin from another organisation cannot delete user', async () => {
-    const res = await request(app)
-      .delete(`/user/${userId}`)
-      .set('Authorization', `Bearer ${otherOrgToken}`);
+  await request(app)
+    .post(`/project/${projectId}/member/${createdId}`)
+    .set('Authorization', `Bearer ${authToken}`);
 
-    expect(res.status).toBe(403);
-  });
+  const taskGroup = await request(app)
+    .post('/taskGroup')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Task Delete Test Group', projectId });
+  const taskGroupId = taskGroup.body.id;
 
-  it('DELETE /user/:userId - no auth token', async () => {
-    const res = await request(app)
-      .delete(`/user/${userId}`);
+  const task = await request(app)
+    .post('/task')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Task to be deleted', responsibleId: createdId, taskGroupId });
+  const taskId = task.body.id;
 
-    expect(res.status).toBe(401);
-  });
+  const res = await request(app)
+    .delete(`/user/${createdId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+  expect(res.status).toBe(200);
+
+  // verify task is gone
+  const taskRes = await request(app)
+    .get(`/task/${taskId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+  expect(taskRes.status).toBe(404);
+});
+
+it('DELETE /user/:userId - user deletes themselves', async () => {
+  const created = await request(app)
+    .post('/user/create')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({
+      firstName: 'Self',
+      lastName: 'Delete',
+      email: 'selfdelete@test.com',
+      password: 'password123',
+      role: 'member'
+    });
+  const login = await request(app)
+    .post('/user/login')
+    .send({ email: 'selfdelete@test.com', password: 'password123' });
+
+  const res = await request(app)
+    .delete(`/user/${created.body.id}`)
+    .set('Authorization', `Bearer ${login.body.authToken}`);
+  expect(res.status).toBe(200);
+});
+
+it('DELETE /user/:userId - user deletes themselves with tasks and project memberships', async () => {
+  const created = await request(app)
+    .post('/user/create')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({
+      firstName: 'Self',
+      lastName: 'DeleteFull',
+      email: 'selfdeletefull@test.com',
+      password: 'password123',
+      role: 'member'
+    });
+  const createdId = created.body.id;
+  const login = await request(app)
+    .post('/user/login')
+    .send({ email: 'selfdeletefull@test.com', password: 'password123' });
+
+  const project = await request(app)
+    .post('/project')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Self Delete Project', description: 'test' });
+  const projectId = project.body.id;
+
+  await request(app)
+    .post(`/project/${projectId}/member/${createdId}`)
+    .set('Authorization', `Bearer ${authToken}`);
+
+  const taskGroup = await request(app)
+    .post('/taskGroup')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Self Delete Group', projectId });
+
+  await request(app)
+    .post('/task')
+    .set('Authorization', `Bearer ${authToken}`)
+    .send({ title: 'Self Delete Task', responsibleId: createdId, taskGroupId: taskGroup.body.id });
+
+  const res = await request(app)
+    .delete(`/user/${createdId}`)
+    .set('Authorization', `Bearer ${login.body.authToken}`);
+  expect(res.status).toBe(200);
+});
+
+it('DELETE /user/:userId - member cannot delete another user', async () => {
+  const res = await request(app)
+    .delete(`/user/${userId}`)
+    .set('Authorization', `Bearer ${memberToken}`);
+  expect(res.status).toBe(403);
+});
+
+it('DELETE /user/:userId - admin from another organisation cannot delete user', async () => {
+  const res = await request(app)
+    .delete(`/user/${userId}`)
+    .set('Authorization', `Bearer ${otherOrgToken}`);
+  expect(res.status).toBe(403);
+});
+
+it('DELETE /user/:userId - not found', async () => {
+  const res = await request(app)
+    .delete('/user/nonexistentid')
+    .set('Authorization', `Bearer ${authToken}`);
+  expect(res.status).toBe(404);
+});
+
+it('DELETE /user/:userId - no auth token', async () => {
+  const res = await request(app)
+    .delete(`/user/${userId}`);
+  expect(res.status).toBe(401);
+});
 });

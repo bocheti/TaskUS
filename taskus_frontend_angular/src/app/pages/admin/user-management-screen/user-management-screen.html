@@ -57,7 +57,15 @@
           }
         </div>
       }
-      
     }
   </div>
+  <app-confirm-dialog
+      [isOpen]="isRejectDialogOpen"
+      title="Reject Request"
+      message="Are you sure you want to reject this request?"
+      confirmText="Reject"
+      [isDanger]="true"
+      (confirm)="executeRejectRequest()"
+      (cancel)="isRejectDialogOpen = false; selectedRequestId = null">
+    </app-confirm-dialog>
 </app-authorized-layout>

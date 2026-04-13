@@ -3,20 +3,17 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
-
-// Models & Services
 import { Project, TaskGroup, Task, User } from '../../../core/models/app.models';
 import { AuthService } from '../../../core/services/auth';
 import { ProjectService } from '../../../core/services/project';
 import { TaskGroupService } from '../../../core/services/task-group';
 import { TaskService } from '../../../core/services/task';
-
-// Child Components
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
 import { TaskGroupCard } from '../../../shared/components/taskgroup/taskgroup-card/taskgroup-card';
 import { CreateTaskGroupDialog } from '../../../shared/components/taskgroup/create-taskgroup-dialog/create-taskgroup-dialog';
 import { ProjectMembersModal } from '../../../shared/components/project/project-members-modal/project-members-modal';
 import { EditProjectDialog } from '../../../shared/components/project/edit-project-dialog/edit-project-dialog';
+import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-project-detail-screen',
@@ -28,7 +25,8 @@ import { EditProjectDialog } from '../../../shared/components/project/edit-proje
     TaskGroupCard, 
     CreateTaskGroupDialog, 
     ProjectMembersModal, 
-    EditProjectDialog
+    EditProjectDialog,
+    ConfirmDialog
   ],
   templateUrl: './project-detail-screen.html',
   styleUrls: ['./project-detail-screen.scss']
@@ -49,6 +47,7 @@ export class ProjectDetailScreen implements OnInit {
   createDialogOpen = false;
   membersModalOpen = false;
   editDialogOpen = false;
+  isDeleteDialogOpen = false;
 
   totalTasks = 0;
   pendingTasks = 0;
@@ -179,10 +178,12 @@ export class ProjectDetailScreen implements OnInit {
 
   handleDeleteProject(): void {
     if (!this.projectId || !this.project) return;
+    this.isDeleteDialogOpen = true;
+  }
 
-    const confirmed = window.confirm(`Are you sure you want to delete "${this.project.title}"? This action cannot be undone and will delete all task groups and tasks.`);
-    if (!confirmed) return;
-
+  executeDeleteProject(): void {
+    if (!this.projectId) return;
+    this.isDeleteDialogOpen = false;
     this.projectService.deleteProject(this.projectId).subscribe({
       next: () => {
         toast.success('Project deleted successfully');

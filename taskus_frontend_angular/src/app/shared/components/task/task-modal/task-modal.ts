@@ -2,17 +2,16 @@ import { Component, Input, Output, EventEmitter, OnChanges, SimpleChanges, Chang
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { Task, User } from '../../../../core/models/app.models';
-
-// Updated import paths!
 import { TaskService } from '../../../../core/services/task'; 
 import { UserService } from '../../../../core/services/user';
 import { AuthService } from '../../../../core/services/auth';
 import { toast } from 'ngx-sonner';
+import { ConfirmDialog } from '../../../../shared/components/ui/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-task-modal',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, ConfirmDialog],
   templateUrl: './task-modal.html',
   styleUrls: ['./task-modal.scss']
 })
@@ -27,6 +26,7 @@ export class TaskModal implements OnChanges {
   responsibleUser: { firstName: string; lastName: string } | null = null;
   isTogglingStatus = false;
   currentUser: User | null = null;
+  isDeleteDialogOpen = false;
 
   constructor(
     private taskService: TaskService,
@@ -91,11 +91,14 @@ export class TaskModal implements OnChanges {
   }
 
   handleDeleteTask(): void {
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${this.currentTask.title}"? This action cannot be undone.`
-    );
+    if (!this.currentTask) return;
+    this.isDeleteDialogOpen = true;
+  }
 
-    if (!confirmed) return;
+  executeDeleteTask(): void {
+    if (!this.currentTask) return;
+
+    this.isDeleteDialogOpen = false; 
 
     this.taskService.deleteTask(this.currentTask.id).subscribe({
       next: () => {

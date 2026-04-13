@@ -3,18 +3,17 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
-
-// Models & Services
 import { User, Task } from '../../../core/models/app.models';
 import { AuthService } from '../../../core/services/auth';
 import { UserService } from '../../../core/services/user';
 import { TaskService } from '../../../core/services/task';
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
+import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-profile-screen',
   standalone: true,
-  imports: [CommonModule, MatIconModule, AuthorizedLayout],
+  imports: [CommonModule, MatIconModule, AuthorizedLayout, ConfirmDialog],
   templateUrl: './profile-screen.html',
   styleUrls: ['./profile-screen.scss']
 })
@@ -46,6 +45,8 @@ export class ProfileScreen implements OnInit {
     progressArray: '0 439.82', progressOffset: 0,
     doneArray: '0 439.82', doneOffset: 0,
   };
+  isConfirmDialogOpen = false;
+  isRoleDialogOpen = false;
 
   linePoints: { x: number; y: number; nextX: number | null; nextY: number | null }[] = [];
   barPoints: { x: number; y: number; height: number; value: number; label: string }[] = [];
@@ -243,14 +244,12 @@ export class ProfileScreen implements OnInit {
 
   handleToggleRole(): void {
     if (!this.profileUser) return;
-    
+    this.isRoleDialogOpen = true;
+  }
+  executeToggleRole(): void {
+    if (!this.profileUser) return;
+    this.isRoleDialogOpen = false; 
     const newRole = this.profileUser.role === 'admin' ? 'member' : 'admin';
-    const confirmed = window.confirm(
-      `Are you sure you want to ${newRole === 'admin' ? 'promote' : 'demote'} ${this.profileUser.firstName} ${this.profileUser.lastName} to ${newRole}?`
-    );
-
-    if (!confirmed) return;
-
     this.userService.updateUserRole(this.profileUser.id).subscribe({
       next: () => {
         toast.success(`User ${newRole === 'admin' ? 'promoted' : 'demoted'} successfully`);
@@ -263,16 +262,15 @@ export class ProfileScreen implements OnInit {
     });
   }
 
+
   handleDeleteUser(): void {
     if (!this.profileUser) return;
+    this.isConfirmDialogOpen = true;
+  }
+  executeDeleteUser(): void {
+    this.isConfirmDialogOpen = false;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${this.profileUser.firstName} ${this.profileUser.lastName}? This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
-
-    this.userService.deleteUser(this.profileUser.id).subscribe({
+    this.userService.deleteUser(this.profileUser!.id).subscribe({
       next: () => {
         toast.success('User deleted successfully');
         this.router.navigate(['/admin/users']);

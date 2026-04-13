@@ -11,6 +11,7 @@ import { TaskCard } from "@/components/task/TaskCard";
 import { TaskModal } from "@/components/task/TaskModal";
 import { CreateTaskDialog } from "@/components/task/CreateTaskDialog";
 import { EditTaskGroupDialog } from "@/components/taskgroup/EditTaskGroupDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export const TaskGroupDetailScreen = () => {
   const { taskGroupId } = useParams<{ taskGroupId: string }>();
@@ -24,6 +25,7 @@ export const TaskGroupDetailScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   useEffect(() => {
     if (taskGroupId) {
@@ -65,14 +67,15 @@ export const TaskGroupDetailScreen = () => {
     setTaskGroup(updatedTaskGroup);
   };
 
-  const handleDeleteTaskGroup = async () => {
+  const handleDeleteTaskGroup = () => {
     if (!taskGroupId || !taskGroup) return;
+    setIsDeleteDialogOpen(true);
+  };
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${taskGroup.title}"? This will also delete all tasks in this group. This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
+  const executeDeleteTaskGroup = async () => {
+    if (!taskGroupId || !taskGroup) return;
+    
+    setIsDeleteDialogOpen(false);
 
     try {
       await taskGroupService.deleteTaskGroup(taskGroupId);
@@ -257,8 +260,6 @@ export const TaskGroupDetailScreen = () => {
           )}
         </div>
       </div>
-
-      {/* Task Modal */}
       {selectedTask && (
         <TaskModal
           task={selectedTask}
@@ -272,8 +273,6 @@ export const TaskGroupDetailScreen = () => {
           }}
         />
       )}
-
-      {/* Create Task Dialog */}
       {user?.role === "admin" && taskGroupId && (
         <CreateTaskDialog
           open={createDialogOpen}
@@ -282,14 +281,23 @@ export const TaskGroupDetailScreen = () => {
           taskGroupId={taskGroupId}
         />
       )}
-
-      {/* Edit Task Group Dialog */}
       {user?.role === "admin" && taskGroup && (
         <EditTaskGroupDialog
           open={editDialogOpen}
           onOpenChange={setEditDialogOpen}
           taskGroup={taskGroup}
           onTaskGroupUpdated={handleTaskGroupUpdated}
+        />
+      )}
+      {taskGroup && (
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          title="Delete Task Group"
+          message={`Are you sure you want to delete "${taskGroup.title}"? This will also delete all tasks in this group. This action cannot be undone.`}
+          confirmText="Delete"
+          isDanger={true}
+          onConfirm={executeDeleteTaskGroup}
+          onCancel={() => setIsDeleteDialogOpen(false)}
         />
       )}
     </AuthorizedLayout>

@@ -11,6 +11,7 @@ import { TaskGroupCard } from "@/components/taskgroup/TaskGroupCard";
 import { CreateTaskGroupDialog } from "@/components/taskgroup/CreateTaskGroupDialog";
 import { ProjectMembersModal } from "@/components/project/ProjectMembersModal";
 import { EditProjectDialog } from "@/components/project/EditProjectDialog";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export const ProjectDetailScreen = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -27,6 +28,7 @@ export const ProjectDetailScreen = () => {
   const [createDialogOpen, setCreateDialogOpen] = useState(false);
   const [membersModalOpen, setMembersModalOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
 
   useEffect(() => {
@@ -106,10 +108,16 @@ export const ProjectDetailScreen = () => {
     }
   };
 
-  const handleDeleteProject = async () => {
+  const handleDeleteProject = () => {
     if (!projectId || !project) return;
-    const confirmed = window.confirm(`Are you sure you want to delete "${project.title}"? This action cannot be undone and will delete all task groups and tasks.`);
-    if (!confirmed) return;
+    setIsDeleteDialogOpen(true);
+  };
+
+  const executeDeleteProject = async () => {
+    if (!projectId || !project) return;
+    
+    setIsDeleteDialogOpen(false);
+    
     try {
       await projectService.deleteProject(projectId);
       toast.success("Project deleted successfully");
@@ -409,6 +417,17 @@ export const ProjectDetailScreen = () => {
           onOpenChange={setEditDialogOpen}
           project={project}
           onProjectUpdated={handleProjectUpdated}
+        />
+      )}
+      {project && (
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          title="Delete Project"
+          message={`Are you sure you want to delete "${project.title}"? This action cannot be undone and will delete all task groups and tasks.`}
+          confirmText="Delete"
+          isDanger={true}
+          onConfirm={executeDeleteProject}
+          onCancel={() => setIsDeleteDialogOpen(false)}
         />
       )}
     </AuthorizedLayout>

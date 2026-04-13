@@ -96,27 +96,25 @@ export const requestAccount = async (req: Request, res: Response) => {
 export const removeUser = async (req: AuthRequest, res: Response) => {
   const { userId } = req.params as { userId: string };
   try {
-    const userToBeRemoved = await prisma.user.findUnique({
-      where: { id: userId }
-    });
+    const userToBeRemoved = await prisma.user.findUnique({ where: { id: userId } });
     if (!userToBeRemoved) {
       res.status(404).json({ error: 'User not found' });
       return;
     }
-    if (req.user!.id === userId) {
-      await prisma.user.delete({ where: { id: userId } });
-      res.json({ message: 'User removed successfully' });
+    const isSelf = req.user!.id === userId;
+    const isAdminOfSameOrg = req.user!.role === 'admin' && userToBeRemoved.organisationId === req.user!.organisationId;
+    if (!isSelf && !isAdminOfSameOrg) {
+      res.status(403).json({ error: 'Unauthorized: You can only delete your own account or users in your organisation as an admin' });
       return;
     }
-    if (req.user!.role === 'admin' && userToBeRemoved.organisationId === req.user!.organisationId) {
-      await prisma.user.delete({ where: { id: userId } });
-      res.json({ message: 'User removed successfully' });
-      return;
-    }
-    res.status(403).json({
-      error: 'Unauthorized: You can only delete your own account or users in your organisation as an admin'
-    });
+    await prisma.$transaction([
+      prisma.task.deleteMany({ where: { responsibleId: userId } }),
+      prisma.projectMember.deleteMany({ where: { userId } }),
+      prisma.user.delete({ where: { id: userId } })
+    ]);
+    res.json({ message: 'User removed successfully' });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

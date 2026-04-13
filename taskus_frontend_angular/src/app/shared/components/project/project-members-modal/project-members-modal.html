@@ -91,6 +91,15 @@
             </div>
           }
         </div>
+        <app-confirm-dialog
+          [isOpen]="isRemoveMemberDialogOpen"
+          title="Remove Member"
+          [message]="'Are you sure you want to remove ' + selectedMemberToRemove?.firstName + ' ' + selectedMemberToRemove?.lastName + ' from this project?'"
+          confirmText="Remove"
+          [isDanger]="true"
+          (confirm)="executeRemoveMember()"
+          (cancel)="isRemoveMemberDialogOpen = false; selectedMemberToRemove = null">
+        </app-confirm-dialog>
       }
     </div>
   </div>

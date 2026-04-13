@@ -6,6 +6,7 @@ import { toast } from "sonner";
 import { X, UserMinus, UserPlus } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 interface ProjectMembersModalProps {
   open: boolean;
@@ -27,6 +28,8 @@ export const ProjectMembersModal = ({
   const [showAddUser, setShowAddUser] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [memberToRemove, setMemberToRemove] = useState<User | null>(null);
 
   useEffect(() => {
     if (open && user?.role === "admin") {
@@ -44,19 +47,22 @@ export const ProjectMembersModal = ({
     }
   };
 
-  const handleRemoveMember = async (userId: string) => {
-    const memberToRemove = members.find(m => m.id === userId);
+  const handleRemoveMember = (userId: string) => {
+    const member = members.find(m => m.id === userId);
+    if (!member) return;
+    
+    setMemberToRemove(member);
+    setIsConfirmOpen(true);
+  };
+
+  const executeRemoveMember = async () => {
     if (!memberToRemove) return;
 
-    const confirmed = window.confirm(
-      `Remove ${memberToRemove.firstName} ${memberToRemove.lastName} from this project?`
-    );
-
-    if (!confirmed) return;
+    setIsConfirmOpen(false);
+    setIsLoading(true);
 
     try {
-      setIsLoading(true);
-      await projectService.removeUserFromProject(projectId, userId);
+      await projectService.removeUserFromProject(projectId, memberToRemove.id);
       toast.success("Member removed from project");
       onMembersUpdated();
     } catch (error) {
@@ -64,6 +70,7 @@ export const ProjectMembersModal = ({
       toast.error("Failed to remove member");
     } finally {
       setIsLoading(false);
+      setMemberToRemove(null); // Clean up memory
     }
   };
 
@@ -220,6 +227,18 @@ export const ProjectMembersModal = ({
           </div>
         )}
       </div>
+      <ConfirmDialog
+        isOpen={isConfirmOpen}
+        title="Remove Member"
+        message={`Remove ${memberToRemove?.firstName} ${memberToRemove?.lastName} from this project?`}
+        confirmText="Remove"
+        isDanger={true}
+        onConfirm={executeRemoveMember}
+        onCancel={() => {
+          setIsConfirmOpen(false);
+          setMemberToRemove(null);
+        }}
+      />
     </div>
   );
 };

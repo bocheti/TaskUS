@@ -135,5 +135,15 @@
         (taskGroupUpdated)="handleTaskGroupUpdated($event)">
       </app-edit-taskgroup-dialog>
     }
+
+    <app-confirm-dialog
+      [isOpen]="isDeleteDialogOpen"
+      title="Delete Task Group"
+      [message]="'Are you sure you want to delete \'' + taskGroup?.title + '\'? This will also delete all tasks in this group. This action cannot be undone.'"
+      confirmText="Delete"
+      [isDanger]="true"
+      (confirm)="executeDeleteTaskGroup()"
+      (cancel)="isDeleteDialogOpen = false">
+    </app-confirm-dialog>
   }
 </app-authorized-layout>

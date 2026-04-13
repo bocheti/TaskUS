@@ -3,17 +3,16 @@ import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
-
 import { TaskGroup, Task, User } from '../../../core/models/app.models';
 import { AuthService } from '../../../core/services/auth';
 import { TaskGroupService } from '../../../core/services/task-group';
 import { TaskService } from '../../../core/services/task';
-
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
 import { TaskCard } from '../../../shared/components/task/task-card/task-card';
 import { TaskModal } from '../../../shared/components/task/task-modal/task-modal';
 import { CreateTaskDialog } from '../../../shared/components/task/create-task-dialog/create-task-dialog';
 import { EditTaskGroupDialog } from '../../../shared/components/taskgroup/edit-taskgroup-dialog/edit-taskgroup-dialog';
+import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
 
 @Component({
   selector: 'app-taskgroup-detail-screen',
@@ -25,7 +24,8 @@ import { EditTaskGroupDialog } from '../../../shared/components/taskgroup/edit-t
     TaskCard, 
     TaskModal, 
     CreateTaskDialog, 
-    EditTaskGroupDialog
+    EditTaskGroupDialog,
+    ConfirmDialog
   ],
   templateUrl: './task-group-detail-screen.html',
   styleUrls: ['./task-group-detail-screen.scss']
@@ -43,6 +43,7 @@ export class TaskGroupDetailScreen implements OnInit {
   isModalOpen = false;
   createDialogOpen = false;
   editDialogOpen = false;
+  isDeleteDialogOpen = false;
 
   myTasks: Task[] = [];
   totalTasks = 0;
@@ -138,13 +139,12 @@ export class TaskGroupDetailScreen implements OnInit {
 
   handleDeleteTaskGroup(): void {
     if (!this.taskGroupId || !this.taskGroup) return;
+    this.isDeleteDialogOpen = true;
+  }
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete "${this.taskGroup.title}"? This will also delete all tasks in this group. This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
-
+  executeDeleteTaskGroup(): void {
+    if (!this.taskGroupId || !this.taskGroup) return;
+    this.isDeleteDialogOpen = false;
     this.taskGroupService.deleteTaskGroup(this.taskGroupId).subscribe({
       next: () => {
         toast.success('Task group deleted successfully');

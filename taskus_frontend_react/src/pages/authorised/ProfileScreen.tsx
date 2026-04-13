@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { userService, taskService } from "@/services/api";
 import { User, Task } from "@/types";
 import { toast } from "sonner";
+import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 
 export const ProfileScreen = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -18,6 +19,8 @@ export const ProfileScreen = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isUploading, setIsUploading] = useState(false);
   const [timeFilter, setTimeFilter] = useState<7 | 30 | 90>(30);
+  const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
 
   const isOwnProfile = !userId || userId === currentUser?.id;
   const isAdmin = currentUser?.role === "admin";
@@ -73,15 +76,16 @@ export const ProfileScreen = () => {
     }
   };
 
-  const handleToggleRole = async () => {
+  const handleToggleRole = () => {
+    if (!profileUser) return;
+    setIsRoleDialogOpen(true);
+  };
+
+  const executeToggleRole = async () => {
     if (!profileUser) return;
     
+    setIsRoleDialogOpen(false);
     const newRole = profileUser.role === "admin" ? "member" : "admin";
-    const confirmed = window.confirm(
-      `Are you sure you want to ${newRole === "admin" ? "promote" : "demote"} ${profileUser.firstName} ${profileUser.lastName} to ${newRole}?`
-    );
-
-    if (!confirmed) return;
 
     try {
       await userService.updateUserRole(profileUser.id);
@@ -93,14 +97,15 @@ export const ProfileScreen = () => {
     }
   };
 
-  const handleDeleteUser = async () => {
+  const handleDeleteUser = () => {
     if (!profileUser) return;
+    setIsDeleteDialogOpen(true);
+  };
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete ${profileUser.firstName} ${profileUser.lastName}? This action cannot be undone.`
-    );
-
-    if (!confirmed) return;
+  const executeDeleteUser = async () => {
+    if (!profileUser) return;
+    
+    setIsDeleteDialogOpen(false);
 
     try {
       await userService.deleteUser(profileUser.id);
@@ -464,6 +469,29 @@ export const ProfileScreen = () => {
             )}
           </div>
         </div>
+        {profileUser && (
+        <>
+          <ConfirmDialog
+            isOpen={isRoleDialogOpen}
+            title={profileUser.role === "admin" ? "Demote User" : "Promote User"}
+            message={`Are you sure you want to ${profileUser.role === "admin" ? "demote" : "promote"} ${profileUser.firstName} ${profileUser.lastName} to ${profileUser.role === "admin" ? "member" : "admin"}?`}
+            confirmText={profileUser.role === "admin" ? "Demote" : "Promote"}
+            isDanger={profileUser.role === "admin"}
+            onConfirm={executeToggleRole}
+            onCancel={() => setIsRoleDialogOpen(false)}
+          />
+
+          <ConfirmDialog
+            isOpen={isDeleteDialogOpen}
+            title="Delete User"
+            message={`Are you sure you want to delete ${profileUser.firstName} ${profileUser.lastName}? This action cannot be undone.`}
+            confirmText="Delete"
+            isDanger={true}
+            onConfirm={executeDeleteUser}
+            onCancel={() => setIsDeleteDialogOpen(false)}
+          />
+        </>
+      )}
       </div>
     </AuthorizedLayout>
   );

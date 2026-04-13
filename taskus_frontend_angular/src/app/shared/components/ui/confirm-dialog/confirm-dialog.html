@@ -1,0 +1,29 @@
+@if (isOpen) {
+  <div class="modal-wrapper">
+    <div class="modal-backdrop" (click)="onCancel()"></div>
+    
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title">{{ title }}</h2>
+        <button class="close-btn" (click)="onCancel()">
+          <mat-icon svgIcon="x"></mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <p class="modal-message">{{ message }}</p>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-outline" (click)="onCancel()">
+          {{ cancelText }}
+        </button>
+        <button 
+          [class]="isDanger ? 'btn-destructive' : 'btn-primary'" 
+          (click)="onConfirm()">
+          {{ confirmText }}
+        </button>
+      </div>
+    </div>
+  </div>
+}
