@@ -109,7 +109,6 @@ export class ProjectDetailScreen implements OnInit {
     }).catch(error => {
       console.error('Error fetching project data:', error);
       toast.error('Failed to load project');
-      console.log(error);
       this.isLoading = false;
       this.cdr.detectChanges();
     });

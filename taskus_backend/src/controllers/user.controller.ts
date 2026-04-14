@@ -114,7 +114,7 @@ export const removeUser = async (req: AuthRequest, res: Response) => {
     ]);
     res.json({ message: 'User removed successfully' });
   } catch (error) {
-    console.log(error);
+    console.error(error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };

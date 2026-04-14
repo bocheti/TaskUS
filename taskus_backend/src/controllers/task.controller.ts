@@ -233,7 +233,7 @@ export const createTask = async (req: AuthRequest, res: Response) => {
         });
     res.status(201).json(task);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
@@ -297,7 +297,7 @@ export const editTask = async (req: AuthRequest, res: Response) => {
         });
         res.json(updated);
     } catch (error) {
-        console.log(error);
+        console.error(error);
         res.status(500).json({ error: 'Internal server error' });
     }
 };
