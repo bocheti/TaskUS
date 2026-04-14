@@ -131,24 +131,52 @@
   gap: 6px;
   font-size: 14px;
   color: var(--muted-foreground);
+  cursor: pointer;
+  transition: color 0.2s ease-out;
 }
 
 .dot {
   width: 12px;
   height: 12px;
   border-radius: 50%;
+  transition: transform 0.2s ease-out;
 }
 .dot-pending { background-color: var(--status-pending, #f59e0b); }
 .dot-progress { background-color: var(--status-progress, #3b82f6); }
 .dot-done { background-color: var(--status-done, #10b981); }
 
-.bar-text-value {
-  fill: var(--foreground);
-  font-size: 14px;
-  font-weight: 600;
+
+
+.pie-slice {
+  fill: none;
+  pointer-events: stroke;
+  cursor: pointer;
+  transition: stroke-width 0.3s ease-out;
+  transform: rotate(-90deg);
+  transform-origin: 100px 100px;
 }
 
-.bar-text-label {
-  fill: var(--muted-foreground);
-  font-size: 14px;
-}
+.axis-text { font-size: 10px; font-family: inherit; fill: var(--muted-foreground, #6b7280); }
+.axis-text-end { text-anchor: end; }
+.axis-text-middle { text-anchor: middle; }
+.axis-line { stroke: var(--border, #e5e7eb); stroke-width: 1px; }
+.grid-line { stroke: var(--border, #e5e7eb); stroke-width: 1px; stroke-dasharray: 4 4; }
+.data-line { stroke: var(--primary, #3b82f6); stroke-width: 2px; }
+.data-dot { fill: var(--background, #ffffff); stroke: var(--primary, #3b82f6); stroke-width: 2px; }
+.hitbox-dot { fill: transparent; cursor: pointer; }
+.tooltip-bg { fill: var(--background, #ffffff); stroke: var(--border, #e5e7eb); rx: 4px; }
+.tooltip-val { font-size: 10px; font-weight: 700; font-family: inherit; fill: var(--foreground, #000); text-anchor: middle; }
+.tooltip-date { font-size: 9px; font-family: inherit; fill: var(--muted-foreground, #6b7280); text-anchor: middle; }
+
+.bar-rect { fill: var(--primary, #3b82f6); rx: 4px; }
+.bar-overlay { fill: black; rx: 4px; pointer-events: none; }
+.bar-text-value { fill: var(--foreground, #000); font-size: 14px; font-weight: 600; text-anchor: middle; pointer-events: none; }
+.bar-text-label { font-size: 14px; text-anchor: middle; pointer-events: none; }
+
+.cursor-pointer { cursor: pointer; }
+.pointer-events-none { pointer-events: none; }
+.relative-container { position: relative; }
+.transition-opacity { transition: opacity 0.2s ease-out; }
+.transition-transform { transition: transform 0.3s ease-out; }
+.transition-colors { transition: fill 0.2s ease-out, color 0.2s ease-out; }
+.shadow-sm { filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15)); }

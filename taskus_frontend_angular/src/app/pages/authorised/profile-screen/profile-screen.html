@@ -2,14 +2,38 @@
 
   @if (isLoading) {
     <div class="empty-state">Loading profile...</div>
-  } @else if (!profileUser) {
+  } 
+  
+  @else if (errorStatus === 403) {
+    <div class="safe-screen-container">
+      <div class="safe-icon-wrapper">
+        <mat-icon svgIcon="user-cog" class="large-icon text-danger"></mat-icon>
+      </div>
+      <h2 class="error-title">Private Profile</h2>
+      <p class="error-description">
+        You do not have permission to view this profile. This user belongs to a different organization or is restricted.
+      </p>
+      <div class="safe-actions">
+        <button class="outline-btn" (click)="goBack()">
+          <mat-icon svgIcon="arrow-left"></mat-icon>
+          Go Back
+        </button>
+        <button class="primary-btn" (click)="goToDashboard()">
+          Return to Dashboard
+        </button>
+      </div>
+    </div>
+  }
+
+  @else if (!profileUser) {
     <div class="empty-state">
       <p class="error-msg">User not found</p>
       <button class="outline-btn" (click)="goBack()">Go Back</button>
     </div>
-  } @else {
+  } 
+  
+  @else {
     <div class="screen-container">
-      
       @if (!isOwnProfile) {
         <button class="back-btn" (click)="goBack()">
           <mat-icon svgIcon="arrow-left"></mat-icon>
@@ -19,7 +43,6 @@
 
       <div class="card-container header-card">
         <div class="header-layout">
-          
           <div class="avatar-container">
             @if (profileUser.pic) {
               <img [src]="profileUser.pic" [alt]="profileUser.firstName" class="avatar-img" />
@@ -41,7 +64,6 @@
           <div class="actions-container">
             @if (isOwnProfile || isAdmin) {
               <input type="file" #fileInput accept="image/*" class="hidden" (change)="handleImageUpload($event)" />
-              
               <button class="outline-btn" [disabled]="isUploading" (click)="fileInput.click()">
                 <mat-icon svgIcon="upload"></mat-icon>
                 <span class="desktop-text">{{ isUploading ? 'Uploading...' : 'Change Picture' }}</span>
@@ -61,15 +83,16 @@
               </button>
             }
           </div>
-
         </div>
       </div>
+
       <app-task-stats 
         [tasks]="tasks" 
         [title]="isOwnProfile ? 'My Statistics' : profileUser.firstName + '\'s Statistics'">
       </app-task-stats>
     </div>
   }
+
   <app-confirm-dialog
     [isOpen]="isConfirmDialogOpen"
     title="Delete User"
@@ -79,6 +102,7 @@
     (confirm)="executeDeleteUser()"
     (cancel)="isConfirmDialogOpen = false">
   </app-confirm-dialog>
+
   @if (profileUser) {
     <app-confirm-dialog
       [isOpen]="isRoleDialogOpen"

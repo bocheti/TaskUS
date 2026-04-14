@@ -31,7 +31,15 @@ export class TaskStats implements OnChanges {
     doneArray: '0 439.82', doneOffset: 0,
   };
 
-  linePoints: { x: number; y: number; nextX: number | null; nextY: number | null }[] = [];
+  hoveredSlice: 'pending' | 'progress' | 'done' | null = null;
+  activePointIndex = 0;
+  isHoveringLine = false;
+  hoveredBar: number | null = null;
+
+  maxLineCount = 1;
+  midLineCount = 0;
+
+  linePoints: { x: number; y: number; nextX: number | null; nextY: number | null; date: string; count: number; bandWidth: number }[] = [];
   barPoints: { x: number; y: number; height: number; value: number; label: string }[] = [];
 
   constructor(private cdr: ChangeDetectorRef) {}
@@ -40,6 +48,11 @@ export class TaskStats implements OnChanges {
     if (changes['tasks'] && this.tasks) {
       this.updateDerivedState();
     }
+  }
+
+  get activeLinePoint() {
+    const safeIndex = Math.min(this.activePointIndex, this.linePoints.length - 1);
+    return this.linePoints[safeIndex];
   }
 
   updateDerivedState(): void {
@@ -52,11 +65,11 @@ export class TaskStats implements OnChanges {
       : 0;
 
     const completionTimes = this.completedTasks
-      .filter(t => t.completedAt)
+      .filter(t => t.completedAt && t.createdAt)
       .map(t => {
         const created = new Date(t.createdAt).getTime();
         const completed = new Date(t.completedAt!).getTime();
-        return (completed - created) / (1000 * 60 * 60 * 24);
+        return Math.abs(completed - created) / (1000 * 60 * 60 * 24); // Safe absolute value
       });
       
     this.avgCompletionTime = completionTimes.length > 0
@@ -97,14 +110,19 @@ export class TaskStats implements OnChanges {
       return { date: dateStr, count };
     });
 
-    const maxLineCount = Math.max(...tasksByDay.map(d => d.count), 1);
+    this.maxLineCount = Math.max(...tasksByDay.map(d => d.count), 1);
+    this.midLineCount = Math.round(this.maxLineCount / 2);
+
     this.linePoints = tasksByDay.map((day, i) => {
-      const x = (i / (tasksByDay.length - 1)) * 380 + 10;
-      const y = 140 - (day.count / maxLineCount) * 120;
+      const bandWidth = tasksByDay.length > 1 ? 340 / (tasksByDay.length - 1) : 340;
+      const x = 40 + (i / (tasksByDay.length - 1)) * 340;
+      const y = 130 - (day.count / this.maxLineCount) * 110;
+      
       const nextDay = tasksByDay[i + 1];
-      const nextX = nextDay ? ((i + 1) / (tasksByDay.length - 1)) * 380 + 10 : null;
-      const nextY = nextDay ? 140 - (nextDay.count / maxLineCount) * 120 : null;
-      return { x, y, nextX, nextY };
+      const nextX = nextDay ? 40 + ((i + 1) / (tasksByDay.length - 1)) * 340 : null;
+      const nextY = nextDay ? 130 - (nextDay.count / this.maxLineCount) * 110 : null;
+      
+      return { x, y, nextX, nextY, date: day.date, count: day.count, bandWidth };
     });
 
     // Bar Chart: Group by month
@@ -121,8 +139,9 @@ export class TaskStats implements OnChanges {
     });
 
     const maxBarCount = Math.max(...tasksByMonth.map(m => m.count), 1);
+    
     this.barPoints = tasksByMonth.map((month, i) => {
-      const height = (month.count / maxBarCount) * 160;
+      const height = maxBarCount > 0 ? (month.count / maxBarCount) * 160 : 0;
       return {
         x: i * 100 + 20,
         y: 180 - height,
@@ -147,5 +166,20 @@ export class TaskStats implements OnChanges {
       doneArray: `${(this.doneCount / this.totalTasks) * circumference} ${circumference}`,
       doneOffset: -(((this.pendingCount + this.inProgressCount) / this.totalTasks) * circumference)
     };
+  }
+
+  setHoveredSlice(slice: 'pending' | 'progress' | 'done' | null): void {
+    this.hoveredSlice = slice;
+  }
+
+  setHoveredBar(index: number | null): void {
+    this.hoveredBar = index;
+  }
+
+  setHoveringLine(isHovering: boolean, pointIndex?: number): void {
+    this.isHoveringLine = isHovering;
+    if (pointIndex !== undefined) {
+      this.activePointIndex = pointIndex;
+    }
   }
 }

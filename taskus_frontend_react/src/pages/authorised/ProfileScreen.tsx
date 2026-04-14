@@ -9,6 +9,7 @@ import { User, Task } from "@/types";
 import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { TaskStats } from "@/components/ui/TaskStats";
+import axios from "axios"; 
 
 export const ProfileScreen = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -21,6 +22,7 @@ export const ProfileScreen = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [isRoleDialogOpen, setIsRoleDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [errorStatus, setErrorStatus] = useState<number | null>(null);
 
   const isOwnProfile = !userId || userId === currentUser?.id;
   const isAdmin = currentUser?.role === "admin";
@@ -29,20 +31,36 @@ export const ProfileScreen = () => {
     fetchProfileData();
   }, [userId]);
 
+
   const fetchProfileData = async () => {
     try {
       setIsLoading(true);
+      setErrorStatus(null);
       
       const targetUserId = userId || currentUser?.id;
       if (!targetUserId) return;
       
       const userData = await userService.getUserInfo(targetUserId);
       setProfileUser(userData);
+      
       const userTasks = await taskService.getTasksByUser(targetUserId);
       setTasks(userTasks);
-    } catch (error) {
+    } catch (error: unknown) {
       console.error("Error fetching profile:", error);
-      toast.error("Failed to load profile");
+      if (axios.isAxiosError(error)) {
+        const status = error.response?.status;
+        
+        if (status === 403) {
+          setErrorStatus(403);
+        } else if (status === 404) {
+          setErrorStatus(404);
+        } else {
+          toast.error("Failed to load profile");
+        }
+      } else {
+        // Handles non-axios errors (like network failures or code crashes)
+        toast.error("An unexpected error occurred");
+      }
     } finally {
       setIsLoading(false);
     }
@@ -132,6 +150,33 @@ export const ProfileScreen = () => {
         <div className="text-center py-12">
           <p className="text-xl text-muted-foreground mb-4">User not found</p>
           <Button onClick={() => navigate(-1)}>Go Back</Button>
+        </div>
+      </AuthorizedLayout>
+    );
+  }
+
+  if (errorStatus === 403) {
+    return (
+      <AuthorizedLayout title="Access Denied">
+        <div className="flex flex-col items-center justify-center py-20 text-center">
+          <div className="bg-destructive/10 p-6 rounded-full mb-6">
+            <UserCog className="h-12 w-12 text-destructive" />
+          </div>
+          <h2 className="text-3xl font-bold mb-2">Private Profile</h2>
+          <p className="text-muted-foreground max-w-md mb-8">
+            You do not have permission to view this profile. This user belongs to a different organization or is restricted.
+          </p>
+          <div className="flex gap-4">
+            <Button variant="outline" onClick={() => navigate(-1)}>
+              <ArrowLeft className="h-4 w-4" /> Go Back
+            </Button>
+            <Button 
+              onClick={() => navigate("/dashboard")}
+              className="h-8 px-4" 
+            >
+              Return to Dashboard
+            </Button>
+          </div>
         </div>
       </AuthorizedLayout>
     );

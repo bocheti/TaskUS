@@ -2,6 +2,7 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
+import { HttpErrorResponse } from '@angular/common/http';
 import { toast } from 'ngx-sonner';
 import { User, Task } from '../../../core/models/app.models';
 import { AuthService } from '../../../core/services/auth';
@@ -9,8 +10,6 @@ import { UserService } from '../../../core/services/user';
 import { TaskService } from '../../../core/services/task';
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
 import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
-
-/* THE MAGIC IMPORT */
 import { TaskStats } from '../../../shared/components/ui/task-stats/task-stats';
 
 @Component({
@@ -28,6 +27,7 @@ export class ProfileScreen implements OnInit {
   tasks: Task[] = [];
   isLoading = true;
   isUploading = false;
+  errorStatus: number | null = null;
 
   isOwnProfile = false;
   isAdmin = false;
@@ -60,7 +60,12 @@ export class ProfileScreen implements OnInit {
     this.location.back();
   }
 
+  goToDashboard(): void {
+    this.router.navigate(['/dashboard']);
+  }
+
   get dynamicPageTitle(): string {
+    if (this.errorStatus === 403) return 'Access Denied';
     if (!this.profileUser) return 'Profile';
     return this.isOwnProfile ? 'My Profile' : `${this.profileUser.firstName}'s Profile`;
   }
@@ -68,9 +73,8 @@ export class ProfileScreen implements OnInit {
   fetchProfileData(): void {
     const targetUserId = this.userIdParam || this.currentUser?.id;
     if (!targetUserId) return;
-
     this.isLoading = true;
-    
+    this.errorStatus = null;
     Promise.all([
       this.userService.getUserInfo(targetUserId).toPromise(),
       this.taskService.getTasksByUser(targetUserId).toPromise()
@@ -82,8 +86,15 @@ export class ProfileScreen implements OnInit {
       this.cdr.detectChanges();
     }).catch(error => {
       console.error('Error fetching profile:', error);
-      toast.error('Failed to load profile');
       this.isLoading = false;
+      if (error instanceof HttpErrorResponse || error.status) {
+        this.errorStatus = error.status;
+      }
+
+      if (this.errorStatus !== 403) {
+        toast.error('Failed to load profile');
+      }
+      
       this.cdr.detectChanges();
     });
   }
@@ -122,6 +133,7 @@ export class ProfileScreen implements OnInit {
     if (!this.profileUser) return;
     this.isRoleDialogOpen = true;
   }
+
   executeToggleRole(): void {
     if (!this.profileUser) return;
     this.isRoleDialogOpen = false; 
@@ -138,14 +150,13 @@ export class ProfileScreen implements OnInit {
     });
   }
 
-
   handleDeleteUser(): void {
     if (!this.profileUser) return;
     this.isConfirmDialogOpen = true;
   }
+
   executeDeleteUser(): void {
     this.isConfirmDialogOpen = false;
-
     this.userService.deleteUser(this.profileUser!.id).subscribe({
       next: () => {
         toast.success('User deleted successfully');

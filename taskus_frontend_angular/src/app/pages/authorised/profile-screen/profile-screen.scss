@@ -1,5 +1,108 @@
 .hidden { display: none; }
 
+.safe-screen-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 80px 20px;
+  text-align: center;
+  width: 100%;
+
+  .safe-icon-wrapper {
+    background-color: var(--status-destructive-muted, rgba(239, 68, 68, 0.1));
+    width: 96px;
+    height: 96px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+
+    .large-icon {
+      width: 48px !important;
+      height: 48px !important;
+      font-size: 48px !important;
+      color: var(--status-destructive, #ef4444);
+    }
+  }
+
+  .error-title {
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 36px;
+    margin-bottom: 8px;
+    margin-top: 24px;
+    color: var(--foreground);
+  }
+
+  .error-description {
+    color: var(--muted-foreground);
+    max-width: 448px;
+    margin: 0 auto 32px auto;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+
+  .safe-actions {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+  }
+}
+
+.primary-btn {
+  background-color: var(--primary);
+  color: var(--primary-foreground);
+  padding: 5px 16px; 
+  border-radius: 6px;
+  font-weight: 500;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: filter 0.2s ease;
+  height: 32px;
+  box-sizing: border-box; 
+  
+  &:hover {
+    filter: brightness(0.9);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.outline-btn {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  color: var(--foreground);
+  padding: 5px 16px;
+  border-radius: 6px;
+  font-weight: 500;
+  font-family: inherit;
+  font-size: 14px;
+  line-height: 20px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: background-color 0.2s ease;
+  height: 32px; 
+  box-sizing: border-box;
+
+  &:hover {
+    background-color: var(--muted);
+  }
+}
+
 .empty-state {
   text-align: center;
   padding: 48px 0;
