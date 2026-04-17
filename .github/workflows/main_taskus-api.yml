@@ -45,6 +45,7 @@ jobs:
           DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
           RESEND_API_KEY: "re_fakekey_123456789"
           EMAIL_FROM: "test@test.com"
+          AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=https;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;EndpointSuffix=core.windows.net" #Microsoft's official testing/emulator connection string
         run: |
           cd taskus_backend
           npm install
