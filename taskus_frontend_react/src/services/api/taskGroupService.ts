@@ -23,8 +23,9 @@ export const taskGroupService = {
     return response.data;
   },
 
-  updateTaskGroup: async (taskGroupId: string, data: UpdateTaskGroupRequest): Promise<void> => {
-    await apiClient.put(`/taskGroup/${taskGroupId}`, data);
+  updateTaskGroup: async (taskGroupId: string, data: UpdateTaskGroupRequest): Promise<TaskGroup> => {
+    const response = await apiClient.put(`/taskGroup/${taskGroupId}`, data);
+    return response.data;
   },
 
   deleteTaskGroup: async (taskGroupId: string): Promise<void> => {
