@@ -43,6 +43,8 @@ jobs:
       - name: npm install, build, and test
         env:
           DATABASE_URL: postgresql://testuser:testpassword@localhost:5432/testdb
+          RESEND_API_KEY: "re_fakekey_123456789"
+          EMAIL_FROM: "test@test.com"
         run: |
           cd taskus_backend
           npm install
