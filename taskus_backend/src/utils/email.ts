@@ -41,7 +41,7 @@ const baseTemplate = (content: string) => `
         <!-- Footer -->
         <tr>
           <td style="padding:24px 32px;font-size:12px;color:#6b7280;background:#f9fafb;">
-            <p style="margin:0;"> ${new Date().getFullYear()} Taskus.</p>
+            <p style="margin:0;"> ${new Date().getFullYear()} Taskus</p>
           </td>
         </tr>
 
