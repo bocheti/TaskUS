@@ -14,7 +14,7 @@ dotenv.config();
 const app = express();
 const allowedOrigins = process.env.NODE_ENV === 'production' 
   ? ['https://taskus.app', 'https://www.taskus.app', 'https://angular.taskus.app']
-  : ['http://localhost:5173', 'http://localhost:4200'];
+  : ['http://localhost:5173', 'http://localhost:4200']; 
 
 app.use(cors({
   origin: function (origin, callback) {
