@@ -50,6 +50,7 @@ jobs:
         run: |
           cd taskus_backend
           npm install
+          npx prisma generate
           npm run build --if-present
           npx prisma db push 
           npm run test:ci --if-present
