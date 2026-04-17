@@ -12,10 +12,23 @@ import taskRoutes from './routes/task.routes';
 dotenv.config();
 
 const app = express();
-app.use(cors());
-//app.use(cors({origin: ['https://taskus.app', 'https://angular.taskus.app', 'https://react.taskus.app']})); TODO: limit requests just from frontend, do during deployment
-app.use(helmet()); // secure http headers
-app.use(express.json({ limit: '10kb' })); // prevents ddos attacks
+const allowedOrigins = process.env.NODE_ENV === 'production' 
+  ? ['https://taskus.app', 'https://www.taskus.app', 'https://angular.taskus.app']
+  : ['http://localhost:5173', 'http://localhost:4200'];
+
+app.use(cors({
+  origin: function (origin, callback) {
+    // allow requests with no origin (postman or own backend)
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+}));
+app.use(helmet());
+app.use(express.json({ limit: '10kb' }));
 
 if (process.env.NODE_ENV !== 'test') {
   const generalLimiter = rateLimit({
