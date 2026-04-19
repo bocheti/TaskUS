@@ -38,10 +38,11 @@
 }
 
 .welcome-title {
-  font-size: 2.25rem; 
+  font-size: 1.875rem /* 30px */;
+  line-height: 2.25rem /* 36px */;
   font-weight: 700; /* Make it extra bold */
   color: var(--foreground);
-  margin-bottom: 0.75rem;
+  margin-bottom: 1rem;
   margin-top: 0;
 
   @media (min-width: 768px) {

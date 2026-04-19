@@ -69,7 +69,7 @@ export const CreateOrgScreen = () => {
       <div className="w-full md:w-1/2 h-[75vh] md:min-h-screen flex flex-col justify-center items-center px-8 md:px-16 py-6">
         <div className="w-full space-y-1">
           <div className="text-center">
-            <h1 className="text-3xl md:text-4xl font-bold text-foreground mb-4 md:mb-6">
+            <h1 className="text-2xl md:text-4xl font-bold text-foreground mb-4 md:mb-6">
               Create an Organisation
             </h1>
           </div>
@@ -180,7 +180,7 @@ export const CreateOrgScreen = () => {
             </div>
           </form>
           
-          <div className="text-center text-foreground pt-4">
+          <div className="text-center text-foreground text-sm lg:text-lg pt-4">
             <p>
               Already have an account?{' '}
               <Link 

@@ -210,7 +210,7 @@ export const RequestScreen = () => {
               </button>
             </div>
           </form>
-          <div className="text-center text-foreground pt-4">
+          <div className="text-center text-foreground text-sm lg:text-lg pt-4">
             <p className="mb-2">
               Already have an account?{' '}
               <Link 
@@ -221,7 +221,7 @@ export const RequestScreen = () => {
               </Link>
             </p>
             <p>
-              Want to create your own organisation?{' '}
+              Want your own org?{' '}
               <Link 
                 to="/create-org" 
                 className="text-primary hover:text-[hsl(193,95%,68%)] hover:underline transition-colors font-medium"

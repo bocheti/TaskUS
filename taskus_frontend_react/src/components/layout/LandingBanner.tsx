@@ -1,6 +1,6 @@
 import { Github, Linkedin } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import BannerLogo from '@/assets/bannerLogo.svg';
+import BannerLogo2 from '@/assets/bannerLogo2.svg';
 
 export const LandingBanner = () => {
   const handleGithubClick = () => {
@@ -12,19 +12,15 @@ export const LandingBanner = () => {
   };
 
   return (
-    <div className="w-full md:w-1/2 h-[50vh] md:min-h-screen bg-banner-bg flex flex-col justify-between px-8 md:px-[8%] py-8 md:py-2">
+    <div className="w-full md:w-1/2 h-[50vh] md:min-h-screen bg-banner-bg flex flex-col justify-between px-8 md:px-[8%] py-8 md:py-2 mb-4 md:mb-0">
       <div className="flex-1 flex flex-col justify-center items-center">
         <Link to="/" className="mb-6 w-11/12 md:w-auto max-h-[25vh] md:max-h-none">
           <img 
-            src={BannerLogo} 
+            src={BannerLogo2} 
             alt="TaskUS Logo" 
             className="w-full h-auto max-h-[25vh] md:max-h-none object-contain cursor-pointer hover:opacity-90 transition-opacity" 
           />
         </Link>
-        
-        <p className="text-2xl md:text-4xl text-center text-foreground py-4">
-          Make task managing <span className="text-[hsl(193,95%,68%)]">easier</span>
-        </p>
       </div>
       <div className="flex flex-row justify-center items-center gap-2">
         <p className="text-xs md:text-sm text-foreground text-center">

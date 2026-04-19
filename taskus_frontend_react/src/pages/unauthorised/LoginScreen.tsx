@@ -105,7 +105,7 @@ export const LoginScreen = () => {
               </button>
             </div>
           </form>
-          <div className="text-center text-foreground pt-2 md:pt-8">
+          <div className="text-center text-foreground text-sm lg:text-lg pt-2 md:pt-8">
             <p className="mb-2">
               Don't have an account?{' '}
               <Link 

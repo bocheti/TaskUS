@@ -40,8 +40,8 @@
 
 /* H1: text-3xl md:text-4xl font-bold text-foreground mb-4 md:mb-6 */
 .form-title {
-  font-size: 1.875rem; /* text-3xl */
-  line-height: 2.25rem; /* Tailwind line-height for 3xl */
+  font-size: 1.5rem; /* text-3xl */
+  line-height: 2rem; /* Tailwind line-height for 3xl */
   font-weight: 700;   
   color: var(--foreground);
   margin-bottom: 1rem; /* mb-4 */
@@ -149,6 +149,12 @@
   text-align: center;
   color: var(--foreground);
   padding-top: 1rem; 
+  font-size: 0.875rem /* 14px */;
+  line-height: 1.25rem /* 20px */;
+  @media (min-width: 1024px) {
+    font-size: 1.125rem /* 18px */;
+    line-height: 1.75rem /* 28px */;
+  }
 }
 
 .bottom-text {

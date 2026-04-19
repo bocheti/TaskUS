@@ -78,7 +78,7 @@ export const ResetPasswordRequestScreen = () => {
               </button>
             </div>
           </form>
-          <div className="text-center text-foreground pt-4">
+          <div className="text-center text-foreground text-sm lg:text-lg pt-4">
             <p>
               Remember your password?{' '}
               <Link 
