@@ -162,13 +162,30 @@ export const sendPasswordResetEmail = async (
         We received a request to reset your password.
       </p>
 
-      <p style="margin:0 0 24px;color:#374151;font-size:16px;line-height:1.6;">
-        Click the button below to set a new password. This link will expire in 1 hour.
+      <p style="margin:0 0 16px;color:#374151;font-size:16px;line-height:1.6;">
+        Click one of the buttons below to set a new password. This link will expire in 1 hour.
       </p>
 
-      <a href="${resetLink}" style="display:inline-block;padding:12px 20px;background:#111827;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:500;">
-        Reset Password
-      </a>
+      <table width="100%" cellpadding="0" cellspacing="0" style="margin:24px 0;">
+        <tr>
+          <td align="center">
+            <table cellpadding="0" cellspacing="0" style="width:100%;max-width:400px;">
+              <tr>
+                <td style="padding:0 4px;">
+                  <a href="${resetLink}" style="display:block;padding:14px 20px;background:#61dafb;color:#000000;text-decoration:none;border-radius:8px;font-weight:600;text-align:center;font-size:15px;transition:opacity 0.2s;">
+                    Reset Password (R)
+                  </a>
+                </td>
+                <td style="padding:0 4px;">
+                  <a href="${resetLink}" style="display:block;padding:14px 20px;background:#c93033;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;text-align:center;font-size:15px;transition:opacity 0.2s;">
+                    Reset Password (A)
+                  </a>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+      </table>
 
       <p style="margin:24px 0 0;color:#6b7280;font-size:14px;line-height:1.5;">
         If you didn't request this, you can safely ignore this email.
