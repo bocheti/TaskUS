@@ -1,43 +1,48 @@
 <div class="project-list-container">
   
-  @if (showCreateButton && currentUser?.role === 'admin') {
-    <div class="header-actions">
-      <button class="primary-btn" (click)="isCreateDialogOpen = true">
-        <mat-icon svgIcon="plus"></mat-icon>
-        Create Project
-      </button>
-    </div>
-  }
-
   @if (isLoading) {
-    <div class="empty-state">Loading projects...</div>
-  } 
-  
-  @else if (projects.length === 0) {
-    <div class="empty-state">
-      <p class="empty-title">No projects yet</p>
-      @if (currentUser?.role === 'admin') {
-        <p class="empty-subtitle">Create your first project to get started</p>
-      }
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading projects...</p>
     </div>
-  } 
-  
-  @else {
-    <div class="projects-grid">
-      @for (project of projects; track project.id) {
-        <app-project-card
-          [project]="project"
-          (click)="handleProjectClick(project.id)">
-        </app-project-card>
-      }
-    </div>
-  }
+  } @else {
 
-  @if (currentUser?.role === 'admin') {
-    <app-create-project-dialog
-      [isOpen]="isCreateDialogOpen"
-      (isOpenChange)="isCreateDialogOpen = $event"
-      (projectCreated)="handleProjectCreated()">
-    </app-create-project-dialog>
+    @if (showCreateButton && currentUser?.role === 'admin') {
+      <div class="header-actions">
+        <button class="primary-btn" (click)="isCreateDialogOpen = true">
+          <mat-icon svgIcon="plus"></mat-icon>
+          Create Project
+        </button>
+      </div>
+    }
+
+    
+    @if (projects.length === 0) {
+      <div class="empty-state">
+        <p class="empty-title">No projects yet</p>
+        @if (currentUser?.role === 'admin') {
+          <p class="empty-subtitle">Create your first project to get started</p>
+        }
+      </div>
+    } 
+    
+    @else {
+      <div class="projects-grid">
+        @for (project of projects; track project.id) {
+          <app-project-card
+            [project]="project"
+            (click)="handleProjectClick(project.id)">
+          </app-project-card>
+        }
+      </div>
+    }
+
+    @if (currentUser?.role === 'admin') {
+      <app-create-project-dialog
+        [isOpen]="isCreateDialogOpen"
+        (isOpenChange)="isCreateDialogOpen = $event"
+        (projectCreated)="handleProjectCreated()">
+      </app-create-project-dialog>
+    }
   }
 </div>

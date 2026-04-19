@@ -8,11 +8,12 @@ import { AuthService } from '../../../../core/services/auth';
 import { ProjectService } from '../../../../core/services/project';
 import { ProjectCard } from '../project-card/project-card';
 import { CreateProjectDialog } from '../create-project-dialog/create-project-dialog';
+import { LoadingSpinner } from '../../ui/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-project-list',
   standalone: true,
-  imports: [CommonModule, MatIconModule, ProjectCard, CreateProjectDialog],
+  imports: [CommonModule, MatIconModule, ProjectCard, CreateProjectDialog, LoadingSpinner],
   templateUrl: './project-list.html',
   styleUrls: ['./project-list.scss']
 })

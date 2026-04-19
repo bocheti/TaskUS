@@ -9,6 +9,7 @@ import { EditOrganisationDialog } from '../../../shared/components/organisation/
 import { Organisation, Task } from '../../../core/models/app.models';
 import { TaskService } from '../../../core/services/task';
 import { TaskStats } from '../../../shared/components/ui/task-stats/task-stats';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-organisation-settings-screen',
@@ -19,7 +20,8 @@ import { TaskStats } from '../../../shared/components/ui/task-stats/task-stats';
     AuthorizedLayout,
     ProjectList,
     EditOrganisationDialog,
-    TaskStats
+    TaskStats,
+    LoadingSpinner
   ],
   templateUrl: './organisation-settings-screen.html',
   styleUrls: ['./organisation-settings-screen.scss']

@@ -1,64 +1,69 @@
 <app-authorized-layout pageTitle="My Dashboard">
   
-  <div class="dashboard-header">
-    <h2 class="greeting">
-      {{ greeting }}, {{ currentUser?.firstName }}!
-    </h2>
-    <p class="current-date">
-      {{ currentDate }}
-    </p>
-  </div>
+  @if (isLoading) {
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading dashboard...</p>
+    </div>
+  } @else {
+    <div class="dashboard-header">
+      <h2 class="greeting">
+        {{ greeting }}, {{ currentUser?.firstName }}!
+      </h2>
+      <p class="current-date">
+        {{ currentDate }}
+      </p>
+    </div>
 
-  <div class="dashboard-grid">
-    
-    <div class="main-column">
+    <div class="dashboard-grid">
       
-      <div class="section-header">
-        <h3 class="section-title">Tasks Requiring Attention</h3>
-        <button class="view-all-btn" (click)="goToAllTasks()">
-          View All Tasks
-        </button>
-      </div>
+      <div class="main-column">
+        
+        <div class="section-header">
+          <h3 class="section-title">Tasks Requiring Attention</h3>
+          <button class="view-all-btn" (click)="goToAllTasks()">
+            View All Tasks
+          </button>
+        </div>
 
-      <div class="tasks-container">
-        @if (isLoading) {
-          <p class="loading-text">Loading tasks...</p>
-        } @else if (tasksToDisplay.length === 0) {
-          <div class="empty-state">
-            <p>No pending tasks! You're all caught up.</p>
-          </div>
-        } @else {
-          @for (task of tasksToDisplay; track task.id) {
-            <app-task-card 
-              [task]="task" 
-              [isInteractive]="true"
-              (click)="openTaskModal(task)">
-            </app-task-card>
+        <div class="tasks-container">
+          @if (tasksToDisplay.length === 0) {
+            <div class="empty-state">
+              <p>No pending tasks! You're all caught up.</p>
+            </div>
+          } @else {
+            @for (task of tasksToDisplay; track task.id) {
+              <app-task-card 
+                [task]="task" 
+                [isInteractive]="true"
+                (click)="openTaskModal(task)">
+              </app-task-card>
+            }
           }
-        }
+        </div>
+
+        <h3 class="section-title calendar-title">Deadlines calendar</h3>
+        <app-task-calendar 
+          [tasks]="tasks" 
+          (taskClick)="openTaskModal($event)">
+        </app-task-calendar>
+
       </div>
 
-      <h3 class="section-title calendar-title">Deadlines calendar</h3>
-      <app-task-calendar 
-        [tasks]="tasks" 
-        (taskClick)="openTaskModal($event)">
-      </app-task-calendar>
+      <div class="side-column">
+        <app-stats-overview-card 
+          [tasks]="tasks" 
+          [isLoading]="isLoading">
+        </app-stats-overview-card>
+        
+        <app-recent-completed-card 
+          [tasks]="tasks" 
+          [isLoading]="isLoading">
+        </app-recent-completed-card>
+      </div>
 
     </div>
-
-    <div class="side-column">
-      <app-stats-overview-card 
-        [tasks]="tasks" 
-        [isLoading]="isLoading">
-      </app-stats-overview-card>
-      
-      <app-recent-completed-card 
-        [tasks]="tasks" 
-        [isLoading]="isLoading">
-      </app-recent-completed-card>
-    </div>
-
-  </div>
+  }
 
   @if (selectedTask) {
     <app-task-modal
@@ -68,5 +73,4 @@
       (taskUpdated)="handleTaskUpdated($event)">
     </app-task-modal>
   }
-
 </app-authorized-layout>

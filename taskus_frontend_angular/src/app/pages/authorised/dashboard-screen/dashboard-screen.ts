@@ -11,6 +11,7 @@ import { RecentCompletedCard } from '../../../shared/components/dashboard/recent
 import { TaskCalendar } from '../../../shared/components/dashboard/task-calendar/task-calendar';
 import { TaskCard } from '../../../shared/components/task/task-card/task-card';
 import { TaskModal } from '../../../shared/components/task/task-modal/task-modal';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-dashboard',
@@ -22,7 +23,8 @@ import { TaskModal } from '../../../shared/components/task/task-modal/task-modal
     RecentCompletedCard,
     TaskCalendar,
     TaskCard,
-    TaskModal
+    TaskModal,
+    LoadingSpinner
   ],
   templateUrl: './dashboard-screen.html',
   styleUrls: ['./dashboard-screen.scss']
@@ -55,6 +57,7 @@ export class DashboardScreen implements OnInit {
     const request$ = this.currentUser.role === 'admin' 
       ? this.taskService.getAllTasks() 
       : this.taskService.getTasksByUser(this.currentUser.id);
+      
     request$.subscribe({
       next: (userTasks) => {
         this.tasks = userTasks;
@@ -74,17 +77,14 @@ export class DashboardScreen implements OnInit {
     const tasksWithDeadline = tasksToBeDone.filter(task => task.deadline);
     const tasksWithoutDeadline = tasksToBeDone.filter(task => !task.deadline);
     
-    // sort tasks w deadline by deadline
     const sortedByDeadline = tasksWithDeadline.sort(
       (a, b) => new Date(a.deadline!).getTime() - new Date(b.deadline!).getTime()
     );
     
-    // sort tasks w/o deadline by created date (oldest first)
     const sortedByCreated = tasksWithoutDeadline.sort(
       (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
     );
     
-    // combine: tasks with deadlines first, then fill with oldest created
     return [...sortedByDeadline, ...sortedByCreated].slice(0, 3);
   }
 

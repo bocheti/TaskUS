@@ -2,17 +2,14 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule, Location } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { toast } from 'ngx-sonner';
-
-// Models & Services
 import { Task, TaskStatus, User } from '../../../core/models/app.models';
 import { TaskService } from '../../../core/services/task';
 import { AuthService } from '../../../core/services/auth';
-
-// Layout & Child Components
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
 import { TaskCard } from '../../../shared/components/task/task-card/task-card';
 import { TaskModal } from '../../../shared/components/task/task-modal/task-modal';
 import { KanbanBoard } from '../../../shared/components/task/kanban-board/kanban-board';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 type FilterStatus = 'All' | TaskStatus;
 
@@ -25,7 +22,8 @@ type FilterStatus = 'All' | TaskStatus;
     AuthorizedLayout,
     TaskCard,
     TaskModal,
-    KanbanBoard
+    KanbanBoard,
+    LoadingSpinner
   ],
   templateUrl: './all-tasks-screen.html',
   styleUrls: ['./all-tasks-screen.scss']

@@ -1,7 +1,10 @@
 <app-authorized-layout [pageTitle]="project ? project.title : 'Project Details'">
   
   @if (isLoading) {
-    <div class="empty-state">Loading project...</div>
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading project...</p>
+    </div>
   } @else if (!project) {
     <div class="empty-state">
       <p class="error-msg">Project not found</p>

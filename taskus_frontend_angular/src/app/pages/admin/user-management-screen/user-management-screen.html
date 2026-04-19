@@ -1,6 +1,11 @@
 <app-authorized-layout pageTitle="User Management">
   <div class="screen-container">
-    
+    @if (isLoading) {
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading users...</p>
+    </div>
+  } @else {
     <div class="tab-container">
       <div class="tab-pill">
         <button 
@@ -19,53 +24,57 @@
         </button>
       </div>
     </div>
-
-    @if (isLoading) {
-      <div class="loading-state">Loading...</div>
+    @if (activeTab === 'users') {
+      <div class="list-container">
+        @if (users.length === 0) {
+          <div class="empty-state">
+            <p>No users found</p>
+          </div>
+        } @else {
+          @for (user of users; track user.id) {
+            <app-user-card 
+              [user]="user" 
+              (deleted)="fetchData()">
+            </app-user-card>
+          }
+        }
+      </div>
     } @else {
-      
-      @if (activeTab === 'users') {
-        <div class="list-container">
-          @if (users.length === 0) {
-            <div class="empty-state">
-              <p>No users found</p>
-            </div>
-          } @else {
-            @for (user of users; track user.id) {
-              <app-user-card 
-                [user]="user" 
-                (deleted)="fetchData()">
-              </app-user-card>
-            }
+      <div class="list-container">
+        @if (requests.length === 0) {
+          <div class="empty-state">
+            <mat-icon svgIcon="user-plus" class="empty-icon"></mat-icon>
+            <p>No pending requests</p>
+          </div>
+        } @else {
+          @for (request of requests; track request.id) {
+            <app-user-request-card 
+              [request]="request"
+              (accept)="handleAcceptRequest($event)"
+              (reject)="handleRejectRequest($event)">
+            </app-user-request-card>
           }
-        </div>
-      } @else {
-        <div class="list-container">
-          @if (requests.length === 0) {
-            <div class="empty-state">
-              <mat-icon svgIcon="user-plus" class="empty-icon"></mat-icon>
-              <p>No pending requests</p>
-            </div>
-          } @else {
-            @for (request of requests; track request.id) {
-              <app-user-request-card 
-                [request]="request"
-                (accept)="handleAcceptRequest($event)"
-                (reject)="handleRejectRequest($event)">
-              </app-user-request-card>
-            }
-          }
-        </div>
-      }
+        }
+      </div>
     }
+  }
   </div>
   <app-confirm-dialog
-      [isOpen]="isRejectDialogOpen"
-      title="Reject Request"
-      message="Are you sure you want to reject this request?"
-      confirmText="Reject"
-      [isDanger]="true"
-      (confirm)="executeRejectRequest()"
-      (cancel)="isRejectDialogOpen = false; selectedRequestId = null">
-    </app-confirm-dialog>
+    [isOpen]="isRejectDialogOpen"
+    title="Reject Request"
+    message="Are you sure you want to reject this request?"
+    confirmText="Reject"
+    [isDanger]="true"
+    (confirm)="executeRejectRequest()"
+    (cancel)="isRejectDialogOpen = false; selectedRequestId = null">
+  </app-confirm-dialog>
+  <app-confirm-dialog
+    [isOpen]="isAcceptDialogOpen"
+    title="Accept Request"
+    message="Are you sure you want to accept this request?"
+    confirmText="Accept"
+    [isDanger]="false"
+    (confirm)="executeAcceptRequest()"
+    (cancel)="isAcceptDialogOpen = false; selectedRequestId = null">
+  </app-confirm-dialog>
 </app-authorized-layout>

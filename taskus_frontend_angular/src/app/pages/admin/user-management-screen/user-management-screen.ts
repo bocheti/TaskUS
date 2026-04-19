@@ -8,6 +8,7 @@ import { AuthorizedLayout } from '../../../shared/components/layout/authorized-l
 import { UserCard } from '../../../shared/components/user/user-card/user-card';
 import { UserRequestCard } from '../../../shared/components/user/user-request-card/user-request-card';
 import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 type Tab = 'users' | 'requests';
 
@@ -20,7 +21,8 @@ type Tab = 'users' | 'requests';
     AuthorizedLayout, 
     UserCard, 
     UserRequestCard,
-    ConfirmDialog
+    ConfirmDialog,
+    LoadingSpinner
   ],
   templateUrl: './user-management-screen.html',
   styleUrls: ['./user-management-screen.scss']
@@ -31,6 +33,7 @@ export class UserManagementScreen implements OnInit {
   requests: UserRequest[] = [];
   isLoading = true;
   isRejectDialogOpen = false;
+  isAcceptDialogOpen = false;
   selectedRequestId: string | null = null;
 
   constructor(
@@ -66,14 +69,23 @@ export class UserManagementScreen implements OnInit {
   }
 
   handleAcceptRequest(requestId: string): void {
-    this.userService.acceptUserRequest(requestId).subscribe({
+    this.selectedRequestId = requestId;
+    this.isAcceptDialogOpen = true;
+  }
+
+  executeAcceptRequest(): void {
+    if (!this.selectedRequestId) return;
+    this.isAcceptDialogOpen = false; 
+    this.userService.acceptUserRequest(this.selectedRequestId).subscribe({
       next: () => {
         toast.success('User request accepted');
         this.fetchData();
+        this.selectedRequestId = null; 
       },
       error: (error) => {
         console.error('Error accepting request:', error);
         toast.error('Failed to accept request');
+        this.selectedRequestId = null; 
       }
     });
   }

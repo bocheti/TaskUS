@@ -1,7 +1,10 @@
 <app-authorized-layout pageTitle="Organisation Settings">
   
   @if (isLoading) {
-    <div class="empty-state">Loading...</div>
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading organisation...</p>
+    </div>
   } @else if (!organisation) {
     <div class="empty-state">
       <p class="error-msg">Organisation not found</p>

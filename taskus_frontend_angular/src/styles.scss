@@ -32,6 +32,29 @@ img, svg, mat-icon {
   vertical-align: middle;
 }
 
+
+.full-screen-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60vh;
+  gap: 1rem;
+  .pulse-text {
+    color: var(--muted-foreground, #6b7280);
+    animation: pulse-animation 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  }
+}
+
+@keyframes pulse-animation {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
 * {
   box-sizing: border-box;
 }

@@ -1,7 +1,10 @@
 <app-authorized-layout [pageTitle]="taskGroup ? taskGroup.title : 'Task Group'">
   
   @if (isLoading) {
-    <div class="empty-state">Loading task group...</div>
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading task group...</p>
+    </div>
   } @else if (!taskGroup) {
     <div class="empty-state">
       <p class="error-msg">Task group not found</p>

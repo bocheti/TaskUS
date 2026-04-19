@@ -13,6 +13,7 @@ import { TaskModal } from '../../../shared/components/task/task-modal/task-modal
 import { CreateTaskDialog } from '../../../shared/components/task/create-task-dialog/create-task-dialog';
 import { EditTaskGroupDialog } from '../../../shared/components/taskgroup/edit-taskgroup-dialog/edit-taskgroup-dialog';
 import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-taskgroup-detail-screen',
@@ -25,7 +26,8 @@ import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/conf
     TaskModal, 
     CreateTaskDialog, 
     EditTaskGroupDialog,
-    ConfirmDialog
+    ConfirmDialog,
+    LoadingSpinner
   ],
   templateUrl: './task-group-detail-screen.html',
   styleUrls: ['./task-group-detail-screen.scss']

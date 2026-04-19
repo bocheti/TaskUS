@@ -11,11 +11,12 @@ import { TaskService } from '../../../core/services/task';
 import { AuthorizedLayout } from '../../../shared/components/layout/authorized-layout/authorized-layout';
 import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
 import { TaskStats } from '../../../shared/components/ui/task-stats/task-stats';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-profile-screen',
   standalone: true,
-  imports: [CommonModule, MatIconModule, AuthorizedLayout, ConfirmDialog, TaskStats],
+  imports: [CommonModule, MatIconModule, AuthorizedLayout, ConfirmDialog, TaskStats, LoadingSpinner],
   templateUrl: './profile-screen.html',
   styleUrls: ['./profile-screen.scss']
 })

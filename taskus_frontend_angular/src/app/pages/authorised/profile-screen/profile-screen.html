@@ -1,8 +1,11 @@
 <app-authorized-layout [pageTitle]="dynamicPageTitle">
 
   @if (isLoading) {
-    <div class="empty-state">Loading profile...</div>
-  } 
+    <div class="full-screen-loader">
+      <app-loading-spinner></app-loading-spinner>
+      <p class="pulse-text">Loading profile...</p>
+    </div>
+  }
   
   @else if (errorStatus === 403) {
     <div class="safe-screen-container">

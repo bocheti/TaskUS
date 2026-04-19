@@ -14,6 +14,7 @@ import { CreateTaskGroupDialog } from '../../../shared/components/taskgroup/crea
 import { ProjectMembersModal } from '../../../shared/components/project/project-members-modal/project-members-modal';
 import { EditProjectDialog } from '../../../shared/components/project/edit-project-dialog/edit-project-dialog';
 import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/confirm-dialog';
+import { LoadingSpinner } from '../../../shared/components/ui/loading-spinner/loading-spinner';
 
 @Component({
   selector: 'app-project-detail-screen',
@@ -26,7 +27,8 @@ import { ConfirmDialog } from '../../../shared/components/ui/confirm-dialog/conf
     CreateTaskGroupDialog, 
     ProjectMembersModal, 
     EditProjectDialog,
-    ConfirmDialog
+    ConfirmDialog,
+    LoadingSpinner
   ],
   templateUrl: './project-detail-screen.html',
   styleUrls: ['./project-detail-screen.scss']
