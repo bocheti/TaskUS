@@ -147,7 +147,7 @@ export const sendRejectionEmail = async (
 
 export const sendPasswordResetEmail = async (
   to: string,
-  resetLink: string
+  resetToken: string
 ) => {
   await resend.emails.send({
     from,
@@ -172,12 +172,12 @@ export const sendPasswordResetEmail = async (
             <table cellpadding="0" cellspacing="0" style="width:100%;max-width:400px;">
               <tr>
                 <td style="padding:0 4px;">
-                  <a href="${resetLink}" style="display:block;padding:14px 20px;background:#61dafb;color:#000000;text-decoration:none;border-radius:8px;font-weight:600;text-align:center;font-size:15px;transition:opacity 0.2s;">
+                  <a href="https://taskus.app/reset-password?token=${resetToken}" style="display:block;padding:14px 20px;background:#61dafb;color:#000000;text-decoration:none;border-radius:8px;font-weight:600;text-align:center;font-size:15px;transition:opacity 0.2s;">
                     Reset Password (R)
                   </a>
                 </td>
                 <td style="padding:0 4px;">
-                  <a href="${resetLink}" style="display:block;padding:14px 20px;background:#c93033;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;text-align:center;font-size:15px;transition:opacity 0.2s;">
+                  <a href="https://angular.taskus.app/reset-password?token=${resetToken}" style="display:block;padding:14px 20px;background:#c93033;color:#ffffff;text-decoration:none;border-radius:8px;font-weight:600;text-align:center;font-size:15px;transition:opacity 0.2s;">
                     Reset Password (A)
                   </a>
                 </td>

@@ -133,8 +133,7 @@ export const requestPasswordChange = async (req: Request, res: Response) => {
             return;
         }
         const resetToken = jwt.sign({ id: user.id, purpose: 'password-reset' }, process.env.JWT_SECRET!, { expiresIn: '1h' });
-        const resetLink = `https://taskus.app/reset-password?token=${resetToken}`;
-        await sendPasswordResetEmail(email, resetLink);
+        await sendPasswordResetEmail(email, resetToken);
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Internal server error' });
