@@ -8,6 +8,7 @@ import { toast } from "sonner";
 import { ProjectList } from "@/components/project/ProjectList";
 import { EditOrganisationDialog } from "@/components/organisation/EditOrganisationDialog";
 import { TaskStats } from "@/components/ui/TaskStats";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export const OrganisationSettingsScreen = () => {
   const [organisation, setOrganisation] = useState<Organisation | null>(null);
@@ -76,8 +77,9 @@ export const OrganisationSettingsScreen = () => {
   if (isLoading) {
     return (
       <AuthorizedLayout title="Organisation Settings">
-        <div className="text-center py-12 text-muted-foreground">
-          Loading...
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <LoadingSpinner/>
+          <p className="text-muted-foreground animate-pulse">Loading organisation...</p>
         </div>
       </AuthorizedLayout>
     );

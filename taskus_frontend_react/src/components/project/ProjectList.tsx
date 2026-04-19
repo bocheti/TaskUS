@@ -8,6 +8,7 @@ import { Project } from "@/types";
 import { toast } from "sonner";
 import { ProjectCard } from "@/components/project/ProjectCard";
 import { CreateProjectDialog } from "@/components/project/CreateProjectDialog";
+import { LoadingSpinner } from "../ui/LoadingSpinner";
 
 interface ProjectListProps {
   showCreateButton?: boolean;
@@ -51,55 +52,55 @@ export const ProjectList = ({ showCreateButton = true }: ProjectListProps) => {
   };
 
   return (
-    <div className="space-y-4">
-      {showCreateButton && user?.role === "admin" && (
-        <div className="flex justify-end">
-          <Button
-            onClick={() => setCreateDialogOpen(true)}
-            className="flex items-center gap-2"
-          >
-            <Plus className="h-4 w-4" />
-            Create Project
-          </Button>
+    <>
+      { isLoading ? (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <LoadingSpinner/>
+          <p className="text-muted-foreground animate-pulse">Loading projects...</p>
         </div>
-      )}
-
-      {isLoading && (
-        <div className="text-center py-12 text-muted-foreground">
-          Loading projects...
-        </div>
-      )}
-
-      {!isLoading && projects.length === 0 && (
-        <div className="text-center py-12">
-          <p className="text-xl text-muted-foreground mb-4">No projects yet</p>
-          {user?.role === "admin" && (
-            <p className="text-sm text-muted-foreground">
-              Create your first project to get started
-            </p>
-          )}
-        </div>
-      )}
-
-      {!isLoading && projects.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {projects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              onClick={() => handleProjectClick(project.id)}
-            />
-          ))}
-        </div>
-      )}
-
-      {user?.role === "admin" && (
-        <CreateProjectDialog
-          open={createDialogOpen}
-          onOpenChange={setCreateDialogOpen}
-          onProjectCreated={handleProjectCreated}
-        />
-      )}
-    </div>
+      ) : 
+      <div className="space-y-4">
+        { showCreateButton && user?.role === "admin" && (
+          <div className="flex justify-end">
+            <Button
+              onClick={() => setCreateDialogOpen(true)}
+              className="flex items-center gap-2"
+            >
+              <Plus className="h-4 w-4" />
+              Create Project
+            </Button>
+          </div>
+        )}
+        {!isLoading && projects.length === 0 && (
+          <div className="text-center py-12">
+            <p className="text-xl text-muted-foreground mb-4">No projects yet</p>
+            {user?.role === "admin" && (
+              <p className="text-sm text-muted-foreground">
+                Create your first project to get started
+              </p>
+            )}
+          </div>
+        )}
+        {!isLoading && projects.length > 0 && (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {projects.map((project) => (
+              <ProjectCard
+                key={project.id}
+                project={project}
+                onClick={() => handleProjectClick(project.id)}
+              />
+            ))}
+          </div>
+        )}
+        {user?.role === "admin" && (
+          <CreateProjectDialog
+            open={createDialogOpen}
+            onOpenChange={setCreateDialogOpen}
+            onProjectCreated={handleProjectCreated}
+          />
+        )}
+      </div>
+    }
+    </>
   );
 };

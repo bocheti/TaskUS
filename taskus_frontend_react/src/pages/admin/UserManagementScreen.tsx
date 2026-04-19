@@ -7,6 +7,7 @@ import { toast } from "sonner";
 import { UserCard } from "@/components/user/UserCard";
 import { UserRequestCard } from "@/components/user/UserRequestCard";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 type Tab = "users" | "requests";
 
@@ -15,7 +16,7 @@ export const UserManagementScreen = () => {
   const [users, setUsers] = useState<User[]>([]);
   const [requests, setRequests] = useState<UserRequest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  
+  const [isAcceptDialogOpen, setIsAcceptDialogOpen] = useState(false);
   const [isRejectDialogOpen, setIsRejectDialogOpen] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState<string | null>(null);
 
@@ -40,14 +41,24 @@ export const UserManagementScreen = () => {
     }
   };
 
-  const handleAcceptRequest = async (requestId: string) => {
+
+  const handleAcceptClick = (requestId: string) => {
+    setSelectedRequestId(requestId);
+    setIsAcceptDialogOpen(true);
+  };
+
+  const executeAcceptRequest = async () => {
+    if (!selectedRequestId) return;
+    setIsAcceptDialogOpen(false);
     try {
-      await userService.acceptUserRequest(requestId);
+      await userService.acceptUserRequest(selectedRequestId);
       toast.success("User request accepted");
       fetchData();
     } catch (error) {
       console.error("Error accepting request:", error);
       toast.error("Failed to accept request");
+    } finally {
+      setSelectedRequestId(null);
     }
   };
 
@@ -58,7 +69,6 @@ export const UserManagementScreen = () => {
 
   const executeRejectRequest = async () => {
     if (!selectedRequestId) return;
-    
     setIsRejectDialogOpen(false);
 
     try {
@@ -74,8 +84,13 @@ export const UserManagementScreen = () => {
   };
 
   return (
-    <>
-      <AuthorizedLayout title="User Management">
+    <AuthorizedLayout title="User Management">
+      {isLoading ? (
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <LoadingSpinner/>
+          <p className="text-muted-foreground animate-pulse">Loading users...</p>
+        </div>
+      ) : 
         <div className="space-y-6">
           <div className="flex justify-center">
             <div className="bg-muted p-1 rounded-full inline-flex gap-1">
@@ -104,11 +119,7 @@ export const UserManagementScreen = () => {
             </div>
           </div>
 
-          {isLoading ? (
-            <div className="text-center py-12 text-muted-foreground">
-              Loading...
-            </div>
-          ) : activeTab === "users" ? (
+          { activeTab === "users" ? (
             <div className="space-y-3">
               {users.length === 0 ? (
                 <div className="text-center py-12 bg-background rounded-lg border-2 border-border">
@@ -132,7 +143,7 @@ export const UserManagementScreen = () => {
                   <UserRequestCard
                     key={request.id}
                     request={request}
-                    onAccept={handleAcceptRequest}
+                    onAccept={handleAcceptClick}
                     onReject={handleRejectClick}
                     onDelete={fetchData}
                   />
@@ -141,20 +152,33 @@ export const UserManagementScreen = () => {
             </div>
           )}
         </div>
-      </AuthorizedLayout>
-
-      <ConfirmDialog
-        isOpen={isRejectDialogOpen}
-        title="Reject Request"
-        message="Are you sure you want to reject this request?"
-        confirmText="Reject"
-        isDanger={true}
-        onConfirm={executeRejectRequest}
-        onCancel={() => {
-          setIsRejectDialogOpen(false);
-          setSelectedRequestId(null);
-        }}
-      />
-    </>
+        } { isRejectDialogOpen &&
+          <ConfirmDialog
+            isOpen={isRejectDialogOpen}
+            title="Reject Request"
+            message="Are you sure you want to reject this request?"
+            confirmText="Reject"
+            isDanger={true}
+            onConfirm={executeRejectRequest}
+            onCancel={() => {
+              setIsRejectDialogOpen(false);
+              setSelectedRequestId(null);
+            }}
+          />
+        } { isAcceptDialogOpen &&
+          <ConfirmDialog
+            isOpen={isAcceptDialogOpen}
+            title="Accept Request"
+            message="Are you sure you want to accept this request?"
+            confirmText="Accept"
+            isDanger={false}
+            onConfirm={executeAcceptRequest}
+            onCancel={() => {
+              setIsAcceptDialogOpen(false);
+              setSelectedRequestId(null);
+            }}
+          />
+        }
+    </AuthorizedLayout>
   );
 };

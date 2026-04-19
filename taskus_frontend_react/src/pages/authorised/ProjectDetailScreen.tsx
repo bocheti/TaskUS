@@ -12,6 +12,7 @@ import { CreateTaskGroupDialog } from "@/components/taskgroup/CreateTaskGroupDia
 import { ProjectMembersModal } from "@/components/project/ProjectMembersModal";
 import { EditProjectDialog } from "@/components/project/EditProjectDialog";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export const ProjectDetailScreen = () => {
   const { projectId } = useParams<{ projectId: string }>();
@@ -145,8 +146,9 @@ export const ProjectDetailScreen = () => {
   if (isLoading) {
     return (
       <AuthorizedLayout title="Project Details">
-        <div className="text-center py-12 text-muted-foreground">
-          Loading project...
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <LoadingSpinner/>
+          <p className="text-muted-foreground animate-pulse">Loading project...</p>
         </div>
       </AuthorizedLayout>
     );

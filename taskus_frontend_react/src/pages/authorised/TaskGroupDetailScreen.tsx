@@ -12,6 +12,7 @@ import { TaskModal } from "@/components/task/TaskModal";
 import { CreateTaskDialog } from "@/components/task/CreateTaskDialog";
 import { EditTaskGroupDialog } from "@/components/taskgroup/EditTaskGroupDialog";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export const TaskGroupDetailScreen = () => {
   const { taskGroupId } = useParams<{ taskGroupId: string }>();
@@ -104,8 +105,9 @@ export const TaskGroupDetailScreen = () => {
   if (isLoading) {
     return (
       <AuthorizedLayout title="Task Group">
-        <div className="text-center py-12 text-muted-foreground">
-          Loading task group...
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <LoadingSpinner/>
+          <p className="text-muted-foreground animate-pulse">Loading task group...</p>
         </div>
       </AuthorizedLayout>
     );

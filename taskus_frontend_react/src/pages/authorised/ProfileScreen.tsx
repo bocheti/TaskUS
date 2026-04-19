@@ -10,6 +10,7 @@ import { toast } from "sonner";
 import { ConfirmDialog } from "@/components/ui/ConfirmDialog";
 import { TaskStats } from "@/components/ui/TaskStats";
 import axios from "axios"; 
+import { LoadingSpinner } from "@/components/ui/LoadingSpinner";
 
 export const ProfileScreen = () => {
   const { userId } = useParams<{ userId: string }>();
@@ -137,19 +138,9 @@ export const ProfileScreen = () => {
   if (isLoading) {
     return (
       <AuthorizedLayout title="Profile">
-        <div className="text-center py-12 text-muted-foreground">
-          Loading profile...
-        </div>
-      </AuthorizedLayout>
-    );
-  }
-
-  if (!profileUser) {
-    return (
-      <AuthorizedLayout title="Profile">
-        <div className="text-center py-12">
-          <p className="text-xl text-muted-foreground mb-4">User not found</p>
-          <Button onClick={() => navigate(-1)}>Go Back</Button>
+        <div className="flex flex-col items-center justify-center min-h-[60vh] space-y-4">
+          <LoadingSpinner/>
+          <p className="text-muted-foreground animate-pulse">Loading profile...</p>
         </div>
       </AuthorizedLayout>
     );
@@ -177,6 +168,17 @@ export const ProfileScreen = () => {
               Return to Dashboard
             </Button>
           </div>
+        </div>
+      </AuthorizedLayout>
+    );
+  }
+
+  if (!profileUser) {
+    return (
+      <AuthorizedLayout title="Profile">
+        <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+          <p className="text-xl text-muted-foreground mb-4">User not found</p>
+          <Button onClick={() => navigate(-1)}>Go Back</Button>
         </div>
       </AuthorizedLayout>
     );
@@ -280,29 +282,25 @@ export const ProfileScreen = () => {
           title={isOwnProfile ? "My Statistics" : `${profileUser.firstName}'s Statistics`} 
         />
 
-        {profileUser && (
-        <>
-          <ConfirmDialog
-            isOpen={isRoleDialogOpen}
-            title={profileUser.role === "admin" ? "Demote User" : "Promote User"}
-            message={`Are you sure you want to ${profileUser.role === "admin" ? "demote" : "promote"} ${profileUser.firstName} ${profileUser.lastName} to ${profileUser.role === "admin" ? "member" : "admin"}?`}
-            confirmText={profileUser.role === "admin" ? "Demote" : "Promote"}
-            isDanger={profileUser.role === "admin"}
-            onConfirm={executeToggleRole}
-            onCancel={() => setIsRoleDialogOpen(false)}
-          />
+        <ConfirmDialog
+          isOpen={isRoleDialogOpen}
+          title={profileUser.role === "admin" ? "Demote User" : "Promote User"}
+          message={`Are you sure you want to ${profileUser.role === "admin" ? "demote" : "promote"} ${profileUser.firstName} ${profileUser.lastName} to ${profileUser.role === "admin" ? "member" : "admin"}?`}
+          confirmText={profileUser.role === "admin" ? "Demote" : "Promote"}
+          isDanger={profileUser.role === "admin"}
+          onConfirm={executeToggleRole}
+          onCancel={() => setIsRoleDialogOpen(false)}
+        />
 
-          <ConfirmDialog
-            isOpen={isDeleteDialogOpen}
-            title="Delete User"
-            message={`Are you sure you want to delete ${profileUser.firstName} ${profileUser.lastName}? This action cannot be undone.`}
-            confirmText="Delete"
-            isDanger={true}
-            onConfirm={executeDeleteUser}
-            onCancel={() => setIsDeleteDialogOpen(false)}
-          />
-        </>
-      )}
+        <ConfirmDialog
+          isOpen={isDeleteDialogOpen}
+          title="Delete User"
+          message={`Are you sure you want to delete ${profileUser.firstName} ${profileUser.lastName}? This action cannot be undone.`}
+          confirmText="Delete"
+          isDanger={true}
+          onConfirm={executeDeleteUser}
+          onCancel={() => setIsDeleteDialogOpen(false)}
+        />
       </div>
     </AuthorizedLayout>
   );

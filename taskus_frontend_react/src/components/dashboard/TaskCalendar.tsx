@@ -40,7 +40,14 @@ export const TaskCalendar = ({ tasks, onTaskClick }: TaskCalendarProps) => {
   };
 
   return (
-    <div className="bg-background rounded-lg border-2 border-border p-4">
+    <div className="bg-background rounded-lg border-2 border-border p-2 md:p-4 
+      [&_.fc-toolbar-title]:text-xl md:[&_.fc-toolbar-title]:text-2xl
+      [&_.fc-toolbar-title]:font-extrabold
+      [&_.fc-button]:text-xs md:[&_.fc-button]:text-sm
+      [&_.fc-button]:px-2 [&_.fc-button]:py-1
+      [&_.fc-header-toolbar]:gap-1 md:[&_.fc-header-toolbar]:gap-0
+      [&_.fc-header-toolbar]:flex-wrap md:[&_.fc-header-toolbar]:flex-nowrap"
+    >
       <FullCalendar
         plugins={[dayGridPlugin]}
         initialView="dayGridMonth"
