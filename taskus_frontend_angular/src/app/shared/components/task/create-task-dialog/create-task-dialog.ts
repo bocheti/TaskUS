@@ -8,6 +8,7 @@ import { toast } from 'ngx-sonner';
 import { User } from '../../../../core/models/app.models';
 import { TaskService } from '../../../../core/services/task';
 import { UserService } from '../../../../core/services/user';
+import { ProjectService } from '../../../../core/services/project';
 
 @Component({
   selector: 'app-create-task-dialog',
@@ -19,7 +20,8 @@ import { UserService } from '../../../../core/services/user';
 export class CreateTaskDialog implements OnChanges {
   @Input() isOpen = false;
   @Input({ required: true }) taskGroupId!: string;
-  
+  @Input({ required: true }) projectId!: string;
+
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() taskCreated = new EventEmitter<void>();
 
@@ -32,7 +34,7 @@ export class CreateTaskDialog implements OnChanges {
 
   constructor(
     private taskService: TaskService,
-    private userService: UserService
+    private projectService: ProjectService
   ) {}
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -42,7 +44,7 @@ export class CreateTaskDialog implements OnChanges {
   }
 
   fetchUsers(): void {
-    this.userService.getAllUsers().subscribe({
+    this.projectService.getProjectMembers(this.projectId).subscribe({
       next: (allUsers) => {
         this.users = allUsers;
       },

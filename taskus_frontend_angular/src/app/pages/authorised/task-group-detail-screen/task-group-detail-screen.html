@@ -125,6 +125,7 @@
       <app-create-task-dialog
         [isOpen]="createDialogOpen"
         [taskGroupId]="taskGroupId"
+        [projectId]="taskGroup.projectId"
         (isOpenChange)="createDialogOpen = $event"
         (taskCreated)="handleTaskCreated()">
       </app-create-task-dialog>

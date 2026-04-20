@@ -281,6 +281,7 @@ export const TaskGroupDetailScreen = () => {
           onOpenChange={setCreateDialogOpen}
           onTaskCreated={handleTaskCreated}
           taskGroupId={taskGroupId}
+          projectId={taskGroup.projectId}
         />
       )}
       {user?.role === "admin" && taskGroup && (

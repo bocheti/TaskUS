@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { taskService, userService } from "@/services/api";
+import { taskService, projectService } from "@/services/api";
 import { User } from "@/types";
 import { toast } from "sonner";
 import { AxiosError } from "axios";
@@ -12,13 +12,15 @@ interface CreateTaskDialogProps {
   onOpenChange: (open: boolean) => void;
   onTaskCreated: () => void;
   taskGroupId: string;
+  projectId: string;
 }
 
 export const CreateTaskDialog = ({ 
   open, 
   onOpenChange, 
   onTaskCreated, 
-  taskGroupId 
+  taskGroupId,
+  projectId
 }: CreateTaskDialogProps) => {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -35,7 +37,7 @@ export const CreateTaskDialog = ({
 
   const fetchUsers = async () => {
     try {
-      const allUsers = await userService.getAllUsers();
+      const allUsers = await projectService.getProjectMembers(projectId);
       setUsers(allUsers);
     } catch (error) {
       console.error("Error fetching users:", error);
