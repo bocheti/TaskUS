@@ -31,9 +31,10 @@ app.use(helmet());
 app.use(express.json({ limit: '10kb' }));
 
 if (process.env.NODE_ENV !== 'test') {
+  const maxRequests = process.env.RATE_LIMIT_MAX ? parseInt(process.env.RATE_LIMIT_MAX) : 500;
   const generalLimiter = rateLimit({
     windowMs: 15 * 60 * 1000,
-    max: 500,
+    max: maxRequests,
     message: { error: 'Too many requests, please try again later' }
   });
   app.use(generalLimiter);
