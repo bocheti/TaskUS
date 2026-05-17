@@ -340,6 +340,15 @@ export const uploadPicToOtherUser = async (req: AuthRequest, res: Response) => {
   const userId = req.params.userId as string;
   const fileName = `${userId}.jpg`;
   try {
+    const userToBeUpdated = await prisma.user.findUnique({ where: { id: userId } });
+    if (!userToBeUpdated) {
+        res.status(404).json({ error: 'User not found' });
+        return;
+    }
+    if (userToBeUpdated.organisationId !== req.user!.organisationId) {
+        res.status(403).json({ error: 'Unauthorized: This user does not belong to your organisation' });
+        return;
+    }
     const url = await uploadImage('user-pics', fileName, req.file.buffer);
     const updated = await prisma.user.update({
       where: { id: userId },
