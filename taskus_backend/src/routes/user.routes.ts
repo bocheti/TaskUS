@@ -13,7 +13,8 @@ import {
     rejectUserRequest,
     updateRole,
     resetPassword,
-    uploadUserPic
+    uploadUserPic,
+    uploadPicToOtherUser
 } from '../controllers/user.controller';
 import upload from '../middleware/upload.middleware';
 import { sensitiveLimiter, uploadLimiter } from '../middleware/rateLimiter.middleware';
@@ -35,6 +36,7 @@ router.post('/create', authenticate, isAdmin, createAccount);
 router.post('/:userRequestId/accept', authenticate, isAdmin, acceptUserRequest);
 router.post('/:userRequestId/reject', authenticate, isAdmin, rejectUserRequest);
 router.put('/:userId/role', authenticate, isAdmin, updateRole);
+router.post('/uploadPicToOtherUser/:userId', authenticate, uploadLimiter, upload.single('pic'), uploadPicToOtherUser);
 
 
 

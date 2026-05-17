@@ -83,4 +83,20 @@ export const userService = {
   updateUserRole: async (userId: string): Promise<void> => {
     await apiClient.put(`/user/${userId}/role`);
   },
+
+  uploadPicToOtherUser: async (userId: string, file: File): Promise<User> => {
+    const formData = new FormData();
+    formData.append('pic', file);
+    
+    const response = await apiClient.post<User>(
+      `/user/uploadPicToOtherUser/${userId}`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      }
+    );
+    return response.data;
+  }
 };

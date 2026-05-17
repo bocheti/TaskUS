@@ -68,4 +68,10 @@ export class UserService {
   updateUserRole(userId: string): Observable<void> {
     return this.http.put<void>(`${this.API_URL}/${userId}/role`, {});
   }
+
+  uploadPicToOtherUser(userId: string, file: File): Observable<User> {
+    const formData = new FormData();
+    formData.append('pic', file);
+    return this.http.post<User>(`${this.API_URL}/uploadPicToOtherUser/${userId}`, formData);
+  }
 }

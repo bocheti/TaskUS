@@ -82,8 +82,12 @@ export const ProfileScreen = () => {
     }
 
     try {
-      setIsUploading(true);      
-      await userService.uploadPic(file);
+      setIsUploading(true);
+      if (isAdmin && !isOwnProfile && profileUser) {
+        await userService.uploadPicToOtherUser(profileUser.id, file);
+      } else {
+        await userService.uploadPic(file);
+      }     
       toast.success("Profile picture updated!");
       fetchProfileData();
     } catch (error) {

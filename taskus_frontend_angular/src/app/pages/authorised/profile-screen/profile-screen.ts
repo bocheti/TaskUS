@@ -116,7 +116,11 @@ export class ProfileScreen implements OnInit {
     }
 
     this.isUploading = true;
-    this.userService.uploadPic(file).subscribe({
+    const uploadObservable = this.isAdmin && !this.isOwnProfile && this.profileUser
+      ? this.userService.uploadPicToOtherUser(this.profileUser.id, file)
+      : this.userService.uploadPic(file);
+
+    uploadObservable.subscribe({
       next: () => {
         toast.success('Profile picture updated!');
         this.fetchProfileData();
@@ -124,6 +128,8 @@ export class ProfileScreen implements OnInit {
       error: (error) => {
         console.error('Error uploading picture:', error);
         toast.error('Failed to upload picture');
+      },
+      complete: () => {
         this.isUploading = false;
         this.cdr.detectChanges();
       }

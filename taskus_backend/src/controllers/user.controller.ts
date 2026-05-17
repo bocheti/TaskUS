@@ -330,3 +330,31 @@ export const updateRole = async (req: AuthRequest, res: Response) => {
         res.status(500).json({ error: 'Internal server error' });
     }
 };
+
+// POST /user/uploadPicToOtherUser/:userId (admin)
+export const uploadPicToOtherUser = async (req: AuthRequest, res: Response) => {
+  if (!req.file) {
+    res.status(400).json({ error: 'No file provided' });
+    return;
+  }
+  const userId = req.params.userId as string;
+  const fileName = `${userId}.jpg`;
+  try {
+    const url = await uploadImage('user-pics', fileName, req.file.buffer);
+    const updated = await prisma.user.update({
+      where: { id: userId },
+      data: { pic: url },
+      select: {
+        id: true,
+        firstName: true,
+        lastName: true,
+        email: true,
+        role: true,
+        pic: true
+      }
+    });
+    res.json(updated);
+  } catch (error) {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+};
