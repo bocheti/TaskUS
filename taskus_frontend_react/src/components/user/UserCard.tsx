@@ -68,7 +68,7 @@ export const UserCard = ({ user, onDelete }: UserCardProps) => {
             variant="destructive"
             size="sm"
             onClick={handleDeleteClick}
-            className="text-xs"
+            className="text-xs rounded-md"
           >
             Delete
           </Button>
