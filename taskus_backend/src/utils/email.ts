@@ -192,4 +192,4 @@ export const sendPasswordResetEmail = async (
       </p>
     `)
   });
-};
+}; 
