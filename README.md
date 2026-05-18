@@ -1,3 +1,5 @@
+<img width="1700" height="1000" alt="taskus2_n" src="https://github.com/user-attachments/assets/cc052108-2b62-42b8-9e33-f46853a18eb1" />
+
 # TaskUs: Dual-Client Agile Management Platform
 
 TaskUs is an enterprise-grade, full-stack project management and Kanban application suite. This project was developed as a comprehensive thesis to architect, deploy, and benchmark a modern web ecosystem, culminating in a rigorous comparative analysis of the industry's leading frontend frameworks: React and Angular.
