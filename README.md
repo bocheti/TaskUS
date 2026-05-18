@@ -1,4 +1,6 @@
-<img width="1700" height="1000" alt="taskus2_n" src="https://github.com/user-attachments/assets/cc052108-2b62-42b8-9e33-f46853a18eb1" />
+<p align="center">
+  <img width="540" height="318" alt="taskus2_n_small" src="https://github.com/user-attachments/assets/8ee7a9d2-8cfc-4b8f-8022-c502a0926f2f" />
+</p>
 
 # TaskUs: Dual-Client Agile Management Platform
 
